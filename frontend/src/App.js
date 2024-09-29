@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './App.css';
 
 // Error handling function
@@ -26,22 +26,10 @@ function App() {
   const [selectedPodcast, setSelectedPodcast] = useState(null);
   const [hasVoted, setHasVoted] = useState(false);
   const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
 
   const API_BASE_URL = 'http://localhost:8000';
 
-  useEffect(() => {
-    const voted = localStorage.getItem('hasVoted');
-    if (voted) {
-      setHasVoted(true);
-    }
-
-    if (apiKey) {
-      validateApiKey(apiKey);
-    }
-  }, []);
-
-  const validateApiKey = async () => {
+  const validateApiKey = useCallback(async (key) => {
     if (!apiKey) {
       setIsApiKeyValid(false);
       alert('Please enter an API key');
@@ -114,7 +102,6 @@ function App() {
   const handleCreatePodcasts = async () => {
     try {
       setError(null);
-      setIsLoading(true);
       const response = await fetch(`${API_BASE_URL}/create_podcasts`, {
         method: 'POST',
         headers: {
@@ -135,8 +122,6 @@ function App() {
     } catch (error) {
       console.error('Error:', error);
       setError(`Error creating podcasts: ${error.message}`);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -194,6 +179,17 @@ function App() {
     event.preventDefault();
     console.log("Experiment idea submitted:", experimentIdea);
     setExperimentIdea('');
+  };
+
+  const handleApiKeyChange = (event) => {
+    const newApiKey = event.target.value;
+    setApiKey(newApiKey);
+    localStorage.setItem('apiKey', newApiKey);
+    setIsApiKeyValid(false); // Reset validation state when the key changes
+
+    if (newApiKey) {
+      validateApiKey(newApiKey);
+    }
   };
 
   return (
@@ -410,17 +406,6 @@ function App() {
       </div>
     </div>
   );
-
-  const handleApiKeyChange = (event) => {
-    const newApiKey = event.target.value;
-    setApiKey(newApiKey);
-    localStorage.setItem('apiKey', newApiKey);
-    setIsApiKeyValid(false); // Reset validation state when the key changes
-
-    if (newApiKey) {
-      validateApiKey(newApiKey);
-    }
-  };
 }
 
 export default App;
