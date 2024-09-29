@@ -196,7 +196,9 @@ def format_text_with_line_breaks(text, words_per_line=15):
         formatted_lines.append(line)
     return '\n'.join(formatted_lines)
 
-def extract_text_from_pdf(pdf_path: str) -> str:
+import tiktoken
+
+def extract_text_from_pdf(pdf_path: str) -> Tuple[str, int]:
     text = ""
     try:
         with open(pdf_path, 'rb') as file:
@@ -205,8 +207,14 @@ def extract_text_from_pdf(pdf_path: str) -> str:
                 text += page.extract_text()
     except Exception as e:
         print(f"Error extracting text from PDF: {e}")
-        return None
-    return text
+        return None, 0
+    
+    # Count tokens
+    encoding = tiktoken.get_encoding("cl100k_base")
+    tokens = encoding.encode(text)
+    token_count = len(tokens)
+    
+    return text, token_count
 
 def pdf_to_markdown(pdf_path: str) -> None:
     text = extract_text_from_pdf(pdf_path)
@@ -275,9 +283,14 @@ def create_podcast(pdf_path: str, timestamp: str = None, summarizer_model: str =
     if not os.path.exists(pdf_path):
         return None, "PDF file not found"
 
-    text = extract_text_from_pdf(pdf_path)
+    text, token_count = extract_text_from_pdf(pdf_path)
 
-    if text is None or not text.strip():
+    if text is None:
+        if token_count > 40000:
+            return None, f"PDF content exceeds 40,000 tokens (current: {token_count})"
+        return None, "Error extracting text from PDF"
+
+    if not text.strip():
         return None, "Extracted text is empty"
 
     workflow_obj = PodcastCreationWorkflow(summarizer_model, scriptwriter_model, enhancer_model, timestamp, provider, api_key)
