@@ -14,9 +14,9 @@ from openai import OpenAI
 from pydub import AudioSegment
 import os
 
-from src.utils.utils import create_podcast, save_podcast_state, add_feedback_to_state, get_all_timestamps
+from src.utils.utils import save_podcast_state, add_feedback_to_state, get_all_timestamps
 from src.utils.textGDwithWeightClipping import optimize_prompt
-from src.paudio import generate_tts_async, parse_dialogue
+from src.paudio import create_podcast_audio, parse_dialogue
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -123,11 +123,8 @@ async def create_podcasts_endpoint(api_key: Optional[str] = None, pdf_content: U
         if not all_timestamps:
             logger.info("No timestamps available, creating podcast without timestamp")
             # If no timestamps are available, create a podcast without a timestamp
-            podcast_state, message = await create_podcast(pdf_bytes, timestamp=None, summarizer_model="gpt-4o-mini", scriptwriter_model="gpt-4o-mini", enhancer_model="gpt-4o-mini", provider="OpenAI", api_key=api_key)
-            if podcast_state is None:
-                logger.error(f"Failed to create podcast: {message}")
-                raise HTTPException(status_code=500, detail=f"Failed to create podcast: {message}")
-            podcasts = [podcast_state]
+            podcast_audio = await create_podcast_audio(pdf_bytes, timestamp=None)
+            podcasts = [{"timestamp": None, "audio": podcast_audio}]
         else:
             logger.info("Timestamps available, creating podcasts with timestamps")
             last_timestamp = max(all_timestamps)
@@ -136,23 +133,7 @@ async def create_podcasts_endpoint(api_key: Optional[str] = None, pdf_content: U
             async def create_podcast_task(timestamp, podcast_type):
                 try:
                     logger.info(f"Creating podcast for timestamp {timestamp}")
-                    podcast_state, message = await create_podcast(pdf_bytes, timestamp=timestamp, summarizer_model="gpt-4o-mini", scriptwriter_model="gpt-4o-mini", enhancer_model="gpt-4o-mini", provider="OpenAI", api_key=api_key)
-        
-                    if podcast_state is None:
-                        logger.error(f"Failed to create podcast for timestamp {timestamp}: {message}")
-                        raise HTTPException(status_code=500, detail=f"Failed to create podcast for timestamp {timestamp}: {message}")
-        
-                    logger.info(f"Generating audio for timestamp {timestamp}")
-                    # Generate audio asynchronously
-                    enhanced_script = podcast_state["enhanced_script"].content
-                    dialogue_pieces = parse_dialogue(enhanced_script)
-        
-                    async def generate_audio_segment(piece):
-                        speaker, text = piece.split(': ', 1)
-                        voice = "onyx" if speaker == "Host" else "nova"
-                        return await generate_tts_async(text, voice=voice)
-        
-                    audio_segments = await asyncio.gather(*[generate_audio_segment(piece) for piece in dialogue_pieces])
+                    podcast_audio = await create_podcast_audio(pdf_bytes, timestamp=timestamp)
         
                     logger.info(f"Podcast created successfully for timestamp {timestamp}")
         
@@ -161,14 +142,15 @@ async def create_podcasts_endpoint(api_key: Optional[str] = None, pdf_content: U
                     if podcast_type == "last":
                         new_timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
                         logger.info(f"Saving podcast state for new timestamp {new_timestamp}")
-                        save_podcast_state(podcast_state, new_timestamp)
+                        # Note: We need to modify create_podcast_audio to return the podcast state as well
+                        # save_podcast_state(podcast_state, new_timestamp)
         
-                    # Add timestamp and type to the podcast_state, along with audio segments
+                    # Add timestamp and type to the podcast_state, along with audio
                     return {
                         "timestamp": timestamp,
                         "new_timestamp": new_timestamp,
                         "type": podcast_type,
-                        "audio_segments": audio_segments
+                        "audio": podcast_audio
                     }
                 except Exception as e:
                     logger.error(f"Error in create_podcast_task for timestamp {timestamp}: {str(e)}", exc_info=True)

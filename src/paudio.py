@@ -1,4 +1,5 @@
 import os
+import asyncio
 from openai import OpenAI
 import logging
 from pydub import AudioSegment
@@ -69,13 +70,13 @@ async def generate_tts_async(text, voice="onyx"):
         logger.error(f"Error in asynchronous OpenAI TTS API call: {str(e)}", exc_info=True)
         raise
 
-def create_podcast_audio(pdf_path, timestamp=None):
+async def create_podcast_audio(pdf_path, timestamp=None):
     """
     Creates an audio podcast from the given PDF file using the provided timestamp.
     """
     print(f"Using prompts from timestamp: {timestamp or 'default'}")
     # Create the podcast
-    podcast_state, message = create_podcast(pdf_path, timestamp=timestamp, summarizer_model="gpt-4o", scriptwriter_model="gpt-4o", enhancer_model="gpt-4o", provider="OpenAI", api_key=None)
+    podcast_state, message = await create_podcast(pdf_path, timestamp=timestamp, summarizer_model="gpt-4o", scriptwriter_model="gpt-4o", enhancer_model="gpt-4o", provider="OpenAI", api_key=None)
     
     if podcast_state is None or message != "Success":
         raise ValueError(f"Failed to create podcast state: {message}")
@@ -90,23 +91,26 @@ def create_podcast_audio(pdf_path, timestamp=None):
     # Parse the dialogue
     dialogue_pieces = parse_dialogue(enhanced_script)
 
-    # Generate audio for each dialogue piece
-    combined_audio = AudioSegment.empty()
-    for piece in dialogue_pieces:
+    # Generate audio for each dialogue piece concurrently
+    async def generate_audio_segment(piece):
         speaker, text = piece.split(': ', 1)
         voice = "onyx" if speaker == "Host" else "nova"
-        audio_content = generate_tts(text, voice=voice)
+        audio_content = await generate_tts_async(text, voice=voice)
         
         # Save temporary audio file
-        temp_file = f"temp_{speaker.lower()}.mp3"
+        temp_file = f"temp_{speaker.lower()}_{asyncio.current_task().get_name()}.mp3"
         with open(temp_file, "wb") as f:
             f.write(audio_content)
         
-        # Append to combined audio
+        return temp_file, speaker
+
+    audio_segments = await asyncio.gather(*[generate_audio_segment(piece) for piece in dialogue_pieces])
+
+    # Combine audio segments
+    combined_audio = AudioSegment.empty()
+    for temp_file, speaker in audio_segments:
         segment = AudioSegment.from_mp3(temp_file)
         combined_audio += segment
-        
-        # Remove temporary file
         os.remove(temp_file)
 
     # Export the final podcast audio
@@ -138,4 +142,4 @@ if __name__ == "__main__":
     parser.add_argument("--timestamp", help="Timestamp to use for prompts (format: YYYYMMDD_HHMMSS)")
     args = parser.parse_args()
     
-    create_podcast_audio(args.pdf_path, args.timestamp)
+    asyncio.run(create_podcast_audio(args.pdf_path, args.timestamp))
