@@ -1,7 +1,11 @@
 import textgrad as tg
 import os
-from src.utils.utils import load_prompt, load_podcast_state, format_text_with_line_breaks
-from src.utils.agents_and_workflows import WeightClippingAgent
+try:
+    from src.utils.utils import load_prompt, load_podcast_state, format_text_with_line_breaks
+    from src.utils.agents_and_workflows import WeightClippingAgent
+except ImportError:
+    from utils.utils import load_prompt, load_podcast_state, format_text_with_line_breaks
+    from utils.agents_and_workflows import WeightClippingAgent
 
 def optimize_prompt(role, old_timestamp, new_timestamp, engine_model, backward_engine):
     # Set the backward engine
