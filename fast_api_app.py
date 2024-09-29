@@ -132,7 +132,9 @@ async def create_podcasts_endpoint(request: CreatePodcastsRequest):
     except Exception as e:
         uploaded_pdf_content = None
         print(f"Error in create_podcasts_endpoint: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
+        if isinstance(e, HTTPException):
+            raise e
+        raise HTTPException(status_code=422, detail=f"An error occurred: {str(e)}")
 
 @app.post("/process_feedback")
 async def process_feedback(request: FeedbackRequest):

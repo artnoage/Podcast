@@ -113,8 +113,11 @@ function App() {
     }
   };
 
+  const [error, setError] = useState(null);
+
   const handleCreatePodcasts = async () => {
     try {
+      setError(null);
       const response = await fetch(`${API_BASE_URL}/create_podcasts`, {
         method: 'POST',
         headers: {
@@ -134,7 +137,7 @@ function App() {
       console.log('Podcasts created successfully!');
     } catch (error) {
       console.error('Error:', error);
-      alert(`Error creating podcasts: ${error.message}`);
+      setError(`Error creating podcasts: ${error.message}`);
     }
   };
 
@@ -218,6 +221,11 @@ function App() {
         <div className="w-full max-w-6xl px-4">
           <div className="backdrop-blur-md bg-white/10 p-8 rounded-lg shadow-xl mb-8">
             <h2 className="text-4xl font-light text-center text-gray-100 mb-6">Create Your Podcasts</h2>
+            {error && (
+              <div className="bg-red-500 text-white p-4 rounded-md mb-4">
+                {error}
+              </div>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="space-y-4 md:col-span-3">
                 <div className="flex flex-col md:flex-row md:space-x-4">
