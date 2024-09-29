@@ -8,18 +8,18 @@ import re
 try:
     from src.utils.utils import create_podcast, parse_dialogue, save_podcast_state, add_feedback_to_state, get_random_arxiv_file
     from src.utils.agents_and_workflows import FeedbackAgent, PersonalityCreatorAgent
-    from src.utils.prompt_improving import optimize_prompt
+    from src.utils.textGDwithWeightClipping import optimize_prompt
 except ImportError:
     from utils.utils import create_podcast, parse_dialogue, save_podcast_state, add_feedback_to_state, get_random_arxiv_file
     from utils.agents_and_workflows import FeedbackAgent, PersonalityCreatorAgent
-    from utils.prompt_improving import optimize_prompt
+    from utils.textGDwithWeightClipping import optimize_prompt
 
 # Predefined values for provider and models
 podcast_provider = "OpenAI"
 podcast_model = "gpt-4o-mini"
-feedback_provider = "OpenAi"
+feedback_provider = "OpenAI"
 feedback_model = "gpt-4o"
-personality_provider = "OpenAi"
+personality_provider = "OpenAI"
 personality_model = "gpt-4o-mini"
 
 
