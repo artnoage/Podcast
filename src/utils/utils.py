@@ -13,6 +13,12 @@ except ImportError:
 from langchain_core.messages import HumanMessage
 import tiktoken
 
+def get_project_root():
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    return os.path.dirname(os.path.dirname(current_dir))
+
+PROJECT_ROOT = get_project_root()
+
 def get_all_timestamps():
     prompt_history_dir = "prompt_history"
     if not os.path.exists(prompt_history_dir):
@@ -66,9 +72,7 @@ def pdf_to_markdown(pdf_path: str) -> None:
     print(f"Markdown file created: {output_path}")
 
 def get_random_arxiv_file():
-    # Get the path to the project root directory
-    root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    arxiv_folder = os.path.join(root_dir, "arxiv_papers")
+    arxiv_folder = os.path.join(PROJECT_ROOT, "arxiv_papers")
     
     if not os.path.exists(arxiv_folder):
         os.makedirs(arxiv_folder)
@@ -90,9 +94,7 @@ def save_podcast_state(state: PodcastState, timestamp: str):
         "enhanced_script": state["enhanced_script"].content
     }
     
-    # Get the absolute path to the project root directory
-    current_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    podcast_states_dir = os.path.join(current_dir, "podcast_states")
+    podcast_states_dir = os.path.join(PROJECT_ROOT, "podcast_states")
     
     os.makedirs(podcast_states_dir, exist_ok=True)
     filepath = os.path.join(podcast_states_dir, filename)
@@ -106,9 +108,7 @@ def save_podcast_state(state: PodcastState, timestamp: str):
 def add_feedback_to_state(timestamp: str, feedback: str):
     filename = f"podcast_state_{timestamp}.json"
     
-    # Get the absolute path to the project root directory
-    current_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    podcast_states_dir = os.path.join(current_dir, "podcast_states")
+    podcast_states_dir = os.path.join(PROJECT_ROOT, "podcast_states")
     
     filepath = os.path.join(podcast_states_dir, filename)
     
@@ -177,15 +177,11 @@ def create_podcast(pdf_path: str, timestamp: str = None, summarizer_model: str =
     return final_state, "Success"
 
 def load_prompt(role, timestamp=None):
-    # Get the absolute path to the project root directory
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    root_dir = os.path.dirname(os.path.dirname(current_dir))
-    
     prompt_file = f"{role}_prompt.txt"
-    prompts_dir = os.path.join(root_dir, "prompts")
+    prompts_dir = os.path.join(PROJECT_ROOT, "prompts")
     
     if timestamp:
-        prompt_history_dir = os.path.join(root_dir, "prompt_history")
+        prompt_history_dir = os.path.join(PROJECT_ROOT, "prompt_history")
         history_file = f"{role}_prompt.txt_{timestamp}"
         history_path = os.path.join(prompt_history_dir, history_file)
         
@@ -204,9 +200,7 @@ def load_prompt(role, timestamp=None):
 
 def load_podcast_state(timestamp):
     state_file = f"podcast_state_{timestamp}.json"
-    # Get the absolute path to the project root directory
-    current_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    podcast_states_dir = os.path.join(current_dir, "podcast_states")
+    podcast_states_dir = os.path.join(PROJECT_ROOT, "podcast_states")
     state_file_path = os.path.join(podcast_states_dir, state_file)
     if os.path.exists(state_file_path):
         print(f"Loading podcast state from: {state_file_path}")
