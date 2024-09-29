@@ -182,7 +182,7 @@ def parse_dialogue(text: str) -> List[str]:
         dialogue_pieces.append(f"{pieces[i].strip()} {pieces[i+1].strip()}")
     return dialogue_pieces
 
-def create_podcast(pdf_content: bytes, timestamp: str = None, summarizer_model: str = "openai/gpt-4o-mini", scriptwriter_model: str = "openai/gpt-4o-mini", enhancer_model: str = "openai/gpt-4o-mini", provider: str = "OpenRouter", api_key: str = None) -> Tuple[Optional[PodcastState], str]:
+async def create_podcast(pdf_content: bytes, timestamp: str = None, summarizer_model: str = "openai/gpt-4o-mini", scriptwriter_model: str = "openai/gpt-4o-mini", enhancer_model: str = "openai/gpt-4o-mini", provider: str = "OpenRouter", api_key: str = None) -> Tuple[Optional[PodcastState], str]:
     text, token_count = extract_text_from_pdf(pdf_content)
 
     if text is None:
@@ -205,7 +205,7 @@ def create_podcast(pdf_content: bytes, timestamp: str = None, summarizer_model: 
         enhanced_script=None)
 
     try:
-        final_state = workflow.invoke(state)
+        final_state = await workflow.ainvoke(state)
         return final_state, "Success"
     except Exception as e:
         return None, f"Error creating podcast: {str(e)}"
