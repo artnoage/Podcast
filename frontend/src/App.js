@@ -122,6 +122,10 @@ function App() {
         },
         body: JSON.stringify({ api_key: isApiKeyValid ? apiKey : null })
       });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Unknown error occurred');
+      }
       const result = await response.json();
       setPodcasts({
         random: result.podcasts.find(p => p.type === 'random'),
@@ -130,7 +134,7 @@ function App() {
       console.log('Podcasts created successfully!');
     } catch (error) {
       console.error('Error:', error);
-      alert('Error creating podcasts');
+      alert(`Error creating podcasts: ${error.message}`);
     }
   };
 

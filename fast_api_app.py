@@ -137,7 +137,8 @@ async def create_podcasts_endpoint(request: CreatePodcastsRequest):
         if uploaded_pdf_path:
             os.unlink(uploaded_pdf_path)
             uploaded_pdf_path = None
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Error in create_podcasts_endpoint: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
 @app.post("/process_feedback")
 async def process_feedback(request: FeedbackRequest):
