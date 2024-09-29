@@ -76,7 +76,8 @@ async def validate_api_key(request: ApiKeyRequest):
 class FeedbackRequest(BaseModel):
     podcast_state: dict
     feedback: str
-    timestamp: str
+    old_timestamp: str
+    new_timestamp: str
 
 class VoteRequest(BaseModel):
     timestamp: str
@@ -194,19 +195,17 @@ async def create_podcasts_endpoint(api_key: Optional[str] = None, pdf_content: U
 @app.post("/process_feedback")
 async def process_feedback(request: FeedbackRequest):
     feedback = request.feedback
-    timestamp = request.timestamp
+    old_timestamp = request.old_timestamp
+    new_timestamp = request.new_timestamp
     podcast_state = request.podcast_state
 
     # Add feedback to the podcast state
-    add_feedback_to_state(timestamp, feedback)
-
-    # Generate a new timestamp
-    new_timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    add_feedback_to_state(old_timestamp, feedback)
 
     # Optimize prompts
-    optimize_prompt("summarizer", timestamp, new_timestamp, "gpt-4o-mini", "gpt-4o")
-    optimize_prompt("scriptwriter", timestamp, new_timestamp, "gpt-4o-mini", "gpt-4o")
-    optimize_prompt("enhancer", timestamp, new_timestamp, "gpt-4o-mini", "gpt-4o")
+    optimize_prompt("summarizer", old_timestamp, new_timestamp, "gpt-4o-mini", "gpt-4o")
+    optimize_prompt("scriptwriter", old_timestamp, new_timestamp, "gpt-4o-mini", "gpt-4o")
+    optimize_prompt("enhancer", old_timestamp, new_timestamp, "gpt-4o-mini", "gpt-4o")
 
     return {"message": "Feedback processed and prompts optimized"}
 

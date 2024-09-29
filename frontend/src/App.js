@@ -131,9 +131,9 @@ function App() {
 
   const handleFeedbackSubmit = async (event) => {
     event.preventDefault();
-    if (feedback && podcasts.last && newTimestamp) {
+    if (feedback && podcasts.last && podcasts.last.timestamp && newTimestamp) {
       try {
-        await submitFeedback(podcasts.last, feedback, newTimestamp);
+        await submitFeedback(podcasts.last, feedback, podcasts.last.timestamp, newTimestamp);
         console.log("Feedback submitted:", feedback);
         setFeedback('');
         alert('Thanks for the feedback! You were a helpful gradient. Have a nice day!');
