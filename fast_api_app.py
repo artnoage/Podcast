@@ -43,10 +43,11 @@ async def validate_api_key(request: ApiKeyRequest):
         return {"message": "API key is valid"}
     except Exception as e:
         if "Invalid API key" in str(e):
+            logger.warning("Invalid API key provided")
             raise HTTPException(status_code=401, detail="Invalid API key")
         else:
-            logger.error(f"Error validating API key: {str(e)}")
-            raise HTTPException(status_code=500, detail=f"Error validating API key: {str(e)}")
+            logger.error("Error validating API key", exc_info=True)
+            raise HTTPException(status_code=500, detail="Error validating API key")
 
 class FeedbackRequest(BaseModel):
     podcast_state: dict
