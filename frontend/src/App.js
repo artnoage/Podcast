@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './App.css';
 
 // Error handling function
@@ -21,7 +21,7 @@ function App() {
   const [podcasts, setPodcasts] = useState({ random: null, last: null });
   const [feedback, setFeedback] = useState('');
   const [experimentIdea, setExperimentIdea] = useState('');
-  const [apiKey, setApiKey] = useState('');
+  const [apiKey, setApiKey] = useState(localStorage.getItem('apiKey') || '');
   const [isApiKeyValid, setIsApiKeyValid] = useState(false);
   const [selectedPodcast, setSelectedPodcast] = useState(null);
   const [hasVoted, setHasVoted] = useState(false);
@@ -399,3 +399,9 @@ function App() {
 }
 
 export default App;
+  const handleApiKeyChange = (event) => {
+    const newApiKey = event.target.value;
+    setApiKey(newApiKey);
+    localStorage.setItem('apiKey', newApiKey);
+    setIsApiKeyValid(false); // Reset validation state when the key changes
+  };
