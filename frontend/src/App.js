@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { validateApiKey, uploadFile, createPodcasts, submitVote, submitFeedback } from './api';
+import { validateApiKey, createPodcasts, submitVote, submitFeedback } from './api';
 import './App.css';
 import LoadingSpinner from './LoadingSpinner';
 
