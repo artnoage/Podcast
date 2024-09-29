@@ -8,7 +8,8 @@ matplotlib.use('Agg')  # Use a non-interactive backend
 import matplotlib.pyplot as plt
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Tuple, Optional
-
+from src.utils.utils import create_podcast, extract_text_from_pdf, get_random_arxiv_file, get_all_timestamps
+from src.utils.agents_and_workflows import EvaluatorAgent
 # Get the project root directory
 def get_project_root():
     return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -17,8 +18,7 @@ def get_project_root():
 import sys
 sys.path.append(get_project_root())
 
-from src.utils.utils import create_podcast, extract_text_from_pdf, get_random_arxiv_file, get_all_timestamps
-from src.utils.agents_and_workflows import EvaluatorAgent
+
 
 load_dotenv()
 
