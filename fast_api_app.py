@@ -1,22 +1,21 @@
 import logging
+import os
+import random
+import json
+import asyncio
+from datetime import datetime
+from typing import Optional
+
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+from openai import OpenAI
+from pydub import AudioSegment
+
 from src.utils.utils import create_podcast, save_podcast_state, add_feedback_to_state, get_all_timestamps
 from src.utils.textGDwithWeightClipping import optimize_prompt
 from src.paudio import generate_tts, parse_dialogue
-import os
-from datetime import datetime
-import random
-import json
-from openai import OpenAI
-import asyncio
-from pydub import AudioSegment
-from pydantic import BaseModel
-from typing import Optional
-from fastapi import UploadFile
-import os
-from fastapi.staticfiles import StaticFiles
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
