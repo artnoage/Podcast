@@ -111,11 +111,10 @@ function App() {
     }
   };
 
-  const [error, setError] = useState(null);
-
   const handleCreatePodcasts = async () => {
     try {
       setError(null);
+      setIsLoading(true);
       const response = await fetch(`${API_BASE_URL}/create_podcasts`, {
         method: 'POST',
         headers: {
@@ -136,6 +135,8 @@ function App() {
     } catch (error) {
       console.error('Error:', error);
       setError(`Error creating podcasts: ${error.message}`);
+    } finally {
+      setIsLoading(false);
     }
   };
 
