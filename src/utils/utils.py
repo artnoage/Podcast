@@ -5,7 +5,7 @@ import PyPDF2
 import markdown
 import random
 import json
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 from src.utils.agents_and_workflows import PodcastCreationWorkflow, PodcastState
 from langchain_core.messages import HumanMessage
 import tiktoken
@@ -198,7 +198,7 @@ def format_text_with_line_breaks(text, words_per_line=15):
 
 import tiktoken
 
-def extract_text_from_pdf(pdf_path: str) -> Tuple[str, int]:
+def extract_text_from_pdf(pdf_path: str) -> Tuple[Optional[str], int]:
     text = ""
     try:
         with open(pdf_path, 'rb') as file:
@@ -207,6 +207,9 @@ def extract_text_from_pdf(pdf_path: str) -> Tuple[str, int]:
                 text += page.extract_text()
     except Exception as e:
         print(f"Error extracting text from PDF: {e}")
+        return None, 0
+    
+    if not text.strip():
         return None, 0
     
     # Count tokens
