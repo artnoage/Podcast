@@ -410,7 +410,6 @@ function App() {
       </div>
     </div>
   );
-}
 
   const handleApiKeyChange = (event) => {
     const newApiKey = event.target.value;
@@ -422,7 +421,6 @@ function App() {
       validateApiKey(newApiKey);
     }
   };
-
-  // ... (rest of the component code)
+}
 
 export default App;
