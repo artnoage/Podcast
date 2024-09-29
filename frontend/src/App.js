@@ -44,6 +44,7 @@ function App() {
     const newApiKey = event.target.value;
     setApiKey(newApiKey);
     localStorage.setItem('apiKey', newApiKey);
+    setIsApiKeyValid(false); // Reset validation state when the key changes
   };
 
   const validateApiKey = async () => {
@@ -318,6 +319,7 @@ function App() {
                     className={`w-full p-3 bg-gray-800 text-gray-200 text-xl rounded-md border ${
                       isApiKeyValid ? 'border-green-500' : 'border-gray-700'
                     } focus:border-gray-500 focus:ring focus:ring-gray-500 focus:ring-opacity-50`}
+                    readOnly={false}
                   />
                   <button
                     onClick={validateApiKey}
