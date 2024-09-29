@@ -62,19 +62,23 @@ function App() {
         body: JSON.stringify({ api_key: key }),
         mode: 'cors', // Explicitly set CORS mode
       });
+      const data = await response.json();
       if (response.ok) {
         setIsApiKeyValid(true);
         alert('API key is valid!');
       } else {
         setIsApiKeyValid(false);
-        const errorData = await response.json();
-        alert(`Invalid API key: ${errorData.detail || 'Unknown error'}`);
+        if (response.status === 401) {
+          alert('Invalid API key: The provided API key is incorrect.');
+        } else {
+          alert(`Error validating API key: ${data.detail || 'Unknown error'}`);
+        }
       }
     } catch (error) {
       console.error('Error:', error);
       setIsApiKeyValid(false);
       if (error.name === 'TypeError' && error.message === 'Failed to fetch') {
-        alert('Network error: Unable to connect to the server. Please check if the backend is running and accessible, ensure no browser extensions are blocking the request, and verify that CORS is properly configured on the server.');
+        alert('Network error: Unable to connect to the server. Please check if the backend is running and accessible.');
       } else {
         alert(`Error validating API key: ${error.message}`);
       }
