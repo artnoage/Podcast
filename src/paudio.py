@@ -76,17 +76,29 @@ def create_podcast_audio(pdf_path, timestamp=None):
         # Remove temporary file
         os.remove(temp_file)
 
+    # Get the root directory
+    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
     # Export the final podcast audio
-    output_audio_file = "final_podcast.mp3"
+    output_audio_file = os.path.join(root_dir, "final_podcast.mp3")
     combined_audio.export(output_audio_file, format="mp3")
     logger.info(f"Podcast audio created successfully: {output_audio_file}")
 
     # Save the dialogue
-    output_dialogue_file = "podcast_dialogue.txt"
+    output_dialogue_file = os.path.join(root_dir, "podcast_dialogue.txt")
     with open(output_dialogue_file, 'w', encoding='utf-8') as f:
         for piece in dialogue_pieces:
             f.write(f"{piece}\n")
     logger.info(f"Podcast dialogue saved to: {output_dialogue_file}")
+
+    # Save a small text file with summary information
+    summary_file = os.path.join(root_dir, "podcast_summary.txt")
+    with open(summary_file, 'w', encoding='utf-8') as f:
+        f.write(f"Podcast created on: {timestamp}\n")
+        f.write(f"Source PDF: {os.path.basename(pdf_path)}\n")
+        f.write(f"Audio file: {os.path.basename(output_audio_file)}\n")
+        f.write(f"Dialogue file: {os.path.basename(output_dialogue_file)}\n")
+    logger.info(f"Podcast summary saved to: {summary_file}")
 
 if __name__ == "__main__":
     import argparse
