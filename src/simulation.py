@@ -5,11 +5,11 @@ load_dotenv()
 from datetime import datetime
 import re
 try:
-    from src.utils.utils import create_podcast, parse_dialogue, save_podcast_state, add_feedback_to_state, get_random_arxiv_file, get_last_timestamp
+    from src.utils.utils import create_podcast, parse_dialogue, save_podcast_state, add_feedback_to_state, get_random_arxiv_file, get_last_timestamp, PROJECT_ROOT
     from src.utils.agents_and_workflows import FeedbackAgent, PersonalityCreatorAgent
     from src.utils.textGDwithWeightClipping import optimize_prompt
 except ImportError:
-    from utils.utils import create_podcast, parse_dialogue, save_podcast_state, add_feedback_to_state, get_random_arxiv_file, get_last_timestamp
+    from utils.utils import create_podcast, parse_dialogue, save_podcast_state, add_feedback_to_state, get_random_arxiv_file, get_last_timestamp, PROJECT_ROOT
     from utils.agents_and_workflows import FeedbackAgent, PersonalityCreatorAgent
     from utils.textGDwithWeightClipping import optimize_prompt
 

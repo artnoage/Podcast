@@ -8,22 +8,14 @@ matplotlib.use('Agg')  # Use a non-interactive backend
 import matplotlib.pyplot as plt
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Tuple, Optional
-from src.utils.utils import create_podcast, extract_text_from_pdf, get_random_arxiv_file, get_all_timestamps
+from src.utils.utils import create_podcast, extract_text_from_pdf, get_random_arxiv_file, get_all_timestamps, PROJECT_ROOT
 from src.utils.agents_and_workflows import EvaluatorAgent
-# Get the project root directory
-def get_project_root():
-    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Add the project root to sys.path
 import sys
-sys.path.append(get_project_root())
-
-
+sys.path.append(PROJECT_ROOT)
 
 load_dotenv()
-
-# Set the PROJECT_ROOT
-PROJECT_ROOT = get_project_root()
 
 def choose_random_timestamps(n=2):
     all_timestamps = get_all_timestamps()
