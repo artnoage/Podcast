@@ -49,7 +49,7 @@ class FeedbackRequest(BaseModel):
 class VoteRequest(BaseModel):
     timestamp: str
 
-uploaded_pdf_path = None
+uploaded_pdf_content = None
 VOTES_FILE = "votes.json"
 
 def load_votes():
@@ -64,13 +64,10 @@ def save_votes(votes):
 
 @app.post("/upload_pdf")
 async def upload_pdf(file: UploadFile = File(...)):
-    global uploaded_pdf_path
+    global uploaded_pdf_content
     try:
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_file:
-            content = await file.read()
-            temp_file.write(content)
-            uploaded_pdf_path = temp_file.name
-
+        content = await file.read()
+        uploaded_pdf_content = content
         return {"message": "PDF uploaded successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred while uploading the file: {str(e)}")
@@ -82,8 +79,8 @@ class CreatePodcastsRequest(BaseModel):
 
 @app.post("/create_podcasts")
 async def create_podcasts_endpoint(request: CreatePodcastsRequest):
-    global uploaded_pdf_path
-    if not uploaded_pdf_path:
+    global uploaded_pdf_content
+    if not uploaded_pdf_content:
         raise HTTPException(status_code=400, detail="No PDF uploaded")
 
     try:
@@ -95,7 +92,7 @@ async def create_podcasts_endpoint(request: CreatePodcastsRequest):
         all_timestamps = get_all_timestamps()
         if not all_timestamps:
             # If no timestamps are available, create a podcast without a timestamp
-            podcast_state, message = create_podcast(uploaded_pdf_path, timestamp=None, summarizer_model="gpt-4o-mini", scriptwriter_model="gpt-4o-mini", enhancer_model="gpt-4o-mini", provider="OpenAI", api_key=request.api_key if request.api_key else None)
+            podcast_state, message = create_podcast(uploaded_pdf_content, timestamp=None, summarizer_model="gpt-4o-mini", scriptwriter_model="gpt-4o-mini", enhancer_model="gpt-4o-mini", provider="OpenAI", api_key=request.api_key if request.api_key else None)
             if podcast_state is None:
                 raise HTTPException(status_code=500, detail=f"Failed to create podcast: {message}")
             podcasts = [podcast_state]
@@ -104,7 +101,7 @@ async def create_podcasts_endpoint(request: CreatePodcastsRequest):
             random_timestamp = random.choice(all_timestamps)
             podcasts = []
             for timestamp in [last_timestamp, random_timestamp]:
-                podcast_state, message = create_podcast(uploaded_pdf_path, timestamp=timestamp, summarizer_model="gpt-4o-mini", scriptwriter_model="gpt-4o-mini", enhancer_model="gpt-4o-mini", provider="OpenAI", api_key=request.api_key if request.api_key else None)
+                podcast_state, message = create_podcast(uploaded_pdf_content, timestamp=timestamp, summarizer_model="gpt-4o-mini", scriptwriter_model="gpt-4o-mini", enhancer_model="gpt-4o-mini", provider="OpenAI", api_key=request.api_key if request.api_key else None)
                 
                 if podcast_state is None:
                     raise HTTPException(status_code=500, detail=f"Failed to create podcast for timestamp {timestamp}: {message}")
@@ -130,13 +127,10 @@ async def create_podcasts_endpoint(request: CreatePodcastsRequest):
                 
                 podcasts.append(podcast_state_dict)
         
-        os.unlink(uploaded_pdf_path)
-        uploaded_pdf_path = None
+        uploaded_pdf_content = None
         return {"podcasts": podcasts}
     except Exception as e:
-        if uploaded_pdf_path:
-            os.unlink(uploaded_pdf_path)
-            uploaded_pdf_path = None
+        uploaded_pdf_content = None
         print(f"Error in create_podcasts_endpoint: {str(e)}")
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 

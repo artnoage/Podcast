@@ -5,6 +5,7 @@ import PyPDF2
 import markdown
 import random
 import json
+import io
 from typing import List, Tuple, Optional
 try:
     from src.utils.agents_and_workflows import PodcastCreationWorkflow, PodcastState
@@ -92,11 +93,10 @@ def format_text_with_line_breaks(text, words_per_line=15):
     return '\n'.join(formatted_lines)
 
 
-def extract_text_from_pdf(pdf_path: str) -> Tuple[Optional[str], int]:
+def extract_text_from_pdf(pdf_content: bytes) -> Tuple[Optional[str], int]:
     try:
-        with open(pdf_path, 'rb') as file:
-            pdf_reader = PyPDF2.PdfReader(file)
-            text = "".join(page.extract_text() for page in pdf_reader.pages)
+        pdf_reader = PyPDF2.PdfReader(io.BytesIO(pdf_content))
+        text = "".join(page.extract_text() for page in pdf_reader.pages)
     except Exception as e:
         print(f"Error extracting text from PDF: {e}")
         return None, 0
@@ -182,11 +182,8 @@ def parse_dialogue(text: str) -> List[str]:
         dialogue_pieces.append(f"{pieces[i].strip()} {pieces[i+1].strip()}")
     return dialogue_pieces
 
-def create_podcast(pdf_path: str, timestamp: str = None, summarizer_model: str = "openai/gpt-4o-mini", scriptwriter_model: str = "openai/gpt-4o-mini", enhancer_model: str = "openai/gpt-4o-mini", provider: str = "OpenRouter", api_key: str = None) -> Tuple[Optional[PodcastState], str]:
-    if not os.path.exists(pdf_path):
-        return None, "PDF file not found"
-
-    text, token_count = extract_text_from_pdf(pdf_path)
+def create_podcast(pdf_content: bytes, timestamp: str = None, summarizer_model: str = "openai/gpt-4o-mini", scriptwriter_model: str = "openai/gpt-4o-mini", enhancer_model: str = "openai/gpt-4o-mini", provider: str = "OpenRouter", api_key: str = None) -> Tuple[Optional[PodcastState], str]:
+    text, token_count = extract_text_from_pdf(pdf_content)
 
     if text is None:
         return None, "Error extracting text from PDF"
