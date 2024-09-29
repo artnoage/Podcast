@@ -273,8 +273,12 @@ def save_podcast_state(state: PodcastState, timestamp: str):
         "enhanced_script": state["enhanced_script"].content
     }
     
-    os.makedirs("podcast_states", exist_ok=True)
-    filepath = os.path.join("podcast_states", filename)
+    # Get the absolute path to the project root directory
+    current_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    podcast_states_dir = os.path.join(current_dir, "podcast_states")
+    
+    os.makedirs(podcast_states_dir, exist_ok=True)
+    filepath = os.path.join(podcast_states_dir, filename)
     
     with open(filepath, 'w') as f:
         json.dump(data, f, indent=2)
@@ -283,7 +287,12 @@ def save_podcast_state(state: PodcastState, timestamp: str):
 
 def add_feedback_to_state(timestamp: str, feedback: str):
     filename = f"podcast_state_{timestamp}.json"
-    filepath = os.path.join("podcast_states", filename)
+    
+    # Get the absolute path to the project root directory
+    current_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    podcast_states_dir = os.path.join(current_dir, "podcast_states")
+    
+    filepath = os.path.join(podcast_states_dir, filename)
     
     if not os.path.exists(filepath):
         print(f"Error: Podcast state file {filepath} not found.")
