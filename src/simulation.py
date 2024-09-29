@@ -93,9 +93,9 @@ def process_pdf_and_improve_prompts():
     print(f"\nParsed Dialogue Pieces saved to: {dialogue_file}")
 
     # Optimize prompts
-    optimize_prompt("summarizer", last_timestamp, new_timestamp, "gpt-4o-mini", "gpt-4o")
-    optimize_prompt("scriptwriter", last_timestamp, new_timestamp, "gpt-4o-mini", "gpt-4o")
-    optimize_prompt("enhancer", last_timestamp, new_timestamp, "gpt-4o-mini", "gpt-4o")
+    optimize_prompt("summarizer", last_timestamp, new_timestamp, "gpt-4o-mini", "gpt-4o-mini")
+    optimize_prompt("scriptwriter", last_timestamp, new_timestamp, "gpt-4o-mini", "gpt-4o-mini")
+    optimize_prompt("enhancer", last_timestamp, new_timestamp, "gpt-4o-mini", "gpt-4o-mini")
 
     return True
 
