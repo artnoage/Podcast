@@ -42,12 +42,15 @@ class PodcastCreationWorkflow:
             history_path = os.path.join(prompt_history_dir, history_file)
             
             if os.path.exists(history_path):
-                with open(history_path, 'r') as file:
+                with open(history_path, 'r', encoding='utf-8') as file:
                     return file.read().strip()
         
         # If no timestamp provided or file not found, fall back to the original prompt file
         absolute_path = os.path.join(root_dir, file_path)
-        with open(absolute_path, 'r') as file:
+        if not os.path.exists(absolute_path):
+            raise FileNotFoundError(f"Prompt file not found: {absolute_path}")
+        
+        with open(absolute_path, 'r', encoding='utf-8') as file:
             return file.read().strip()
 
     def _create_chat_model(self, model, temperature):
@@ -188,7 +191,9 @@ class PersonalityCreatorAgent:
         current_dir = os.path.dirname(os.path.abspath(__file__))
         root_dir = os.path.dirname(os.path.dirname(current_dir))
         absolute_path = os.path.join(root_dir, file_path)
-        with open(absolute_path, 'r') as file:
+        if not os.path.exists(absolute_path):
+            raise FileNotFoundError(f"Prompt file not found: {absolute_path}")
+        with open(absolute_path, 'r', encoding='utf-8') as file:
             return file.read().strip()
 
     def create_personality(self) -> str:
