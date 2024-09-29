@@ -84,8 +84,13 @@ function App() {
       const result = await createPodcasts(isApiKeyValid ? apiKey : null, pdfFile);
       console.log('Create podcasts result:', result);
       if (result.podcasts && result.podcasts.length === 2) {
-        const randomPodcast = result.podcasts.find(p => p.type === 'random');
-        const lastPodcast = result.podcasts.find(p => p.type === 'last');
+        const processedPodcasts = result.podcasts.map(podcast => {
+          const audioBlob = new Blob([Uint8Array.from(atob(podcast.audio), c => c.charCodeAt(0))], { type: 'audio/mpeg' });
+          const audioUrl = URL.createObjectURL(audioBlob);
+          return { ...podcast, audio_url: audioUrl };
+        });
+        const randomPodcast = processedPodcasts.find(p => p.type === 'random');
+        const lastPodcast = processedPodcasts.find(p => p.type === 'last');
         if (randomPodcast && lastPodcast) {
           setPodcasts({
             random: randomPodcast,
@@ -225,40 +230,52 @@ function App() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="bg-gray-800 p-4 rounded-lg">
                         <h4 className="text-xl font-light text-gray-100 mb-2">Random Podcast</h4>
-                        <audio 
-                          controls 
-                          className="w-full" 
-                          src={podcasts.random?.audio_url}
-                          disabled={!podcasts.random}
-                        >
-                          Your browser does not support the audio element.
-                        </audio>
-                        {podcasts.random?.audio_url && (
-                          <button
-                            onClick={() => URL.revokeObjectURL(podcasts.random.audio_url)}
-                            className="mt-2 text-sm text-gray-400 hover:text-gray-300"
-                          >
-                            Release audio memory
-                          </button>
+                        {podcasts.random?.audio_url ? (
+                          <>
+                            <audio 
+                              controls 
+                              className="w-full" 
+                              src={podcasts.random.audio_url}
+                            >
+                              Your browser does not support the audio element.
+                            </audio>
+                            <button
+                              onClick={() => {
+                                URL.revokeObjectURL(podcasts.random.audio_url);
+                                setPodcasts(prev => ({...prev, random: {...prev.random, audio_url: null}}));
+                              }}
+                              className="mt-2 text-sm text-gray-400 hover:text-gray-300"
+                            >
+                              Release audio memory
+                            </button>
+                          </>
+                        ) : (
+                          <p className="text-gray-400">No audio available</p>
                         )}
                       </div>
                       <div className="bg-gray-800 p-4 rounded-lg">
                         <h4 className="text-xl font-light text-gray-100 mb-2">Last Podcast</h4>
-                        <audio 
-                          controls 
-                          className="w-full" 
-                          src={podcasts.last?.audio_url}
-                          disabled={!podcasts.last}
-                        >
-                          Your browser does not support the audio element.
-                        </audio>
-                        {podcasts.last?.audio_url && (
-                          <button
-                            onClick={() => URL.revokeObjectURL(podcasts.last.audio_url)}
-                            className="mt-2 text-sm text-gray-400 hover:text-gray-300"
-                          >
-                            Release audio memory
-                          </button>
+                        {podcasts.last?.audio_url ? (
+                          <>
+                            <audio 
+                              controls 
+                              className="w-full" 
+                              src={podcasts.last.audio_url}
+                            >
+                              Your browser does not support the audio element.
+                            </audio>
+                            <button
+                              onClick={() => {
+                                URL.revokeObjectURL(podcasts.last.audio_url);
+                                setPodcasts(prev => ({...prev, last: {...prev.last, audio_url: null}}));
+                              }}
+                              className="mt-2 text-sm text-gray-400 hover:text-gray-300"
+                            >
+                              Release audio memory
+                            </button>
+                          </>
+                        ) : (
+                          <p className="text-gray-400">No audio available</p>
                         )}
                       </div>
                     </div>
