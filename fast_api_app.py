@@ -4,12 +4,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from src.utils.utils import create_podcast, save_podcast_state, add_feedback_to_state, get_all_timestamps
 from src.utils.textGDwithWeightClipping import optimize_prompt
+from src.paudio import generate_tts, parse_dialogue
 import os
 from datetime import datetime
 import random
 import json
 from openai import OpenAI
 import asyncio
+from pydub import AudioSegment
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -17,6 +19,9 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 client = OpenAI()
+
+from fastapi.staticfiles import StaticFiles
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Add CORS middleware
 app.add_middleware(
@@ -124,14 +129,29 @@ async def create_podcasts_endpoint(request: CreatePodcastsRequest):
                 # Save the podcast state
                 save_podcast_state(podcast_state, timestamp)
                 
-                # Generate audio (you'll need to implement this part)
+                # Generate audio
+                enhanced_script = podcast_state["enhanced_script"].content
+                dialogue_pieces = parse_dialogue(enhanced_script)
+                
+                combined_audio = AudioSegment.empty()
+                for piece in dialogue_pieces:
+                    speaker, text = piece.split(': ', 1)
+                    voice = "onyx" if speaker == "Host" else "nova"
+                    audio_content = generate_tts(text, voice=voice)
+                    
+                    temp_file = f"temp_{speaker.lower()}.mp3"
+                    with open(temp_file, "wb") as f:
+                        f.write(audio_content)
+                    
+                    segment = AudioSegment.from_mp3(temp_file)
+                    combined_audio += segment
+                    
+                    os.remove(temp_file)
+                
                 audio_filename = f"podcast_{timestamp}.mp3"
                 audio_path = os.path.join("static", audio_filename)
-                # TODO: Implement audio generation and save to audio_path
-                
-                # For now, let's create a dummy audio file
-                with open(audio_path, 'wb') as f:
-                    f.write(b'Dummy audio content')
+                os.makedirs(os.path.dirname(audio_path), exist_ok=True)
+                combined_audio.export(audio_path, format="mp3")
                 
                 # Add audio_url, timestamp, and type to the podcast_state
                 return {
