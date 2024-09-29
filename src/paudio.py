@@ -60,10 +60,14 @@ async def generate_tts_async(text, voice="onyx"):
     """
     try:
         client = get_openai_client()
-        response = await client.audio.speech.acreate(
-            model="tts-1",
-            voice=voice,
-            input=text
+        loop = asyncio.get_running_loop()
+        response = await loop.run_in_executor(
+            None,
+            lambda: client.audio.speech.create(
+                model="tts-1",
+                voice=voice,
+                input=text
+            )
         )
         logger.info(f"TTS audio generated asynchronously using voice: {voice}")
         return response.content
