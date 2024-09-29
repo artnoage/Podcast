@@ -192,6 +192,17 @@ function App() {
     }
   };
 
+  useEffect(() => {
+    const voted = localStorage.getItem('hasVoted');
+    if (voted) {
+      setHasVoted(true);
+    }
+
+    if (apiKey) {
+      validateApiKey(apiKey);
+    }
+  }, [apiKey, validateApiKey]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-gray-200">
       <div className="w-full flex flex-col items-center justify-start min-h-screen pt-20 pb-12 px-4">
