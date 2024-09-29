@@ -199,12 +199,10 @@ def format_text_with_line_breaks(text, words_per_line=15):
 import tiktoken
 
 def extract_text_from_pdf(pdf_path: str) -> Tuple[Optional[str], int]:
-    text = ""
     try:
         with open(pdf_path, 'rb') as file:
             pdf_reader = PyPDF2.PdfReader(file)
-            for page in pdf_reader.pages:
-                text += page.extract_text()
+            text = "".join(page.extract_text() for page in pdf_reader.pages)
     except Exception as e:
         print(f"Error extracting text from PDF: {e}")
         return None, 0
