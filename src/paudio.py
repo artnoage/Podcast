@@ -2,7 +2,10 @@ import os
 from openai import OpenAI
 import logging
 from pydub import AudioSegment
-from src.utils.utils import create_podcast, parse_dialogue, save_podcast_state
+try:
+    from src.utils.utils import create_podcast, parse_dialogue, save_podcast_state
+except ImportError:
+    from utils.utils import create_podcast, parse_dialogue, save_podcast_state
 
 
 # Set up logging

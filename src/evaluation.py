@@ -7,8 +7,12 @@ import matplotlib
 matplotlib.use('Agg')  # Use a non-interactive backend
 import matplotlib.pyplot as plt
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from src.utils.utils import create_podcast, extract_text_from_pdf, get_random_arxiv_file, get_all_timestamps, save_podcast_state
-from src.utils.agents_and_workflows import EvaluatorAgent
+try:
+    from src.utils.utils import create_podcast, extract_text_from_pdf, get_random_arxiv_file, get_all_timestamps, save_podcast_state
+    from src.utils.agents_and_workflows import EvaluatorAgent
+except ImportError:
+    from utils.utils import create_podcast, extract_text_from_pdf, get_random_arxiv_file, get_all_timestamps, save_podcast_state
+    from utils.agents_and_workflows import EvaluatorAgent
 from typing import Tuple, Optional
 
 load_dotenv()
