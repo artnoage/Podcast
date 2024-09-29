@@ -86,7 +86,8 @@ def process_evaluation(evaluator, prompt_model, prompt_provider, i) -> Tuple[Opt
             if podcast1 is None or message1 != "Success":
                 raise ValueError(f"Failed to create podcast1: {message1}")
             
-            podcast2, message2 = create_podcast(pdf_path, timestamp=timestamp2, summarizer_model=prompt_model, scriptwriter_model=prompt_model, enhancer_model=prompt_model, provider=prompt_provider, api_key=os.getenv("OPENAI_API_KEY"))
+            api_key = os.getenv("OPENAI_API_KEY") if prompt_provider == "OpenAI" else os.getenv("OPENROUTER_API_KEY")
+            podcast2, message2 = create_podcast(pdf_path, timestamp=timestamp2, summarizer_model=prompt_model, scriptwriter_model=prompt_model, enhancer_model=prompt_model, provider=prompt_provider, api_key=api_key)
             if podcast2 is None or message2 != "Success":
                 raise ValueError(f"Failed to create podcast2: {message2}")
             
