@@ -78,6 +78,10 @@ def process_evaluation(evaluator, prompt_model, prompt_provider, i) -> Tuple[Opt
         try:
             print(f"{i}-th generation")
             pdf_path = get_random_arxiv_file()
+            if pdf_path is None:
+                print("No more PDF files available in the arxiv_folder. Stopping the evaluation process.")
+                return None, None, None
+            
             original_text = extract_text_from_pdf(pdf_path)
 
             timestamp1, timestamp2 = choose_random_timestamps(2)
@@ -116,6 +120,9 @@ def main():
                 # Process results as they complete
                 for future in as_completed(futures):
                     timestamp1, timestamp2, evaluation = future.result()
+                    if timestamp1 is None and timestamp2 is None and evaluation is None:
+                        print("Evaluation stopped due to lack of PDF files.")
+                        break
                     if "1" in evaluation.lower() and "2" not in evaluation.lower():
                         update_scores(scores, timestamp1)
                     elif "2" in evaluation.lower() and "1" not in evaluation.lower():
@@ -123,8 +130,11 @@ def main():
                     else:
                         print(f"Unclear or tie response from evaluator: {evaluation}")
 
-                plot_scores(scores, evaluator_model, prompt_model)
-                print(f"Evaluation complete for evaluator: {evaluator_model}, prompt: {prompt_model}. Results plotted.")
+                if scores:  # Only plot if we have any scores
+                    plot_scores(scores, evaluator_model, prompt_model)
+                    print(f"Evaluation complete for evaluator: {evaluator_model}, prompt: {prompt_model}. Results plotted.")
+                else:
+                    print("No evaluations were completed. No results to plot.")
 
 if __name__ == "__main__":
     main()
