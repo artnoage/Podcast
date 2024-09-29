@@ -67,9 +67,7 @@ def process_pdf_and_improve_prompts():
     add_feedback_to_state(new_timestamp, feedback)
 
     # Save parsed dialogue pieces
-    # Get the absolute path to the project root directory
-    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    podcast_history_dir = os.path.join(root_dir, "podcast_history")
+    podcast_history_dir = os.path.join(PROJECT_ROOT, "podcast_history")
     os.makedirs(podcast_history_dir, exist_ok=True)
     dialogue_file = os.path.join(podcast_history_dir, f"dialogue_pieces_{new_timestamp}.txt")
     with open(dialogue_file, 'w', encoding='utf-8') as f:
