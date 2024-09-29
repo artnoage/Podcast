@@ -3,9 +3,9 @@ from openai import OpenAI
 import logging
 from pydub import AudioSegment
 try:
-    from src.utils.utils import create_podcast, parse_dialogue, save_podcast_state
+    from src.utils.utils import create_podcast, parse_dialogue, save_podcast_state, PROJECT_ROOT
 except ImportError:
-    from utils.utils import create_podcast, parse_dialogue, save_podcast_state
+    from utils.utils import create_podcast, parse_dialogue, save_podcast_state, PROJECT_ROOT
 
 
 # Set up logging
@@ -76,23 +76,20 @@ def create_podcast_audio(pdf_path, timestamp=None):
         # Remove temporary file
         os.remove(temp_file)
 
-    # Get the root directory
-    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
     # Export the final podcast audio
-    output_audio_file = os.path.join(root_dir, "final_podcast.mp3")
+    output_audio_file = os.path.join(PROJECT_ROOT, "final_podcast.mp3")
     combined_audio.export(output_audio_file, format="mp3")
     logger.info(f"Podcast audio created successfully: {output_audio_file}")
 
     # Save the dialogue
-    output_dialogue_file = os.path.join(root_dir, "podcast_dialogue.txt")
+    output_dialogue_file = os.path.join(PROJECT_ROOT, "podcast_dialogue.txt")
     with open(output_dialogue_file, 'w', encoding='utf-8') as f:
         for piece in dialogue_pieces:
             f.write(f"{piece}\n")
     logger.info(f"Podcast dialogue saved to: {output_dialogue_file}")
 
     # Save a small text file with summary information
-    summary_file = os.path.join(root_dir, "podcast_summary.txt")
+    summary_file = os.path.join(PROJECT_ROOT, "podcast_summary.txt")
     with open(summary_file, 'w', encoding='utf-8') as f:
         f.write(f"Podcast created on: {timestamp}\n")
         f.write(f"Source PDF: {os.path.basename(pdf_path)}\n")
