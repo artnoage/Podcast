@@ -131,59 +131,67 @@ async def create_podcasts_endpoint(request: CreatePodcastsRequest):
             random_timestamp = random.choice([t for t in all_timestamps if t != last_timestamp])
             
             async def create_podcast_task(timestamp, podcast_type):
-                logger.info(f"Creating podcast for timestamp {timestamp}")
-                podcast_state, message = await create_podcast(request.pdf_content, timestamp=timestamp, summarizer_model="gpt-4o-mini", scriptwriter_model="gpt-4o-mini", enhancer_model="gpt-4o-mini", provider="OpenAI", api_key=api_key)
-                
-                if podcast_state is None:
-                    logger.error(f"Failed to create podcast for timestamp {timestamp}: {message}")
-                    raise HTTPException(status_code=500, detail=f"Failed to create podcast for timestamp {timestamp}: {message}")
-                
-                logger.info(f"Saving podcast state for timestamp {timestamp}")
-                save_podcast_state(podcast_state, timestamp)
-                
-                logger.info(f"Generating audio for timestamp {timestamp}")
-                # Generate audio
-                enhanced_script = podcast_state["enhanced_script"].content
-                dialogue_pieces = parse_dialogue(enhanced_script)
-                
-                combined_audio = AudioSegment.empty()
-                for piece in dialogue_pieces:
-                    speaker, text = piece.split(': ', 1)
-                    voice = "onyx" if speaker == "Host" else "nova"
-                    audio_content = generate_tts(text, voice=voice)
+                try:
+                    logger.info(f"Creating podcast for timestamp {timestamp}")
+                    podcast_state, message = await create_podcast(request.pdf_content, timestamp=timestamp, summarizer_model="gpt-4o-mini", scriptwriter_model="gpt-4o-mini", enhancer_model="gpt-4o-mini", provider="OpenAI", api_key=api_key)
                     
-                    temp_file = f"temp_{speaker.lower()}.mp3"
-                    with open(temp_file, "wb") as f:
-                        f.write(audio_content)
+                    if podcast_state is None:
+                        logger.error(f"Failed to create podcast for timestamp {timestamp}: {message}")
+                        raise HTTPException(status_code=500, detail=f"Failed to create podcast for timestamp {timestamp}: {message}")
                     
-                    segment = AudioSegment.from_mp3(temp_file)
-                    combined_audio += segment
+                    logger.info(f"Saving podcast state for timestamp {timestamp}")
+                    save_podcast_state(podcast_state, timestamp)
                     
-                    os.remove(temp_file)
-                
-                audio_filename = f"podcast_{timestamp}.mp3"
-                audio_path = os.path.join("static", audio_filename)
-                os.makedirs(os.path.dirname(audio_path), exist_ok=True)
-                combined_audio.export(audio_path, format="mp3")
-                
-                logger.info(f"Podcast created successfully for timestamp {timestamp}")
-                # Add audio_url, timestamp, and type to the podcast_state
-                return {
-                    "timestamp": timestamp,
-                    "type": podcast_type,
-                    "main_text": podcast_state["main_text"].content,
-                    "key_points": podcast_state["key_points"].content,
-                    "script_essence": podcast_state["script_essence"].content,
-                    "enhanced_script": podcast_state["enhanced_script"].content,
-                    "audio_url": f"http://localhost:8000/static/{audio_filename}"
-                }
+                    logger.info(f"Generating audio for timestamp {timestamp}")
+                    # Generate audio
+                    enhanced_script = podcast_state["enhanced_script"].content
+                    dialogue_pieces = parse_dialogue(enhanced_script)
+                    
+                    combined_audio = AudioSegment.empty()
+                    for piece in dialogue_pieces:
+                        speaker, text = piece.split(': ', 1)
+                        voice = "onyx" if speaker == "Host" else "nova"
+                        audio_content = generate_tts(text, voice=voice)
+                        
+                        temp_file = f"temp_{speaker.lower()}.mp3"
+                        with open(temp_file, "wb") as f:
+                            f.write(audio_content)
+                        
+                        segment = AudioSegment.from_mp3(temp_file)
+                        combined_audio += segment
+                        
+                        os.remove(temp_file)
+                    
+                    audio_filename = f"podcast_{timestamp}.mp3"
+                    audio_path = os.path.join("static", audio_filename)
+                    os.makedirs(os.path.dirname(audio_path), exist_ok=True)
+                    combined_audio.export(audio_path, format="mp3")
+                    
+                    logger.info(f"Podcast created successfully for timestamp {timestamp}")
+                    # Add audio_url, timestamp, and type to the podcast_state
+                    return {
+                        "timestamp": timestamp,
+                        "type": podcast_type,
+                        "main_text": podcast_state["main_text"].content,
+                        "key_points": podcast_state["key_points"].content,
+                        "script_essence": podcast_state["script_essence"].content,
+                        "enhanced_script": podcast_state["enhanced_script"].content,
+                        "audio_url": f"http://localhost:8000/static/{audio_filename}"
+                    }
+                except Exception as e:
+                    logger.error(f"Error in create_podcast_task for timestamp {timestamp}: {str(e)}", exc_info=True)
+                    raise
             
             logger.info("Creating both podcasts concurrently")
             # Create both podcasts concurrently
-            podcasts = await asyncio.gather(
-                create_podcast_task(random_timestamp, "random"),
-                create_podcast_task(last_timestamp, "last")
-            )
+            try:
+                podcasts = await asyncio.gather(
+                    create_podcast_task(random_timestamp, "random"),
+                    create_podcast_task(last_timestamp, "last")
+                )
+            except Exception as e:
+                logger.error(f"Error in asyncio.gather: {str(e)}", exc_info=True)
+                raise HTTPException(status_code=500, detail=f"Failed to create podcasts: {str(e)}")
         
         logger.info("Podcasts created successfully")
         return {"podcasts": podcasts}
@@ -194,7 +202,7 @@ async def create_podcasts_endpoint(request: CreatePodcastsRequest):
         error_detail = str(e)
         if len(error_detail) > 100:
             error_detail = error_detail[:100] + "... (truncated)"
-        raise HTTPException(status_code=422, detail=f"An error occurred: {error_detail}")
+        raise HTTPException(status_code=500, detail=f"An error occurred: {error_detail}")
 
 @app.post("/process_feedback")
 async def process_feedback(request: FeedbackRequest):
