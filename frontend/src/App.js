@@ -23,8 +23,9 @@ function App() {
   const [podcasts, setPodcasts] = useState({ random: null, last: null });
   const [feedback, setFeedback] = useState('');
   const [experimentIdea, setExperimentIdea] = useState('');
-  const [apiKey, setApiKey] = useState(localStorage.getItem('apiKey') || '');
+  const [apiKey, setApiKey] = useState('');
   const [isApiKeyValid, setIsApiKeyValid] = useState(false);
+  const [showApiKey, setShowApiKey] = useState(false);
   const [selectedPodcast, setSelectedPodcast] = useState(null);
   const [hasVoted, setHasVoted] = useState(false);
   const [error, setError] = useState(null);
@@ -41,13 +42,20 @@ function App() {
     try {
       await validateApiKey(apiKey);
       setIsApiKeyValid(true);
-      localStorage.setItem('apiKey', apiKey);
+      setApiKey('');
       alert('API key is valid!');
     } catch (error) {
       setIsApiKeyValid(false);
       alert(error.message);
     }
   };
+
+  useEffect(() => {
+    return () => {
+      setApiKey('');
+      setIsApiKeyValid(false);
+    };
+  }, []);
 
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
@@ -242,15 +250,24 @@ function App() {
                 <p className="text-lg text-gray-200">Please provide your own OpenAI key if possible, I am just a poor postdoc. Each podcast costs around 20-30 cents with the feedback application.</p>
                 <p className="text-red-500 text-lg font-bold">We don't keep any keys</p>
                 <div className="flex flex-col space-y-2">
-                  <input
-                    type="text"
-                    placeholder="Enter your OpenAI API key"
-                    value={apiKey}
-                    onChange={handleApiKeyChange}
-                    className={`w-full p-3 bg-gray-800 text-gray-200 text-xl rounded-md border ${
-                      isApiKeyValid ? 'border-green-500' : 'border-gray-700'
-                    } focus:border-gray-500 focus:ring focus:ring-gray-500 focus:ring-opacity-50`}
-                  />
+                  <div className="relative">
+                    <input
+                      type={showApiKey ? "text" : "password"}
+                      placeholder="Enter your OpenAI API key"
+                      value={apiKey}
+                      onChange={handleApiKeyChange}
+                      className={`w-full p-3 bg-gray-800 text-gray-200 text-xl rounded-md border ${
+                        isApiKeyValid ? 'border-green-500' : 'border-gray-700'
+                      } focus:border-gray-500 focus:ring focus:ring-gray-500 focus:ring-opacity-50`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowApiKey(!showApiKey)}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+                    >
+                      {showApiKey ? 'Hide' : 'Show'}
+                    </button>
+                  </div>
                   <button
                     onClick={handleValidateApiKey}
                     className={`w-full py-3 px-4 text-gray-200 text-xl rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition duration-300 ${
