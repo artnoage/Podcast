@@ -6,6 +6,7 @@ import markdown
 import random
 import json
 import io
+import logging
 from typing import List, Tuple, Optional
 try:
     from src.utils.agents_and_workflows import PodcastCreationWorkflow, PodcastState
@@ -13,6 +14,10 @@ except ImportError:
     from utils.agents_and_workflows import PodcastCreationWorkflow, PodcastState
 from langchain_core.messages import HumanMessage
 import tiktoken
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 def get_project_root():
     current_dir = os.path.dirname(os.path.abspath(__file__))
