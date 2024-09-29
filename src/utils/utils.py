@@ -189,9 +189,10 @@ def create_podcast(pdf_path: str, timestamp: str = None, summarizer_model: str =
     text, token_count = extract_text_from_pdf(pdf_path)
 
     if text is None:
-        if token_count > 40000:
-            return None, f"PDF content exceeds 40,000 tokens (current: {token_count})"
         return None, "Error extracting text from PDF"
+
+    if token_count > 40000:
+        return None, f"PDF content exceeds 40,000 tokens (current: {token_count})"
 
     if not text.strip():
         return None, "Extracted text is empty"
