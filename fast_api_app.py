@@ -93,24 +93,22 @@ def save_votes(votes):
     with open(VOTES_FILE, 'w') as f:
         json.dump(votes, f)
 
-class CreatePodcastsRequest(BaseModel):
-    api_key: Optional[str] = None
-    pdf_content: bytes
+from fastapi import UploadFile, File
 
 @app.post("/create_podcasts")
-async def create_podcasts_endpoint(request: CreatePodcastsRequest):
-    logger.info(f"Creating podcasts. PDF content available: {len(request.pdf_content) > 0}")
-    if not request.pdf_content:
-        logger.error("No PDF content provided")
-        raise HTTPException(status_code=400, detail="No PDF content provided")
+async def create_podcasts_endpoint(api_key: Optional[str] = None, pdf_content: UploadFile = File(...)):
+    logger.info(f"Creating podcasts. PDF file name: {pdf_content.filename}")
+    if not pdf_content:
+        logger.error("No PDF file provided")
+        raise HTTPException(status_code=400, detail="No PDF file provided")
 
     try:
-        # Log the API key status
-        api_key_status = "provided" if request.api_key else "not provided"
-        logger.info(f"Creating podcasts with API key status: {api_key_status}")
+        # Read the content of the uploaded file
+        pdf_bytes = await pdf_content.read()
 
-        # Use the api_key directly from the request
-        api_key = request.api_key
+        # Log the API key status
+        api_key_status = "provided" if api_key else "not provided"
+        logger.info(f"Creating podcasts with API key status: {api_key_status}")
 
         # Get the last timestamp and a random timestamp
         logger.info("Getting timestamps")
@@ -120,7 +118,7 @@ async def create_podcasts_endpoint(request: CreatePodcastsRequest):
         if not all_timestamps:
             logger.info("No timestamps available, creating podcast without timestamp")
             # If no timestamps are available, create a podcast without a timestamp
-            podcast_state, message = await create_podcast(request.pdf_content, timestamp=None, summarizer_model="gpt-4o-mini", scriptwriter_model="gpt-4o-mini", enhancer_model="gpt-4o-mini", provider="OpenAI", api_key=api_key)
+            podcast_state, message = await create_podcast(pdf_bytes, timestamp=None, summarizer_model="gpt-4o-mini", scriptwriter_model="gpt-4o-mini", enhancer_model="gpt-4o-mini", provider="OpenAI", api_key=api_key)
             if podcast_state is None:
                 logger.error(f"Failed to create podcast: {message}")
                 raise HTTPException(status_code=500, detail=f"Failed to create podcast: {message}")
@@ -133,7 +131,7 @@ async def create_podcasts_endpoint(request: CreatePodcastsRequest):
             async def create_podcast_task(timestamp, podcast_type):
                 try:
                     logger.info(f"Creating podcast for timestamp {timestamp}")
-                    podcast_state, message = await create_podcast(request.pdf_content, timestamp=timestamp, summarizer_model="gpt-4o-mini", scriptwriter_model="gpt-4o-mini", enhancer_model="gpt-4o-mini", provider="OpenAI", api_key=api_key)
+                    podcast_state, message = await create_podcast(pdf_bytes, timestamp=timestamp, summarizer_model="gpt-4o-mini", scriptwriter_model="gpt-4o-mini", enhancer_model="gpt-4o-mini", provider="OpenAI", api_key=api_key)
                     
                     if podcast_state is None:
                         logger.error(f"Failed to create podcast for timestamp {timestamp}: {message}")
