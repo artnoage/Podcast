@@ -38,7 +38,7 @@ function App() {
       setApiKey(storedApiKey);
       validateApiKey(storedApiKey);
     }
-  }, []);
+  }, [validateApiKey]);
 
   const handleApiKeyChange = (event) => {
     const newApiKey = event.target.value;
@@ -315,7 +315,7 @@ function App() {
                     placeholder="Enter your OpenAI API key"
                     value={apiKey}
                     onChange={handleApiKeyChange}
-                    className={`w-full p-3 bg-gray-800/50 text-gray-200 text-xl rounded-md border ${
+                    className={`w-full p-3 bg-gray-800 text-gray-200 text-xl rounded-md border ${
                       isApiKeyValid ? 'border-green-500' : 'border-gray-700'
                     } focus:border-gray-500 focus:ring focus:ring-gray-500 focus:ring-opacity-50`}
                   />
