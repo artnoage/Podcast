@@ -80,3 +80,16 @@ export const submitFeedback = async (feedback, oldTimestamp, newTimestamp) => {
     throw new Error('Error processing feedback');
   }
 };
+
+export const submitExperimentIdea = async (idea) => {
+  const response = await fetch(`${API_BASE_URL}/submit_experiment_idea`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ idea })
+  });
+  if (!response.ok) {
+    throw new Error('Error submitting experiment idea');
+  }
+};

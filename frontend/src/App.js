@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { validateApiKey, createPodcasts, submitVote, submitFeedback } from './api';
+import { validateApiKey, createPodcasts, submitVote, submitFeedback, submitExperimentIdea } from './api';
 import './App.css';
 import LoadingSpinner from './LoadingSpinner';
 
@@ -146,10 +146,17 @@ function App() {
     }
   };
 
-  const handleExperimentIdeaSubmit = (event) => {
+  const handleExperimentIdeaSubmit = async (event) => {
     event.preventDefault();
-    console.log("Experiment idea submitted:", experimentIdea);
-    setExperimentIdea('');
+    try {
+      await submitExperimentIdea(experimentIdea);
+      console.log("Experiment idea submitted:", experimentIdea);
+      setExperimentIdea('');
+      alert('Thank you for submitting your experiment idea!');
+    } catch (error) {
+      console.error('Error submitting experiment idea:', error);
+      alert('Error submitting experiment idea. Please try again.');
+    }
   };
 
   const handleApiKeyChange = (event) => {

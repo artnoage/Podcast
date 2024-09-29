@@ -12,6 +12,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from openai import OpenAI
 from pydub import AudioSegment
+import os
 
 from src.utils.utils import create_podcast, save_podcast_state, add_feedback_to_state, get_all_timestamps
 from src.utils.textGDwithWeightClipping import optimize_prompt
@@ -81,7 +82,11 @@ class FeedbackRequest(BaseModel):
 class VoteRequest(BaseModel):
     timestamp: str
 
+class ExperimentIdeaRequest(BaseModel):
+    idea: str
+
 VOTES_FILE = "votes.json"
+EXPERIMENT_IDEAS_FILE = "experiment_ideas.md"
 
 def load_votes():
     if os.path.exists(VOTES_FILE):
@@ -222,6 +227,13 @@ async def vote(request: VoteRequest):
         votes[timestamp] = 1
     save_votes(votes)
     return {"message": "Vote recorded successfully"}
+
+@app.post("/submit_experiment_idea")
+async def submit_experiment_idea(request: ExperimentIdeaRequest):
+    idea = request.idea
+    with open(EXPERIMENT_IDEAS_FILE, "a") as f:
+        f.write(f"\n\n---\n\n# New Experiment Idea\n\n{idea}\n")
+    return {"message": "Experiment idea submitted successfully"}
 
 if __name__ == "__main__":
     import uvicorn
