@@ -3,6 +3,7 @@ import os
 import random
 import json
 import asyncio
+import base64
 from datetime import datetime
 from typing import Optional
 
@@ -133,10 +134,10 @@ async def create_podcasts_endpoint(api_key: Optional[str] = None, pdf_content: U
             async def create_podcast_task(timestamp, podcast_type):
                 try:
                     logger.info(f"Creating podcast for timestamp {timestamp}")
-                    podcast_audio = await create_podcast_audio(pdf_bytes, timestamp=timestamp)
-        
+                    podcast_audio, dialogue_text = await create_podcast_audio(pdf_bytes, timestamp=timestamp)
+
                     logger.info(f"Podcast created successfully for timestamp {timestamp}")
-        
+
                     # For the last podcast, save the state with a new timestamp
                     new_timestamp = None
                     if podcast_type == "last":
@@ -144,13 +145,14 @@ async def create_podcasts_endpoint(api_key: Optional[str] = None, pdf_content: U
                         logger.info(f"Saving podcast state for new timestamp {new_timestamp}")
                         # Note: We need to modify create_podcast_audio to return the podcast state as well
                         # save_podcast_state(podcast_state, new_timestamp)
-        
-                    # Add timestamp and type to the podcast_state, along with audio
+
+                    # Add timestamp and type to the podcast_state, along with audio and dialogue
                     return {
                         "timestamp": timestamp,
                         "new_timestamp": new_timestamp,
                         "type": podcast_type,
-                        "audio": podcast_audio
+                        "audio": podcast_audio,
+                        "dialogue": dialogue_text
                     }
                 except Exception as e:
                     logger.error(f"Error in create_podcast_task for timestamp {timestamp}: {str(e)}", exc_info=True)
@@ -168,6 +170,11 @@ async def create_podcasts_endpoint(api_key: Optional[str] = None, pdf_content: U
                 raise HTTPException(status_code=500, detail=f"Failed to create podcasts: {str(e)}")
         
         logger.info("Podcasts created successfully")
+        # Convert audio content to base64 for JSON serialization
+        for podcast in podcasts:
+            if podcast['audio']:
+                podcast['audio'] = base64.b64encode(podcast['audio']).decode('utf-8')
+        
         return {"podcasts": podcasts}
     except Exception as e:
         logger.error(f"Error in create_podcasts_endpoint: {str(e)}", exc_info=True)

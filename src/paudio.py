@@ -1,5 +1,6 @@
 import os
 import asyncio
+import io
 from openai import OpenAI
 import logging
 from pydub import AudioSegment
@@ -70,13 +71,13 @@ async def generate_tts_async(text, voice="onyx"):
         logger.error(f"Error in asynchronous OpenAI TTS API call: {str(e)}", exc_info=True)
         raise
 
-async def create_podcast_audio(pdf_path, timestamp=None):
+async def create_podcast_audio(pdf_content, timestamp=None):
     """
-    Creates an audio podcast from the given PDF file using the provided timestamp.
+    Creates an audio podcast from the given PDF content using the provided timestamp.
     """
     print(f"Using prompts from timestamp: {timestamp or 'default'}")
     # Create the podcast
-    podcast_state, message = await create_podcast(pdf_path, timestamp=timestamp, summarizer_model="gpt-4o", scriptwriter_model="gpt-4o", enhancer_model="gpt-4o", provider="OpenAI", api_key=None)
+    podcast_state, message = await create_podcast(pdf_content, timestamp=timestamp, summarizer_model="gpt-4o", scriptwriter_model="gpt-4o", enhancer_model="gpt-4o", provider="OpenAI", api_key=None)
     
     if podcast_state is None or message != "Success":
         raise ValueError(f"Failed to create podcast state: {message}")
@@ -96,43 +97,25 @@ async def create_podcast_audio(pdf_path, timestamp=None):
         speaker, text = piece.split(': ', 1)
         voice = "onyx" if speaker == "Host" else "nova"
         audio_content = await generate_tts_async(text, voice=voice)
-        
-        # Save temporary audio file
-        temp_file = f"temp_{speaker.lower()}_{asyncio.current_task().get_name()}.mp3"
-        with open(temp_file, "wb") as f:
-            f.write(audio_content)
-        
-        return temp_file, speaker
+        return audio_content, speaker
 
     audio_segments = await asyncio.gather(*[generate_audio_segment(piece) for piece in dialogue_pieces])
 
     # Combine audio segments
     combined_audio = AudioSegment.empty()
-    for temp_file, speaker in audio_segments:
-        segment = AudioSegment.from_mp3(temp_file)
+    for audio_content, speaker in audio_segments:
+        segment = AudioSegment.from_mp3(io.BytesIO(audio_content))
         combined_audio += segment
-        os.remove(temp_file)
 
-    # Export the final podcast audio
-    output_audio_file = os.path.join(PROJECT_ROOT, "final_podcast.mp3")
-    combined_audio.export(output_audio_file, format="mp3")
-    logger.info(f"Podcast audio created successfully: {output_audio_file}")
+    # Export the final podcast audio to bytes
+    buffer = io.BytesIO()
+    combined_audio.export(buffer, format="mp3")
+    audio_bytes = buffer.getvalue()
 
     # Save the dialogue
-    output_dialogue_file = os.path.join(PROJECT_ROOT, "podcast_dialogue.txt")
-    with open(output_dialogue_file, 'w', encoding='utf-8') as f:
-        for piece in dialogue_pieces:
-            f.write(f"{piece}\n")
-    logger.info(f"Podcast dialogue saved to: {output_dialogue_file}")
+    dialogue_text = "\n".join(dialogue_pieces)
 
-    # Save a small text file with summary information
-    summary_file = os.path.join(PROJECT_ROOT, "podcast_summary.txt")
-    with open(summary_file, 'w', encoding='utf-8') as f:
-        f.write(f"Podcast created on: {timestamp}\n")
-        f.write(f"Source PDF: {os.path.basename(pdf_path)}\n")
-        f.write(f"Audio file: {os.path.basename(output_audio_file)}\n")
-        f.write(f"Dialogue file: {os.path.basename(output_dialogue_file)}\n")
-    logger.info(f"Podcast summary saved to: {summary_file}")
+    return audio_bytes, dialogue_text
 
 if __name__ == "__main__":
     import argparse
