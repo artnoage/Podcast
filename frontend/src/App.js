@@ -43,12 +43,11 @@ function App() {
   const handleApiKeyChange = (event) => {
     const newApiKey = event.target.value;
     setApiKey(newApiKey);
-    validateApiKey(newApiKey);
     localStorage.setItem('apiKey', newApiKey);
   };
 
-  const validateApiKey = async (key) => {
-    if (!key) {
+  const validateApiKey = async () => {
+    if (!apiKey) {
       setIsApiKeyValid(false);
       alert('Please enter an API key');
       return;
@@ -59,7 +58,7 @@ function App() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ api_key: key }),
+        body: JSON.stringify({ api_key: apiKey }),
         mode: 'cors', // Explicitly set CORS mode
       });
       const data = await response.json();
@@ -321,7 +320,7 @@ function App() {
                     } focus:border-gray-500 focus:ring focus:ring-gray-500 focus:ring-opacity-50`}
                   />
                   <button
-                    onClick={() => validateApiKey(apiKey)}
+                    onClick={validateApiKey}
                     className={`w-full py-3 px-4 text-gray-200 text-xl rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition duration-300 ${
                       isApiKeyValid
                         ? 'bg-green-600 hover:bg-green-700'
