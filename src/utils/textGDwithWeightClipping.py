@@ -38,14 +38,13 @@ def optimize_prompt(role, old_timestamp, new_timestamp, engine_model, backward_e
                               requires_grad=False, 
                               role_description=f"input for {role}")
 
-
     # Define the target using the feedback from the JSON
     feedback = data["feedback"]
     target = tg.Variable(f"""create a detailed set of instructions for a ({role}) within a group consisting of a key_point extractor/summarizer from academic texts, 
                         a scriptwriter and a script enhancer, under the following three rules:
                         1) Role boundaries are clear. 
-                        2) Guidelines are topic-agnostic/abstract enough. Any feedback maybe topic related but guidlines must must be abstract enough to apply to any topic.
-                        3) Guidlines are good enough to avoid the following feedback within the role of {role}. Feedback: """ + feedback, 
+                        2) Guidelines are topic-agnostic/abstract enough. Any feedback maybe topic related but guidelines must be abstract enough to apply to any topic.
+                        3) Guidelines are good enough to avoid the following feedback within the role of {role}. Feedback: """ + feedback, 
               requires_grad=False, 
               role_description=f"target output for {role}")
 
@@ -55,24 +54,27 @@ def optimize_prompt(role, old_timestamp, new_timestamp, engine_model, backward_e
     # Set up the optimizer
     optimizer = tg.TGD(parameters=list(model.parameters()))
 
-    # Forward pass
-    output = model(user_prompt)
-    
-    # Compute loss
-    loss = loss_fn(output)
-    
-    # Backward pass
-    loss.backward()
-    # Update the system prompt
-    optimizer.step()
-    optimizer.zero_grad()
-    
+    # Optimization loop
+    num_iterations = 5  # You can adjust this number
+    for _ in range(num_iterations):
+        # Forward pass
+        output = model(user_prompt)
+        
+        # Compute loss
+        loss = loss_fn(output)
+        
+        # Backward pass
+        loss.backward()
+        
+        # Update the system prompt
+        optimizer.step()
+        optimizer.zero_grad()
+
     # Apply weight clipping
     weight_clipper = WeightClippingAgent()
     cleaned_prompt = weight_clipper.clean_prompt(system_prompt.value, role)
 
     print(f"\nCleaned System Prompt for {role}!")
-
 
     # Save the optimized and cleaned prompt to prompt_history folder with new timestamp
     os.makedirs("prompt_history", exist_ok=True)
@@ -81,3 +83,5 @@ def optimize_prompt(role, old_timestamp, new_timestamp, engine_model, backward_e
     with open(new_history_file, "w") as f:
         f.write(formatted_prompt)
     print(f"\nOptimized, cleaned, and formatted system prompt for {role} saved to '{new_history_file}'")
+
+    return cleaned_prompt
