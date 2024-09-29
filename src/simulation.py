@@ -90,7 +90,9 @@ def process_pdf_and_improve_prompts():
     add_feedback_to_state(new_timestamp, feedback)
 
     # Save parsed dialogue pieces
-    dialogue_file = os.path.join("podcast_history", f"dialogue_pieces_{new_timestamp}.txt")
+    podcast_history_dir = "podcast_history"
+    os.makedirs(podcast_history_dir, exist_ok=True)
+    dialogue_file = os.path.join(podcast_history_dir, f"dialogue_pieces_{new_timestamp}.txt")
     with open(dialogue_file, 'w', encoding='utf-8') as f:
         for piece in dialogue_pieces:
             f.write(f"{piece}\n")
