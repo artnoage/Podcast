@@ -70,7 +70,7 @@ function App() {
       });
       console.log('Podcasts created successfully!');
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error creating podcasts:', error);
       setError(`Error creating podcasts: ${error.message}`);
     }
   };

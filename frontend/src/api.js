@@ -35,18 +35,23 @@ export const uploadFile = async (file) => {
 };
 
 export const createPodcasts = async (apiKey) => {
-  const response = await fetch(`${API_BASE_URL}/create_podcasts`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ api_key: apiKey })
-  });
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.detail || 'Unknown error occurred');
+  try {
+    const response = await fetch(`${API_BASE_URL}/create_podcasts`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ api_key: apiKey })
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || 'Unknown error occurred');
+    }
+    return response.json();
+  } catch (error) {
+    console.error('Error creating podcasts:', error);
+    throw error;
   }
-  return response.json();
 };
 
 export const submitVote = async (timestamp) => {
