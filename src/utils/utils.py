@@ -63,14 +63,6 @@ def extract_text_from_pdf(pdf_path: str) -> Tuple[str, int]:
     
     return text, token_count
 
-def pdf_to_markdown(pdf_path: str) -> None:
-    text = extract_text_from_pdf(pdf_path)
-    md = markdown.markdown(text)
-    output_path = pdf_path.rsplit('.', 1)[0] + '.md'
-    with open(output_path, 'w', encoding='utf-8') as f:
-        f.write(md)
-    print(f"Markdown file created: {output_path}")
-
 def get_random_arxiv_file():
     arxiv_folder = os.path.join(PROJECT_ROOT, "arxiv_papers")
     
