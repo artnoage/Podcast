@@ -131,9 +131,9 @@ function App() {
 
   const handleFeedbackSubmit = async (event) => {
     event.preventDefault();
-    if (feedback && podcasts.last) {
+    if (feedback && podcasts.last && newTimestamp) {
       try {
-        await submitFeedback(podcasts.last, feedback, podcasts.last.timestamp);
+        await submitFeedback(podcasts.last, feedback, newTimestamp);
         console.log("Feedback submitted:", feedback);
         setFeedback('');
         alert('Thanks for the feedback! You were a helpful gradient. Have a nice day!');
@@ -141,6 +141,8 @@ function App() {
         console.error('Error:', error);
         alert('Error processing feedback');
       }
+    } else {
+      alert('Please ensure you have created podcasts and provided feedback before submitting.');
     }
   };
 
