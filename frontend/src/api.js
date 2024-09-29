@@ -64,14 +64,13 @@ export const submitVote = async (timestamp) => {
   }
 };
 
-export const submitFeedback = async (podcastState, feedback, oldTimestamp, newTimestamp) => {
+export const submitFeedback = async (feedback, oldTimestamp, newTimestamp) => {
   const response = await fetch(`${API_BASE_URL}/process_feedback`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      podcast_state: podcastState,
       feedback: feedback,
       old_timestamp: oldTimestamp,
       new_timestamp: newTimestamp

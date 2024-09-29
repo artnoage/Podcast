@@ -74,7 +74,6 @@ async def validate_api_key(request: ApiKeyRequest):
             raise HTTPException(status_code=500, detail="Error validating API key")
 
 class FeedbackRequest(BaseModel):
-    podcast_state: dict
     feedback: str
     old_timestamp: str
     new_timestamp: str
@@ -197,7 +196,6 @@ async def process_feedback(request: FeedbackRequest):
     feedback = request.feedback
     old_timestamp = request.old_timestamp
     new_timestamp = request.new_timestamp
-    podcast_state = request.podcast_state
 
     # Add feedback to the podcast state
     add_feedback_to_state(old_timestamp, feedback)
