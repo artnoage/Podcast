@@ -163,11 +163,15 @@ def create_podcast(pdf_path: str, timestamp: str = None, summarizer_model: str =
     return final_state, "Success"
 
 def load_prompt(role, timestamp=None):
+    # Get the absolute path to the project root directory
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    root_dir = os.path.dirname(os.path.dirname(current_dir))
+    
     prompt_file = f"{role}_prompt.txt"
-    prompts_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "prompts")
+    prompts_dir = os.path.join(root_dir, "prompts")
     
     if timestamp:
-        prompt_history_dir = "prompt_history"
+        prompt_history_dir = os.path.join(root_dir, "prompt_history")
         history_file = f"{role}_prompt.txt_{timestamp}"
         history_path = os.path.join(prompt_history_dir, history_file)
         
