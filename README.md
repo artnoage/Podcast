@@ -17,22 +17,25 @@ This project implements an automated workflow for creating podcast scripts from 
 
 5. **WeightClippingAgent**: Cleans and refines the optimized system prompts to ensure they remain abstract, topic-agnostic, and relevant to their specific roles.
 
-6. **Prompt Improvement**: The `prompt_improving.py` script optimizes the prompts for each agent based on feedback and performance, and then uses the WeightClippingAgent to clean the optimized prompts.
+6. **Prompt Improvement**: The `textGDwithWeightClipping.py` script optimizes the prompts for each agent based on feedback and performance, using TextGrad for optimization and the WeightClippingAgent to clean the optimized prompts.
 
 7. **Flexible Model Selection**: The system allows specifying different models for each agent in the podcast creation process.
 
 8. **Evaluation System**: An evaluation script (`evaluation.py`) compares podcast scripts generated using different prompts to assess their quality and track improvements over time.
 
+9. **Web Interface**: A React-based frontend and FastAPI backend allow for user-friendly interaction with the system through a web browser.
+
 ## Key Files
 
 - `simulation.py`: The entry point of the simulation process, orchestrating the entire self-improvement workflow.
-- `create_podcast.py`: Contains functions for creating podcasts, saving podcast states, and adding feedback.
+- `utils.py`: Contains utility functions for creating podcasts, saving podcast states, adding feedback, and PDF processing.
 - `agents_and_workflows.py`: Contains the implementation of the PodcastCreationWorkflow, PersonalityCreatorAgent, FeedbackAgent, and WeightClippingAgent.
 - `prompts/`: Directory containing prompt templates for each agent, including files for personality creation, weight clipping, and evaluation.
-- `textGDwithWeightClipping.py`: Script for optimizing agent prompts and applying weight clipping.
+- `textGDwithWeightClipping.py`: Script for optimizing agent prompts and applying weight clipping using TextGrad.
 - `evaluation.py`: Script for evaluating and comparing podcast scripts generated with different prompts.
 - `paudio.py`: Script for generating actual podcast audio using a specific prompt generation, separate from the self-improvement process.
 - `backend/fast_api_app.py`: FastAPI backend application for handling API requests from the frontend.
+- `creator-front-end/`: React-based frontend application for the web interface.
 
 ## Project Structure
 
@@ -160,7 +163,9 @@ The system will process PDFs, generate podcast scripts, and provide feedback. Fo
 - Improved feedback handling by adding it directly to the podcast state file.
 - Enhanced error handling and logging throughout the workflow.
 - Renamed `prompt_improving.py` to `textGDwithWeightClipping.py` for clarity.
-- Updated the utility functions in `utils.py` to include functionality from `pdf_to_markdown.py` and `create_podcast.py`.
+- Consolidated utility functions in `utils.py`, incorporating functionality from `pdf_to_markdown.py` and `create_podcast.py`.
+- Implemented a web interface with a React frontend and FastAPI backend for improved user interaction.
+- Integrated TextGrad for more sophisticated prompt optimization in the self-improvement process.
 
 ## Note
 
