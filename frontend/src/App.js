@@ -29,7 +29,7 @@ function App() {
 
   const API_BASE_URL = 'http://localhost:8000';
 
-  const validateApiKey = useCallback(async (key) => {
+  const validateApiKey = useCallback(async () => {
     if (!apiKey) {
       setIsApiKeyValid(false);
       alert('Please enter an API key');
@@ -65,7 +65,7 @@ function App() {
         alert(`Error validating API key: ${error.message}`);
       }
     }
-  };
+  }, [apiKey, API_BASE_URL]);
 
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
@@ -186,10 +186,6 @@ function App() {
     setApiKey(newApiKey);
     localStorage.setItem('apiKey', newApiKey);
     setIsApiKeyValid(false); // Reset validation state when the key changes
-
-    if (newApiKey) {
-      validateApiKey(newApiKey);
-    }
   };
 
   useEffect(() => {
@@ -199,7 +195,7 @@ function App() {
     }
 
     if (apiKey) {
-      validateApiKey(apiKey);
+      validateApiKey();
     }
   }, [apiKey, validateApiKey]);
 
