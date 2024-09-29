@@ -27,6 +27,22 @@ class PodcastCreationWorkflow:
         self.scriptwriter_system_prompt = self.load_prompt("prompts/scriptwriter_prompt.txt", self.timestamp)
         self.enhancer_system_prompt = self.load_prompt("prompts/enhancer_prompt.txt", self.timestamp)
 
+    @staticmethod
+    def load_prompt(file_path, timestamp=None):
+        if timestamp:
+            prompt_history_dir = "prompt_history"
+            base_filename = os.path.basename(file_path)
+            history_file = f"{base_filename}_{timestamp}"
+            history_path = os.path.join(prompt_history_dir, history_file)
+            
+            if os.path.exists(history_path):
+                with open(history_path, 'r') as file:
+                    return file.read().strip()
+        
+        # If no timestamp provided or file not found, fall back to the original prompt file
+        with open(file_path, 'r') as file:
+            return file.read().strip()
+
     def _create_chat_model(self, model, temperature):
         if self.provider == "OpenAI":
             return ChatOpenAI(

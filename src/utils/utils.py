@@ -271,16 +271,16 @@ def parse_dialogue(text: str) -> List[str]:
         dialogue_pieces.append(f"{pieces[i].strip()} {pieces[i+1].strip()}")
     return dialogue_pieces
 
-def create_podcast(pdf_path: str, timestamp: str = None, summarizer_model: str = "openai/gpt-4o-mini", scriptwriter_model: str = "openai/gpt-4o-mini", enhancer_model: str = "openai/gpt-4o-mini", provider: str = "OpenRouter") -> PodcastState:
+def create_podcast(pdf_path: str, timestamp: str = None, summarizer_model: str = "openai/gpt-4o-mini", scriptwriter_model: str = "openai/gpt-4o-mini", enhancer_model: str = "openai/gpt-4o-mini", provider: str = "OpenRouter", api_key: str = None) -> Tuple[PodcastState, str]:
     if not os.path.exists(pdf_path):
-        return None
+        return None, "PDF file not found"
 
     text = extract_text_from_pdf(pdf_path)
 
     if text is None or not text.strip():
-        return None
+        return None, "Extracted text is empty"
 
-    workflow_obj = PodcastCreationWorkflow(summarizer_model, scriptwriter_model, enhancer_model, timestamp, provider)
+    workflow_obj = PodcastCreationWorkflow(summarizer_model, scriptwriter_model, enhancer_model, timestamp, provider, api_key)
     workflow = workflow_obj.create_workflow()
     workflow = workflow.compile()
 

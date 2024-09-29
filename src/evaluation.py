@@ -86,7 +86,7 @@ def process_evaluation(evaluator, prompt_model, prompt_provider, i) -> Tuple[Opt
             if podcast2 is None or message2 != "Success":
                 raise ValueError(f"Failed to create podcast2: {message2}")
             
-            evaluation = evaluator.evaluate_podcasts(original_text, podcast_state1["enhanced_script"].content, podcast_state2["enhanced_script"].content)
+            evaluation = evaluator.evaluate_podcasts(original_text, podcast1["enhanced_script"].content, podcast2["enhanced_script"].content)
             
             return timestamp1, timestamp2, evaluation
         except Exception as e:

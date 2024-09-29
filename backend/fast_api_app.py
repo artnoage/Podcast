@@ -93,13 +93,17 @@ async def create_podcasts_endpoint(request: CreatePodcastsRequest):
 
         # Get the last timestamp and a random timestamp
         all_timestamps = get_all_timestamps()
-        last_timestamp = max(all_timestamps) if all_timestamps else None
-        random_timestamp = random.choice(all_timestamps) if all_timestamps else None
-
-        podcasts = []
-
-        for timestamp in [last_timestamp, random_timestamp]:
-            if timestamp:
+        if not all_timestamps:
+            # If no timestamps are available, create a podcast without a timestamp
+            podcast_state, message = create_podcast(uploaded_pdf_path, timestamp=None, summarizer_model="gpt-4o-mini", scriptwriter_model="gpt-4o-mini", enhancer_model="gpt-4o-mini", provider="OpenAI", api_key=request.api_key if request.api_key else None)
+            if podcast_state is None:
+                raise HTTPException(status_code=500, detail=f"Failed to create podcast: {message}")
+            podcasts = [podcast_state]
+        else:
+            last_timestamp = max(all_timestamps)
+            random_timestamp = random.choice(all_timestamps)
+            podcasts = []
+            for timestamp in [last_timestamp, random_timestamp]:
                 podcast_state, message = create_podcast(uploaded_pdf_path, timestamp=timestamp, summarizer_model="gpt-4o-mini", scriptwriter_model="gpt-4o-mini", enhancer_model="gpt-4o-mini", provider="OpenAI", api_key=request.api_key if request.api_key else None)
                 
                 if podcast_state is None:

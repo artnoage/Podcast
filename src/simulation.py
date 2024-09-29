@@ -55,7 +55,7 @@ def process_pdf_and_improve_prompts():
     new_timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
     # Create the podcast
-    final_state, message = create_podcast(pdf_path, timestamp=last_timestamp, summarizer_model=podcast_model, scriptwriter_model=podcast_model, enhancer_model=podcast_model, provider=podcast_provider, api_key=None)
+    final_state, message = create_podcast(pdf_path, timestamp=last_timestamp, summarizer_model=podcast_model, scriptwriter_model=podcast_model, enhancer_model=podcast_model, provider=podcast_provider, api_key=os.getenv("OPENAI_API_KEY"))
 
     if message != "Success":
         print(f"Error creating podcast: {message}")
