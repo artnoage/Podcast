@@ -279,9 +279,11 @@ class WeightClippingAgent:
 
     @staticmethod
     def load_prompt(file_path):
-        # Adjust the file path to look in the root directory
-        root_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), file_path)
-        with open(root_file_path, 'r') as file:
+        # Get the absolute path to the project root directory
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        root_dir = os.path.dirname(os.path.dirname(current_dir))
+        absolute_path = os.path.join(root_dir, file_path)
+        with open(absolute_path, 'r') as file:
             return file.read().strip()
 
     def clean_prompt(self, system_prompt: str, role: str) -> str:
