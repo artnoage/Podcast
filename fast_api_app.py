@@ -197,6 +197,11 @@ async def process_feedback(request: FeedbackRequest):
     old_timestamp = request.old_timestamp
     new_timestamp = request.new_timestamp
 
+    # Log the received values
+    logger.info(f"Received feedback: {feedback}")
+    logger.info(f"Old timestamp: {old_timestamp}")
+    logger.info(f"New timestamp: {new_timestamp}")
+
     # Add feedback to the podcast state
     add_feedback_to_state(old_timestamp, feedback)
 
