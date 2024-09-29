@@ -74,33 +74,32 @@ def plot_scores(scores,  evaluator_model, prompt_model):
     print(f"Raw data saved as: {csv_filename}")
 
 def process_evaluation(evaluator, prompt_model, prompt_provider, i) -> Tuple[Optional[str], Optional[str], Optional[str]]:
-    while True:
-        try:
-            print(f"{i}-th generation")
-            pdf_path = get_random_arxiv_file()
-            if pdf_path is None:
-                print("No more PDF files available in the arxiv_folder. Stopping the evaluation process.")
-                return None, None, None
-            
-            original_text = extract_text_from_pdf(pdf_path)
+    print(f"{i}-th generation")
+    pdf_path = get_random_arxiv_file()
+    if pdf_path is None or pdf_path == "No PDF files found in the arxiv_folder.":
+        print("No more PDF files available in the arxiv_folder. Stopping the evaluation process.")
+        return None, None, None
+    
+    try:
+        original_text = extract_text_from_pdf(pdf_path)
 
-            timestamp1, timestamp2 = choose_random_timestamps(2)
-            
-            podcast1, message1 = create_podcast(pdf_path, timestamp=timestamp1, summarizer_model=prompt_model, scriptwriter_model=prompt_model, enhancer_model=prompt_model, provider=prompt_provider, api_key=os.getenv("OPENAI_API_KEY"))
-            if podcast1 is None or message1 != "Success":
-                raise ValueError(f"Failed to create podcast1: {message1}")
-            
-            api_key = os.getenv("OPENAI_API_KEY") if prompt_provider == "OpenAI" else os.getenv("OPENROUTER_API_KEY")
-            podcast2, message2 = create_podcast(pdf_path, timestamp=timestamp2, summarizer_model=prompt_model, scriptwriter_model=prompt_model, enhancer_model=prompt_model, provider=prompt_provider, api_key=api_key)
-            if podcast2 is None or message2 != "Success":
-                raise ValueError(f"Failed to create podcast2: {message2}")
-            
-            evaluation = evaluator.evaluate_podcasts(original_text, podcast1["enhanced_script"].content, podcast2["enhanced_script"].content)
-            
-            return timestamp1, timestamp2, evaluation
-        except Exception as e:
-            print(f"An error occurred: {str(e)}. Retrying...")
-            continue
+        timestamp1, timestamp2 = choose_random_timestamps(2)
+        
+        podcast1, message1 = create_podcast(pdf_path, timestamp=timestamp1, summarizer_model=prompt_model, scriptwriter_model=prompt_model, enhancer_model=prompt_model, provider=prompt_provider, api_key=os.getenv("OPENAI_API_KEY"))
+        if podcast1 is None or message1 != "Success":
+            raise ValueError(f"Failed to create podcast1: {message1}")
+        
+        api_key = os.getenv("OPENAI_API_KEY") if prompt_provider == "OpenAI" else os.getenv("OPENROUTER_API_KEY")
+        podcast2, message2 = create_podcast(pdf_path, timestamp=timestamp2, summarizer_model=prompt_model, scriptwriter_model=prompt_model, enhancer_model=prompt_model, provider=prompt_provider, api_key=api_key)
+        if podcast2 is None or message2 != "Success":
+            raise ValueError(f"Failed to create podcast2: {message2}")
+        
+        evaluation = evaluator.evaluate_podcasts(original_text, podcast1["enhanced_script"].content, podcast2["enhanced_script"].content)
+        
+        return timestamp1, timestamp2, evaluation
+    except Exception as e:
+        print(f"An error occurred: {str(e)}. Skipping this evaluation.")
+        return None, None, None
 
 def main():
     evaluator_models = [ ("OpenAI", "gpt-4o-mini")]
@@ -118,11 +117,12 @@ def main():
                 futures = [executor.submit(process_evaluation, evaluator, prompt_model, prompt_provider, i) for i in range(2)]
                 
                 # Process results as they complete
+                all_none = True
                 for future in as_completed(futures):
                     timestamp1, timestamp2, evaluation = future.result()
                     if timestamp1 is None and timestamp2 is None and evaluation is None:
-                        print("Evaluation stopped due to lack of PDF files.")
-                        break
+                        continue
+                    all_none = False
                     if "1" in evaluation.lower() and "2" not in evaluation.lower():
                         update_scores(scores, timestamp1)
                     elif "2" in evaluation.lower() and "1" not in evaluation.lower():
@@ -130,11 +130,15 @@ def main():
                     else:
                         print(f"Unclear or tie response from evaluator: {evaluation}")
 
+                if all_none:
+                    print("All evaluations failed or no PDF files were available. Stopping the process.")
+                    break
+
                 if scores:  # Only plot if we have any scores
                     plot_scores(scores, evaluator_model, prompt_model)
                     print(f"Evaluation complete for evaluator: {evaluator_model}, prompt: {prompt_model}. Results plotted.")
                 else:
-                    print("No evaluations were completed. No results to plot.")
+                    print("No evaluations were completed successfully. No results to plot.")
 
 if __name__ == "__main__":
     main()
