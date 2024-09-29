@@ -160,7 +160,7 @@ def create_podcast(pdf_path: str, timestamp: str = None, summarizer_model: str =
     return final_state, "Success"
 
 def load_prompt(role, timestamp=None):
-    prompt_file = f"prompts/{role}_prompt.txt"
+    prompt_file = f"{role}_prompt.txt"
     if timestamp:
         prompt_history_dir = "prompt_history"
         history_file = f"{role}_prompt.txt_{timestamp}"
@@ -179,7 +179,7 @@ def load_prompt(role, timestamp=None):
         return file.read().strip()
 
 def load_podcast_state(timestamp):
-    state_file = f"podcast_states/podcast_state_{timestamp}.json"
+    state_file = f"podcast_state_{timestamp}.json"
     if os.path.exists(state_file):
         print(f"Loading podcast state from: {state_file}")
         with open(state_file, 'r') as f:

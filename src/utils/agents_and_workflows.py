@@ -177,7 +177,9 @@ class PersonalityCreatorAgent:
 
     @staticmethod
     def load_prompt(file_path):
-        with open(file_path, 'r') as file:
+        # Adjust the file path to look in the root directory
+        root_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), file_path)
+        with open(root_file_path, 'r') as file:
             return file.read().strip()
 
     def create_personality(self) -> str:
