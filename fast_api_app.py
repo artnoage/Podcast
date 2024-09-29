@@ -9,6 +9,7 @@ from datetime import datetime
 import random
 import json
 from openai import OpenAI
+import asyncio
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -104,7 +105,7 @@ async def create_podcasts_endpoint(request: CreatePodcastsRequest):
         all_timestamps = get_all_timestamps()
         if not all_timestamps:
             # If no timestamps are available, create a podcast without a timestamp
-            podcast_state, message = create_podcast(uploaded_pdf_content, timestamp=None, summarizer_model="gpt-4o-mini", scriptwriter_model="gpt-4o-mini", enhancer_model="gpt-4o-mini", provider="OpenAI", api_key=request.api_key if request.api_key else None)
+            podcast_state, message = await create_podcast(uploaded_pdf_content, timestamp=None, summarizer_model="gpt-4o-mini", scriptwriter_model="gpt-4o-mini", enhancer_model="gpt-4o-mini", provider="OpenAI", api_key=request.api_key if request.api_key else None)
             if podcast_state is None:
                 logger.error(f"Failed to create podcast: {message}")
                 raise HTTPException(status_code=500, detail=f"Failed to create podcast: {message}")
@@ -112,9 +113,9 @@ async def create_podcasts_endpoint(request: CreatePodcastsRequest):
         else:
             last_timestamp = max(all_timestamps)
             random_timestamp = random.choice(all_timestamps)
-            podcasts = []
-            for timestamp in [last_timestamp, random_timestamp]:
-                podcast_state, message = create_podcast(uploaded_pdf_content, timestamp=timestamp, summarizer_model="gpt-4o-mini", scriptwriter_model="gpt-4o-mini", enhancer_model="gpt-4o-mini", provider="OpenAI", api_key=request.api_key if request.api_key else None)
+            
+            async def create_podcast_task(timestamp):
+                podcast_state, message = await create_podcast(uploaded_pdf_content, timestamp=timestamp, summarizer_model="gpt-4o-mini", scriptwriter_model="gpt-4o-mini", enhancer_model="gpt-4o-mini", provider="OpenAI", api_key=request.api_key if request.api_key else None)
                 
                 if podcast_state is None:
                     logger.error(f"Failed to create podcast for timestamp {timestamp}: {message}")
@@ -129,7 +130,7 @@ async def create_podcasts_endpoint(request: CreatePodcastsRequest):
                 # TODO: Implement audio generation and save to audio_path
                 
                 # Add audio_url, timestamp, and type to the podcast_state
-                podcast_state_dict = {
+                return {
                     "timestamp": timestamp,
                     "type": "last" if timestamp == last_timestamp else "random",
                     "main_text": podcast_state["main_text"],
@@ -138,8 +139,12 @@ async def create_podcasts_endpoint(request: CreatePodcastsRequest):
                     "enhanced_script": podcast_state["enhanced_script"],
                     "audio_url": f"/static/{audio_filename}"
                 }
-                
-                podcasts.append(podcast_state_dict)
+            
+            # Create both podcasts concurrently
+            podcasts = await asyncio.gather(
+                create_podcast_task(last_timestamp),
+                create_podcast_task(random_timestamp)
+            )
         
         logger.info("Podcasts created successfully")
         return {"podcasts": podcasts}
