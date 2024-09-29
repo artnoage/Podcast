@@ -416,7 +416,11 @@ function App() {
     }
   };
 
-  // ... (rest of the JSX)
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-gray-200">
+      {/* ... (rest of the JSX) */}
+    </div>
+  );
 }
 
 export default App;
