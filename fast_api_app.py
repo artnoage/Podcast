@@ -122,9 +122,9 @@ async def create_podcasts_endpoint(request: CreatePodcastsRequest):
             podcasts = [podcast_state]
         else:
             last_timestamp = max(all_timestamps)
-            random_timestamp = random.choice(all_timestamps)
+            random_timestamp = random.choice([t for t in all_timestamps if t != last_timestamp])
             
-            async def create_podcast_task(timestamp):
+            async def create_podcast_task(timestamp, podcast_type):
                 podcast_state, message = await create_podcast(uploaded_pdf_content, timestamp=timestamp, summarizer_model="gpt-4o-mini", scriptwriter_model="gpt-4o-mini", enhancer_model="gpt-4o-mini", provider="OpenAI", api_key=request.api_key)
                 
                 if podcast_state is None:
@@ -161,7 +161,7 @@ async def create_podcasts_endpoint(request: CreatePodcastsRequest):
                 # Add audio_url, timestamp, and type to the podcast_state
                 return {
                     "timestamp": timestamp,
-                    "type": "last" if timestamp == last_timestamp else "random",
+                    "type": podcast_type,
                     "main_text": podcast_state["main_text"].content,
                     "key_points": podcast_state["key_points"].content,
                     "script_essence": podcast_state["script_essence"].content,
@@ -171,8 +171,8 @@ async def create_podcasts_endpoint(request: CreatePodcastsRequest):
             
             # Create both podcasts concurrently
             podcasts = await asyncio.gather(
-                create_podcast_task(last_timestamp),
-                create_podcast_task(random_timestamp)
+                create_podcast_task(random_timestamp, "random"),
+                create_podcast_task(last_timestamp, "last")
             )
         
         logger.info("Podcasts created successfully")
