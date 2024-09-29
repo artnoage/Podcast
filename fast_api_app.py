@@ -137,32 +137,32 @@ async def create_podcasts_endpoint(api_key: Optional[str] = None, pdf_content: U
                 try:
                     logger.info(f"Creating podcast for timestamp {timestamp}")
                     podcast_state, message = await create_podcast(pdf_bytes, timestamp=timestamp, summarizer_model="gpt-4o-mini", scriptwriter_model="gpt-4o-mini", enhancer_model="gpt-4o-mini", provider="OpenAI", api_key=api_key)
-                    
+        
                     if podcast_state is None:
                         logger.error(f"Failed to create podcast for timestamp {timestamp}: {message}")
                         raise HTTPException(status_code=500, detail=f"Failed to create podcast for timestamp {timestamp}: {message}")
-                    
+        
                     logger.info(f"Generating audio for timestamp {timestamp}")
-                    # Generate audio
+                    # Generate audio asynchronously
                     enhanced_script = podcast_state["enhanced_script"].content
                     dialogue_pieces = parse_dialogue(enhanced_script)
-                    
-                    audio_segments = []
-                    for piece in dialogue_pieces:
+        
+                    async def generate_audio_segment(piece):
                         speaker, text = piece.split(': ', 1)
                         voice = "onyx" if speaker == "Host" else "nova"
-                        audio_content = generate_tts(text, voice=voice)
-                        audio_segments.append(audio_content)
-                    
+                        return await asyncio.to_thread(generate_tts, text, voice=voice)
+        
+                    audio_segments = await asyncio.gather(*[generate_audio_segment(piece) for piece in dialogue_pieces])
+        
                     logger.info(f"Podcast created successfully for timestamp {timestamp}")
-                    
+        
                     # For the last podcast, save the state with a new timestamp
                     new_timestamp = None
                     if podcast_type == "last":
                         new_timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
                         logger.info(f"Saving podcast state for new timestamp {new_timestamp}")
                         save_podcast_state(podcast_state, new_timestamp)
-                    
+        
                     # Add timestamp and type to the podcast_state, along with audio segments
                     return {
                         "timestamp": timestamp,
