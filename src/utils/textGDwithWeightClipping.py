@@ -66,20 +66,19 @@ def optimize_prompt(role, old_timestamp, new_timestamp, engine_model, backward_e
     optimizer = tg.TGD(parameters=list(model.parameters()))
 
     # Optimization loop
-    num_iterations = 5  # You can adjust this number
-    for _ in range(num_iterations):
-        # Forward pass
-        output = model(user_prompt)
-        
-        # Compute loss
-        loss = loss_fn(output)
-        
-        # Backward pass
-        loss.backward()
-        
-        # Update the system prompt
-        optimizer.step()
-        optimizer.zero_grad()
+   
+    # Forward pass
+    output = model(user_prompt)
+    
+    # Compute loss
+    loss = loss_fn(output)
+    
+    # Backward pass
+    loss.backward()
+    
+    # Update the system prompt
+    optimizer.step()
+    optimizer.zero_grad()
 
     # Apply weight clipping
     weight_clipper = WeightClippingAgent()
