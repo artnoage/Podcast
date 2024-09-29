@@ -132,6 +132,7 @@ function App() {
         await submitFeedback(podcasts.last, feedback, podcasts.last.timestamp);
         console.log("Feedback submitted:", feedback);
         setFeedback('');
+        alert('Thanks for the feedback! You were a helpful gradient. Have a nice day!');
       } catch (error) {
         console.error('Error:', error);
         alert('Error processing feedback');
