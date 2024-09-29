@@ -15,9 +15,9 @@ from openai import OpenAI
 from pydub import AudioSegment
 import os
 
-from src.utils.utils import save_podcast_state, add_feedback_to_state, get_all_timestamps
+from src.utils.utils import add_feedback_to_state, get_all_timestamps
 from src.utils.textGDwithWeightClipping import optimize_prompt
-from src.paudio import create_podcast_audio, parse_dialogue
+from src.paudio import create_podcast_audio
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')

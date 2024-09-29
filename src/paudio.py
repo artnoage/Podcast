@@ -81,7 +81,7 @@ async def create_podcast_audio(pdf_content, timestamp=None):
     """
     print(f"Using prompts from timestamp: {timestamp or 'default'}")
     # Create the podcast
-    podcast_state, message = await create_podcast(pdf_content, timestamp=timestamp, summarizer_model="gpt-4o", scriptwriter_model="gpt-4o", enhancer_model="gpt-4o", provider="OpenAI", api_key=None)
+    podcast_state, message = await create_podcast(pdf_content, timestamp=timestamp, summarizer_model="gpt-4o-mini", scriptwriter_model="gpt-4o-mini", enhancer_model="gpt-4o-mini", provider="OpenAI", api_key=None)
     
     if podcast_state is None or message != "Success":
         raise ValueError(f"Failed to create podcast state: {message}")
