@@ -98,6 +98,7 @@ def save_podcast_state(state: PodcastState, timestamp: str):
         json.dump(data, f, indent=2)
     
     print(f"Podcast state saved to {filepath}")
+    print(f"Full path: {os.path.abspath(filepath)}")
 
 def add_feedback_to_state(timestamp: str, feedback: str):
     filename = f"podcast_state_{timestamp}.json"
@@ -210,6 +211,7 @@ def load_podcast_state(timestamp):
             return json.load(f)
     else:
         print(f"No podcast state found for timestamp: {timestamp}")
+        print(f"Searched in: {state_file_path}")
         return None
 
 def format_text_with_line_breaks(text, words_per_line=15):
