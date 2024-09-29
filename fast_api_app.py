@@ -137,9 +137,6 @@ async def create_podcasts_endpoint(api_key: Optional[str] = None, pdf_content: U
                         logger.error(f"Failed to create podcast for timestamp {timestamp}: {message}")
                         raise HTTPException(status_code=500, detail=f"Failed to create podcast for timestamp {timestamp}: {message}")
                     
-                    logger.info(f"Saving podcast state for timestamp {timestamp}")
-                    save_podcast_state(podcast_state, timestamp)
-                    
                     logger.info(f"Generating audio for timestamp {timestamp}")
                     # Generate audio
                     enhanced_script = podcast_state["enhanced_script"].content
@@ -153,14 +150,19 @@ async def create_podcasts_endpoint(api_key: Optional[str] = None, pdf_content: U
                         audio_segments.append(audio_content)
                     
                     logger.info(f"Podcast created successfully for timestamp {timestamp}")
+                    
+                    # For the last podcast, save the state with a new timestamp
+                    new_timestamp = None
+                    if podcast_type == "last":
+                        new_timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                        logger.info(f"Saving podcast state for new timestamp {new_timestamp}")
+                        save_podcast_state(podcast_state, new_timestamp)
+                    
                     # Add timestamp and type to the podcast_state, along with audio segments
                     return {
                         "timestamp": timestamp,
+                        "new_timestamp": new_timestamp,
                         "type": podcast_type,
-                        "main_text": podcast_state["main_text"].content,
-                        "key_points": podcast_state["key_points"].content,
-                        "script_essence": podcast_state["script_essence"].content,
-                        "enhanced_script": podcast_state["enhanced_script"].content,
                         "audio_segments": audio_segments
                     }
                 except Exception as e:
