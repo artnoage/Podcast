@@ -1,10 +1,10 @@
 import textgrad as tg
 import os
 try:
-    from src.utils.utils import load_prompt, load_podcast_state, format_text_with_line_breaks
+    from src.utils.utils import load_prompt, load_podcast_state, format_text_with_line_breaks, PROJECT_ROOT
     from src.utils.agents_and_workflows import WeightClippingAgent
 except ImportError:
-    from utils.utils import load_prompt, load_podcast_state, format_text_with_line_breaks
+    from utils.utils import load_prompt, load_podcast_state, format_text_with_line_breaks, PROJECT_ROOT
     from utils.agents_and_workflows import WeightClippingAgent
 
 def optimize_prompt(role, old_timestamp, new_timestamp, engine_model, backward_engine):
@@ -87,8 +87,9 @@ def optimize_prompt(role, old_timestamp, new_timestamp, engine_model, backward_e
     print(f"\nCleaned System Prompt for {role}!")
 
     # Save the optimized and cleaned prompt to prompt_history folder with new timestamp
-    os.makedirs("prompt_history", exist_ok=True)
-    new_history_file = os.path.join("prompt_history", f"{role}_prompt.txt_{new_timestamp}")
+    prompt_history_dir = os.path.join(PROJECT_ROOT, "prompt_history")
+    os.makedirs(prompt_history_dir, exist_ok=True)
+    new_history_file = os.path.join(prompt_history_dir, f"{role}_prompt.txt_{new_timestamp}")
     formatted_prompt = format_text_with_line_breaks(cleaned_prompt)
     with open(new_history_file, "w") as f:
         f.write(formatted_prompt)
