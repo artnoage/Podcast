@@ -4,7 +4,9 @@ import './App.css';
 // Error handling function
 const handleGooglePlayError = (error) => {
   if (error.message.includes('net::ERR_BLOCKED_BY_CLIENT')) {
-    console.warn('A request was blocked, likely by an ad-blocker. This won\'t affect the app\'s functionality.');
+    console.warn('A request to Google Play was blocked, likely by an ad-blocker. This won\'t affect the app\'s functionality.');
+  } else if (error.message.includes('https://play.google.com/log')) {
+    console.warn('A Google Play logging request was blocked. This won\'t affect the app\'s functionality.');
   } else {
     console.error('An error occurred:', error);
   }
