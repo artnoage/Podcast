@@ -143,18 +143,14 @@ function App() {
     }
   };
 
-  const handleFeedbackSubmit = async (event) => {
+  const handleFeedbackSubmit = (event) => {
     event.preventDefault();
     if (feedback && podcasts.last && podcasts.last.timestamp && newTimestamp) {
-      try {
-        await submitFeedback(feedback, podcasts.last.timestamp, newTimestamp);
-        console.log("Feedback submitted:", feedback);
-        setFeedback('');
-        alert('Thanks for the feedback! You were a helpful gradient. Have a nice day!');
-      } catch (error) {
-        console.error('Error:', error);
-        alert('Error processing feedback');
-      }
+      submitFeedback(feedback, podcasts.last.timestamp, newTimestamp)
+        .then(() => console.log("Feedback submitted:", feedback))
+        .catch(error => console.error('Error:', error));
+      setFeedback('');
+      alert('Thanks for the feedback! You were a helpful gradient. Have a nice day!');
     } else {
       alert('Please ensure you have created podcasts and provided feedback before submitting.');
     }
