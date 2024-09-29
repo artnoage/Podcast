@@ -1,4 +1,5 @@
 import os
+from os import path
 from langgraph.graph import END, StateGraph
 from langchain_core.messages import BaseMessage, HumanMessage
 from typing import TypedDict
@@ -309,7 +310,10 @@ class EvaluatorAgent:
 
     @staticmethod
     def load_prompt(file_path):
-        with open(file_path, 'r') as file:
+        # Get the absolute path to the project root directory
+        root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        absolute_path = os.path.join(root_dir, file_path)
+        with open(absolute_path, 'r') as file:
             return file.read().strip()
 
     def evaluate_podcasts(self, original_text: str, podcast1: str, podcast2: str) -> str:
