@@ -76,18 +76,26 @@ class PodcastCreationWorkflow:
 
     @staticmethod
     def load_prompt(file_path, timestamp=None):
+        # Get the absolute path to the project root directory
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        root_dir = os.path.dirname(os.path.dirname(current_dir))
+        
         if timestamp:
-            prompt_history_dir = "prompt_history"
+            prompt_history_dir = os.path.join(root_dir, "prompt_history")
             base_filename = os.path.basename(file_path)
             history_file = f"{base_filename}_{timestamp}"
             history_path = os.path.join(prompt_history_dir, history_file)
             
             if os.path.exists(history_path):
-                with open(history_path, 'r') as file:
+                with open(history_path, 'r', encoding='utf-8') as file:
                     return file.read().strip()
         
         # If no timestamp provided or file not found, fall back to the original prompt file
-        with open(file_path, 'r') as file:
+        absolute_path = os.path.join(root_dir, file_path)
+        if not os.path.exists(absolute_path):
+            raise FileNotFoundError(f"Prompt file not found: {absolute_path}")
+        
+        with open(absolute_path, 'r', encoding='utf-8') as file:
             return file.read().strip()
 
     def run_summarizer(self, state: PodcastState) -> PodcastState:
