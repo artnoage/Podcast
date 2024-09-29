@@ -46,131 +46,6 @@ def get_last_timestamp():
     timestamps = get_all_timestamps()
     return timestamps[-1] if timestamps else None
 
-def extract_text_from_pdf(pdf_path: str) -> Tuple[str, int]:
-    text = ""
-    try:
-        with open(pdf_path, 'rb') as file:
-            pdf_reader = PyPDF2.PdfReader(file)
-            for page in pdf_reader.pages:
-                text += page.extract_text()
-    except Exception as e:
-        print(f"Error extracting text from PDF: {e}")
-        return None, 0
-    
-    # Count tokens
-    encoding = tiktoken.get_encoding("cl100k_base")
-    tokens = encoding.encode(text)
-    token_count = len(tokens)
-    
-    if token_count > 40000:
-        return None, token_count
-    
-    return text, token_count
-
-def get_random_arxiv_file():
-    arxiv_folder = os.path.join(PROJECT_ROOT, "arxiv_papers")
-    
-    if not os.path.exists(arxiv_folder):
-        os.makedirs(arxiv_folder)
-        print(f"Created '{arxiv_folder}' folder.")
-    
-    pdf_files = [f for f in os.listdir(arxiv_folder) if f.endswith('.pdf')]
-    if not pdf_files:
-        raise FileNotFoundError(f"No PDF files found in the '{arxiv_folder}' folder. Please add some PDF files to continue.")
-    
-    return os.path.join(arxiv_folder, random.choice(pdf_files))
-
-def save_podcast_state(state: PodcastState, timestamp: str):
-    filename = f"podcast_state_{timestamp}.json"
-    
-    data = {
-        "main_text": state["main_text"].content,
-        "key_points": state["key_points"].content,
-        "script_essence": state["script_essence"].content,
-        "enhanced_script": state["enhanced_script"].content
-    }
-    
-    podcast_states_dir = os.path.join(PROJECT_ROOT, "podcast_states")
-    
-    os.makedirs(podcast_states_dir, exist_ok=True)
-    filepath = os.path.join(podcast_states_dir, filename)
-    
-    with open(filepath, 'w') as f:
-        json.dump(data, f, indent=2)
-    
-    print(f"Podcast state saved to {filepath}")
-    print(f"Full path: {os.path.abspath(filepath)}")
-
-def add_feedback_to_state(timestamp: str, feedback: str):
-    filename = f"podcast_state_{timestamp}.json"
-    
-    podcast_states_dir = os.path.join(PROJECT_ROOT, "podcast_states")
-    
-    filepath = os.path.join(podcast_states_dir, filename)
-    
-    if not os.path.exists(filepath):
-        print(f"Error: Podcast state file {filepath} not found.")
-        return
-    
-    with open(filepath, 'r') as f:
-        data = json.load(f)
-    
-    data["feedback"] = feedback
-    
-    with open(filepath, 'w') as f:
-        json.dump(data, f, indent=2)
-    
-    print(f"Feedback added to {filepath}")
-
-def parse_dialogue(text: str) -> List[str]:
-    pattern = r'(Host:|Guest:)'
-    pieces = re.split(pattern, text)
-    dialogue_pieces = []
-    for i in range(1, len(pieces), 2):
-        dialogue_pieces.append(f"{pieces[i].strip()} {pieces[i+1].strip()}")
-    return dialogue_pieces
-
-import logging
-
-def create_podcast(pdf_path: str, timestamp: str = None, summarizer_model: str = "openai/gpt-4o-mini", scriptwriter_model: str = "openai/gpt-4o-mini", enhancer_model: str = "openai/gpt-4o-mini", provider: str = "OpenRouter", api_key: str = None) -> Tuple[PodcastState, str]:
-    if not os.path.exists(pdf_path):
-        return None, "PDF file not found"
-
-    text, token_count = extract_text_from_pdf(pdf_path)
-
-    if text:
-        if token_count > 40000:
-            return None, f"PDF content exceeds 40,000 tokens (current: {token_count})"
-        return None, "Error extracting text from PDF"
-
-    if not text.strip():
-        return None, "Extracted text is empty"
-
-    if api_key:
-        logging.info(f"Using provided API key ending with ...{api_key[-4:]}")
-    else:
-        api_key = os.getenv("OPENAI_API_KEY")
-        if api_key:
-            logging.info(f"Using API key from environment ending with ...{api_key[-4:]}")
-        else:
-            logging.warning("No API key provided or found in environment")
-
-    workflow_obj = PodcastCreationWorkflow(summarizer_model, scriptwriter_model, enhancer_model, timestamp, provider, api_key)
-    workflow = workflow_obj.create_workflow()
-    workflow = workflow.compile()
-
-    state = PodcastState(
-        main_text=HumanMessage(content=text),
-        key_points=None,
-        script_essence=None,
-        enhanced_script=None)
-
-    try:
-        final_state = workflow.invoke(state)
-    except Exception as e:
-        return None, f"Error creating podcast: {str(e)}"
-
-    return final_state, "Success"
 
 def load_prompt(role, timestamp=None):
     prompt_file = f"{role}_prompt.txt"
@@ -216,7 +91,6 @@ def format_text_with_line_breaks(text, words_per_line=15):
         formatted_lines.append(line)
     return '\n'.join(formatted_lines)
 
-import tiktoken
 
 def extract_text_from_pdf(pdf_path: str) -> Tuple[Optional[str], int]:
     try:
