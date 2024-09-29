@@ -7,15 +7,23 @@ import matplotlib
 matplotlib.use('Agg')  # Use a non-interactive backend
 import matplotlib.pyplot as plt
 from concurrent.futures import ThreadPoolExecutor, as_completed
-try:
-    from src.utils.utils import create_podcast, extract_text_from_pdf, get_random_arxiv_file, get_all_timestamps
-    from src.utils.agents_and_workflows import EvaluatorAgent
-except ImportError:
-    from utils.utils import create_podcast, extract_text_from_pdf, get_random_arxiv_file, get_all_timestamps
-    from utils.agents_and_workflows import EvaluatorAgent
 from typing import Tuple, Optional
 
+# Get the project root directory
+def get_project_root():
+    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# Add the project root to sys.path
+import sys
+sys.path.append(get_project_root())
+
+from src.utils.utils import create_podcast, extract_text_from_pdf, get_random_arxiv_file, get_all_timestamps
+from src.utils.agents_and_workflows import EvaluatorAgent
+
 load_dotenv()
+
+# Set the PROJECT_ROOT
+PROJECT_ROOT = get_project_root()
 
 def choose_random_timestamps(n=2):
     all_timestamps = get_all_timestamps()
@@ -53,18 +61,19 @@ def plot_scores(scores,  evaluator_model, prompt_model):
     plt.tight_layout()
     
     # Create a directory for plots and data if it doesn't exist
-    os.makedirs("evaluation_plots", exist_ok=True)
+    plots_dir = os.path.join(PROJECT_ROOT, "evaluation_plots")
+    os.makedirs(plots_dir, exist_ok=True)
     
     # Save the plot with a unique filename
     current_time = datetime.now().strftime("%Y%m%d_%H%M%S")
-    plot_filename = f"evaluation_plots/prompt_performance_{current_time}.png"
+    plot_filename = os.path.join(plots_dir, f"prompt_performance_{current_time}.png")
     plt.savefig(plot_filename)
     plt.close()
     
     print(f"Plot saved as: {plot_filename}")
 
     # Save the raw data to a CSV file
-    csv_filename = f"evaluation_plots/raw_data_{current_time}.csv"
+    csv_filename = os.path.join(plots_dir, f"raw_data_{current_time}.csv")
     with open(csv_filename, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(['Timestamp', 'Raw Points', 'Normalized Points'])
