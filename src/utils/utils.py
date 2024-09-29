@@ -66,7 +66,10 @@ def pdf_to_markdown(pdf_path: str) -> None:
     print(f"Markdown file created: {output_path}")
 
 def get_random_arxiv_file():
-    arxiv_folder = "arxiv_papers"
+    # Get the path to the project root directory
+    root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    arxiv_folder = os.path.join(root_dir, "arxiv_papers")
+    
     if not os.path.exists(arxiv_folder):
         os.makedirs(arxiv_folder)
         print(f"Created '{arxiv_folder}' folder.")
