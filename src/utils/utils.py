@@ -174,6 +174,7 @@ def load_prompt(role, timestamp=None):
     
     if timestamp:
         prompt_history_dir = os.path.join(PROJECT_ROOT, "prompt_history")
+        os.makedirs(prompt_history_dir, exist_ok=True)  # Ensure the directory exists
         history_file = f"{role}_prompt.txt_{timestamp}"
         history_path = os.path.join(prompt_history_dir, history_file)
         
