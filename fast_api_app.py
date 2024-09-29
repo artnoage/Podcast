@@ -12,6 +12,11 @@ import json
 from openai import OpenAI
 import asyncio
 from pydub import AudioSegment
+from pydantic import BaseModel
+from typing import Optional
+from fastapi import UploadFile
+import os
+from fastapi.staticfiles import StaticFiles
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -20,8 +25,7 @@ logger = logging.getLogger(__name__)
 app = FastAPI()
 client = OpenAI()
 
-import os
-from fastapi.staticfiles import StaticFiles
+
 
 # Create the 'static' directory if it doesn't exist
 os.makedirs("static", exist_ok=True)
@@ -92,11 +96,7 @@ async def upload_pdf(file: UploadFile = File(...)):
     except Exception as e:
         logger.error(f"An error occurred while uploading the file: {str(e)}")
         raise HTTPException(status_code=500, detail=f"An error occurred while uploading the file: {str(e)}")
-
-from pydantic import BaseModel
-from typing import Optional
-from fastapi import UploadFile
-
+    
 class CreatePodcastsRequest(BaseModel):
     api_key: Optional[str] = None
     pdf_content: bytes
