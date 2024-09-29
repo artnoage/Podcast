@@ -89,7 +89,7 @@ def optimize_prompt(role, old_timestamp, new_timestamp, engine_model, backward_e
     # Save the optimized and cleaned prompt to prompt_history folder with new timestamp
     prompt_history_dir = os.path.join(PROJECT_ROOT, "prompt_history")
     os.makedirs(prompt_history_dir, exist_ok=True)
-    new_history_file = os.path.join(prompt_history_dir, f"{role}_prompt.txt_{new_timestamp}")
+    new_history_file = os.path.join(prompt_history_dir, f"{role}_prompt_{new_timestamp}.txt")
     formatted_prompt = format_text_with_line_breaks(cleaned_prompt)
     with open(new_history_file, "w") as f:
         f.write(formatted_prompt)
