@@ -8,10 +8,10 @@ matplotlib.use('Agg')  # Use a non-interactive backend
 import matplotlib.pyplot as plt
 from concurrent.futures import ThreadPoolExecutor, as_completed
 try:
-    from src.utils.utils import create_podcast, extract_text_from_pdf, get_random_arxiv_file, get_all_timestamps, save_podcast_state
+    from src.utils.utils import create_podcast, extract_text_from_pdf, get_random_arxiv_file, get_all_timestamps
     from src.utils.agents_and_workflows import EvaluatorAgent
 except ImportError:
-    from utils.utils import create_podcast, extract_text_from_pdf, get_random_arxiv_file, get_all_timestamps, save_podcast_state
+    from utils.utils import create_podcast, extract_text_from_pdf, get_random_arxiv_file, get_all_timestamps
     from utils.agents_and_workflows import EvaluatorAgent
 from typing import Tuple, Optional
 
@@ -108,9 +108,9 @@ def main():
             scores = {}
             evaluator = EvaluatorAgent(model=evaluator_model, provider=evaluator_provider)
 
-            with ThreadPoolExecutor(max_workers=20) as executor:
+            with ThreadPoolExecutor(max_workers=2) as executor:
                 # Submit all tasks
-                futures = [executor.submit(process_evaluation, evaluator, prompt_model, prompt_provider, i) for i in range(300)]
+                futures = [executor.submit(process_evaluation, evaluator, prompt_model, prompt_provider, i) for i in range(2)]
                 
                 # Process results as they complete
                 for future in as_completed(futures):
