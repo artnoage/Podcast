@@ -149,7 +149,7 @@ async def create_podcasts_endpoint(
             async def create_podcast_task(timestamp, podcast_type):
                 try:
                     logger.info(f"Creating podcast for timestamp {timestamp}")
-                    podcast_audio, dialogue_text = await create_podcast_audio(
+                    podcast_audio, dialogue_text, new_timestamp = await create_podcast_audio(
                         pdf_bytes, timestamp=timestamp,
                         summarizer_model=summarizer_model,
                         scriptwriter_model=scriptwriter_model,
@@ -159,14 +159,7 @@ async def create_podcasts_endpoint(
                     )
 
                     logger.info(f"Podcast created successfully for timestamp {timestamp}")
-
-                    # For the last podcast, save the state with a new timestamp
-                    new_timestamp = None
-                    if podcast_type == "last":
-                        new_timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                        logger.info(f"Saving podcast state for new timestamp {new_timestamp}")
-                        # Note: We need to modify create_podcast_audio to return the podcast state as well
-                        # save_podcast_state(podcast_state, new_timestamp)
+                    logger.info(f"New timestamp for saved podcast state: {new_timestamp}")
 
                     # Add timestamp and type to the podcast_state, along with audio and dialogue
                     return {

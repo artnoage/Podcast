@@ -96,7 +96,9 @@ async def create_podcast_audio(pdf_content, timestamp=None, summarizer_model="gp
     if podcast_state is None or message != "Success":
         raise ValueError(f"Failed to create podcast state: {message}")
     
-    save_podcast_state(podcast_state, timestamp)
+    # Generate a new timestamp for saving the podcast state
+    new_timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    save_podcast_state(podcast_state, new_timestamp)
 
     enhanced_script = podcast_state["enhanced_script"].content
     
@@ -129,7 +131,7 @@ async def create_podcast_audio(pdf_content, timestamp=None, summarizer_model="gp
     # Save the dialogue
     dialogue_text = "\n".join(dialogue_pieces)
 
-    return audio_bytes, dialogue_text
+    return audio_bytes, dialogue_text, new_timestamp
 
 if __name__ == "__main__":
     import argparse
