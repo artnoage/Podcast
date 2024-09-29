@@ -28,7 +28,8 @@ PROJECT_ROOT = get_project_root()
 def choose_random_timestamps(n=2):
     all_timestamps = get_all_timestamps()
     if len(all_timestamps) < n:
-        raise ValueError(f"Not enough timestamps available. Found {len(all_timestamps)}, need at least {n}.")
+        print(f"Warning: Not enough timestamps available. Found {len(all_timestamps)}, need at least {n}.")
+        return all_timestamps if all_timestamps else [None, None]
     return random.sample(all_timestamps, n)
 
 def update_scores(scores, winner):
@@ -121,6 +122,10 @@ def main():
     #evaluator_models = [("OpenRouter", "google/gemini-pro-1.5")]
     #prompt_models = [("OpenRouter", "openai/gpt-4o-mini")]
 
+    # Ensure prompt_history directory exists
+    prompt_history_dir = os.path.join(PROJECT_ROOT, "prompt_history")
+    os.makedirs(prompt_history_dir, exist_ok=True)
+
     for evaluator_provider, evaluator_model in evaluator_models:
         for prompt_provider, prompt_model in prompt_models:
             scores = {}
@@ -137,12 +142,15 @@ def main():
                     if timestamp1 is None and timestamp2 is None and evaluation is None:
                         continue
                     all_none = False
-                    if "1" in evaluation.lower() and "2" not in evaluation.lower():
-                        update_scores(scores, timestamp1)
-                    elif "2" in evaluation.lower() and "1" not in evaluation.lower():
-                        update_scores(scores, timestamp2)
+                    if evaluation:
+                        if "1" in evaluation.lower() and "2" not in evaluation.lower():
+                            update_scores(scores, timestamp1)
+                        elif "2" in evaluation.lower() and "1" not in evaluation.lower():
+                            update_scores(scores, timestamp2)
+                        else:
+                            print(f"Unclear or tie response from evaluator: {evaluation}")
                     else:
-                        print(f"Unclear or tie response from evaluator: {evaluation}")
+                        print("No evaluation result available.")
 
                 if all_none:
                     print("All evaluations failed or no PDF files were available. Stopping the process.")
