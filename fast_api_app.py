@@ -4,7 +4,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from src.utils.utils import create_podcast, save_podcast_state, add_feedback_to_state, get_all_timestamps
 from src.utils.textGDwithWeightClipping import optimize_prompt
-import tempfile
 import os
 from datetime import datetime
 import random
