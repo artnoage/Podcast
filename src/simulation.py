@@ -22,29 +22,6 @@ personality_provider = "OpenAI"
 personality_model = "gpt-4o-mini"
 
 
-def get_last_timestamp():
-    prompt_history_dir = "prompt_history"
-    if not os.path.exists(prompt_history_dir):
-        return None
-    
-    history_files = os.listdir(prompt_history_dir)
-    if not history_files:
-        return None
-    
-    timestamps = []
-    for filename in history_files:
-        match = re.search(r'(\d{8}_\d{6})', filename)
-        if match:
-            try:
-                timestamp_str = match.group(1)
-                timestamp = datetime.strptime(timestamp_str, "%Y%m%d_%H%M%S")
-                timestamps.append(timestamp)
-            except ValueError:
-                continue
-    
-    if timestamps:
-        return max(timestamps).strftime("%Y%m%d_%H%M%S")
-    return None
 
 def process_pdf_and_improve_prompts():
     # Get a random PDF file from the arxiv folder

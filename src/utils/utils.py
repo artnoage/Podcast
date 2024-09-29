@@ -42,6 +42,10 @@ def get_all_timestamps():
     print(f"Found {len(sorted_timestamps)} unique timestamps.")
     return sorted_timestamps
 
+def get_last_timestamp():
+    timestamps = get_all_timestamps()
+    return timestamps[-1] if timestamps else None
+
 def extract_text_from_pdf(pdf_path: str) -> Tuple[str, int]:
     text = ""
     try:
