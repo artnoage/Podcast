@@ -77,14 +77,20 @@ function App() {
       console.log('Creating podcasts. API key valid:', isApiKeyValid);
       const result = await createPodcasts(isApiKeyValid ? apiKey : null);
       console.log('Create podcasts result:', result);
-      if (result.podcasts && result.podcasts.length > 0) {
-        setPodcasts({
-          random: result.podcasts.find(p => p.type === 'random'),
-          last: result.podcasts.find(p => p.type === 'last')
-        });
-        console.log('Podcasts created successfully!');
+      if (result.podcasts && result.podcasts.length === 2) {
+        const randomPodcast = result.podcasts.find(p => p.type === 'random');
+        const lastPodcast = result.podcasts.find(p => p.type === 'last');
+        if (randomPodcast && lastPodcast) {
+          setPodcasts({
+            random: randomPodcast,
+            last: lastPodcast
+          });
+          console.log('Podcasts created successfully!');
+        } else {
+          throw new Error('Missing random or last podcast in the server response');
+        }
       } else {
-        throw new Error('No podcasts returned from the server');
+        throw new Error('Incorrect number of podcasts returned from the server');
       }
     } catch (error) {
       console.error('Error creating podcasts:', error);
