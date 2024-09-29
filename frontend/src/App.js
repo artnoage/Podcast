@@ -30,6 +30,7 @@ function App() {
   const [hasVoted, setHasVoted] = useState(false);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [newTimestamp, setNewTimestamp] = useState(null);
 
   useEffect(() => {
     const voted = localStorage.getItem('hasVoted');
@@ -90,6 +91,9 @@ function App() {
             random: randomPodcast,
             last: lastPodcast
           });
+          if (lastPodcast.new_timestamp) {
+            setNewTimestamp(lastPodcast.new_timestamp);
+          }
           console.log('Podcasts created successfully!');
         } else {
           throw new Error('Missing random or last podcast in the server response');
