@@ -203,8 +203,9 @@ function App() {
           </h1>
           <p className="text-3xl sm:text-4xl md:text-5xl font-extralight">
             where <span className="font-normal text-blue-400 animate-pulse">you</span>{' '}
-            <span className="font-normal">generate</span>{' '}
-            <span className="font-normal text-green-400 animate-pulse">the gradient</span>
+            <span className="font-normal">are the</span>{' '}
+
+            <span className="font-normal text-blue-400 animate-pulse"> gradient</span>
           </p>
         </div>
 
