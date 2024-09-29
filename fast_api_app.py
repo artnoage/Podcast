@@ -118,7 +118,7 @@ async def create_podcasts_endpoint(request: CreatePodcastsRequest):
         all_timestamps = get_all_timestamps()
         if not all_timestamps:
             # If no timestamps are available, create a podcast without a timestamp
-            podcast_state, message = await create_podcast(uploaded_pdf_content, timestamp=None, summarizer_model="gpt-4o-mini", scriptwriter_model="gpt-4o-mini", enhancer_model="gpt-4o-mini", provider="OpenAI", api_key=request.api_key)
+            podcast_state, message = await create_podcast(uploaded_pdf_content, timestamp=None, summarizer_model="gpt-4o-mini", scriptwriter_model="gpt-4o-mini", enhancer_model="gpt-4o-mini", provider="OpenAI", api_key=api_key)
             if podcast_state is None:
                 logger.error(f"Failed to create podcast: {message}")
                 raise HTTPException(status_code=500, detail=f"Failed to create podcast: {message}")
@@ -128,7 +128,7 @@ async def create_podcasts_endpoint(request: CreatePodcastsRequest):
             random_timestamp = random.choice([t for t in all_timestamps if t != last_timestamp])
             
             async def create_podcast_task(timestamp, podcast_type):
-                podcast_state, message = await create_podcast(uploaded_pdf_content, timestamp=timestamp, summarizer_model="gpt-4o-mini", scriptwriter_model="gpt-4o-mini", enhancer_model="gpt-4o-mini", provider="OpenAI", api_key=request.api_key)
+                podcast_state, message = await create_podcast(uploaded_pdf_content, timestamp=timestamp, summarizer_model="gpt-4o-mini", scriptwriter_model="gpt-4o-mini", enhancer_model="gpt-4o-mini", provider="OpenAI", api_key=api_key)
                 
                 if podcast_state is None:
                     logger.error(f"Failed to create podcast for timestamp {timestamp}: {message}")
