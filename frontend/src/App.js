@@ -398,7 +398,6 @@ function App() {
   );
 }
 
-export default App;
   const handleApiKeyChange = (event) => {
     const newApiKey = event.target.value;
     setApiKey(newApiKey);
@@ -416,3 +415,10 @@ export default App;
       validateApiKey(newApiKey);
     }
   };
+
+  return (
+    // ... (rest of the JSX)
+  );
+}
+
+export default App;
