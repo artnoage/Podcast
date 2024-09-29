@@ -20,7 +20,7 @@ def get_project_root():
 PROJECT_ROOT = get_project_root()
 
 def get_all_timestamps():
-    prompt_history_dir = "prompt_history"
+    prompt_history_dir = os.path.join(PROJECT_ROOT, "prompt_history")
     if not os.path.exists(prompt_history_dir):
         print(f"Directory '{prompt_history_dir}' does not exist.")
         return []
