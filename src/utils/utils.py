@@ -120,9 +120,7 @@ def pdf_to_markdown(pdf_path: str) -> None:
     print(f"Markdown file created: {output_path}")
 
 def get_random_arxiv_file():
-    # Get the path to the project root directory
-    current_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    arxiv_folder = os.path.join(current_dir, "arxiv_papers")
+    arxiv_folder = os.path.join(PROJECT_ROOT, "arxiv_papers")
     
     if not os.path.exists(arxiv_folder):
         print(f"The '{arxiv_folder}' folder does not exist.")
@@ -145,9 +143,7 @@ def save_podcast_state(state: PodcastState, timestamp: str):
         "enhanced_script": state["enhanced_script"].content
     }
     
-    # Get the absolute path to the project root directory
-    current_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    podcast_states_dir = os.path.join(current_dir, "podcast_states")
+    podcast_states_dir = os.path.join(PROJECT_ROOT, "podcast_states")
     
     os.makedirs(podcast_states_dir, exist_ok=True)
     filepath = os.path.join(podcast_states_dir, filename)
@@ -160,9 +156,7 @@ def save_podcast_state(state: PodcastState, timestamp: str):
 def add_feedback_to_state(timestamp: str, feedback: str):
     filename = f"podcast_state_{timestamp}.json"
     
-    # Get the absolute path to the project root directory
-    current_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    podcast_states_dir = os.path.join(current_dir, "podcast_states")
+    podcast_states_dir = os.path.join(PROJECT_ROOT, "podcast_states")
     
     filepath = os.path.join(podcast_states_dir, filename)
     
