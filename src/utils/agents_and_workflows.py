@@ -1,7 +1,7 @@
+import os
 from langgraph.graph import END, StateGraph
 from langchain_core.messages import BaseMessage, HumanMessage
 from typing import TypedDict
-import os
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
@@ -219,7 +219,9 @@ class FeedbackAgent:
 
     @staticmethod
     def load_prompt(file_path):
-        with open(file_path, 'r') as file:
+        # Adjust the file path to look in the root directory
+        root_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), file_path)
+        with open(root_file_path, 'r') as file:
             return file.read().strip()
 
     def run_feedback(self, original_text: str, final_product: str, personality: str) -> str:
