@@ -31,8 +31,12 @@ class PodcastCreationWorkflow:
 
     @staticmethod
     def load_prompt(file_path, timestamp=None):
+        # Get the absolute path to the project root directory
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        root_dir = os.path.dirname(os.path.dirname(current_dir))
+        
         if timestamp:
-            prompt_history_dir = "prompt_history"
+            prompt_history_dir = os.path.join(root_dir, "prompt_history")
             base_filename = os.path.basename(file_path)
             history_file = f"{base_filename}_{timestamp}"
             history_path = os.path.join(prompt_history_dir, history_file)
@@ -42,7 +46,8 @@ class PodcastCreationWorkflow:
                     return file.read().strip()
         
         # If no timestamp provided or file not found, fall back to the original prompt file
-        with open(file_path, 'r') as file:
+        absolute_path = os.path.join(root_dir, file_path)
+        with open(absolute_path, 'r') as file:
             return file.read().strip()
 
     def _create_chat_model(self, model, temperature):
