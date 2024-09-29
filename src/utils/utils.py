@@ -183,9 +183,11 @@ def load_prompt(role, timestamp=None):
 
 def load_podcast_state(timestamp):
     state_file = f"podcast_state_{timestamp}.json"
-    if os.path.exists(state_file):
-        print(f"Loading podcast state from: {state_file}")
-        with open(state_file, 'r') as f:
+    podcast_states_dir = "podcast_states"
+    state_file_path = os.path.join(podcast_states_dir, state_file)
+    if os.path.exists(state_file_path):
+        print(f"Loading podcast state from: {state_file_path}")
+        with open(state_file_path, 'r') as f:
             return json.load(f)
     else:
         print(f"No podcast state found for timestamp: {timestamp}")
