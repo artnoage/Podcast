@@ -75,13 +75,23 @@ async def generate_tts_async(text, voice="onyx"):
         logger.error(f"Error in asynchronous OpenAI TTS API call: {str(e)}", exc_info=True)
         raise
 
-async def create_podcast_audio(pdf_content, timestamp=None):
+async def create_podcast_audio(pdf_content, timestamp=None, summarizer_model="gpt-4o-mini", scriptwriter_model="gpt-4o-mini", enhancer_model="gpt-4o-mini", provider="OpenAI", api_key=None):
     """
-    Creates an audio podcast from the given PDF content using the provided timestamp.
+    Creates an audio podcast from the given PDF content using the provided timestamp and models.
     """
     print(f"Using prompts from timestamp: {timestamp or 'default'}")
+    print(f"Using models - Summarizer: {summarizer_model}, Scriptwriter: {scriptwriter_model}, Enhancer: {enhancer_model}")
+    
     # Create the podcast
-    podcast_state, message = await create_podcast(pdf_content, timestamp=timestamp, summarizer_model="gpt-4o-mini", scriptwriter_model="gpt-4o-mini", enhancer_model="gpt-4o-mini", provider="OpenAI", api_key=None)
+    podcast_state, message = await create_podcast(
+        pdf_content, 
+        timestamp=timestamp, 
+        summarizer_model=summarizer_model, 
+        scriptwriter_model=scriptwriter_model, 
+        enhancer_model=enhancer_model, 
+        provider=provider, 
+        api_key=api_key
+    )
     
     if podcast_state is None or message != "Success":
         raise ValueError(f"Failed to create podcast state: {message}")

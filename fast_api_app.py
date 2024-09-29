@@ -102,7 +102,14 @@ def save_votes(votes):
 from fastapi import UploadFile, File
 
 @app.post("/create_podcasts")
-async def create_podcasts_endpoint(api_key: Optional[str] = None, pdf_content: UploadFile = File(...)):
+async def create_podcasts_endpoint(
+    api_key: Optional[str] = None,
+    pdf_content: UploadFile = File(...),
+    summarizer_model: str = "gpt-4o-mini",
+    scriptwriter_model: str = "gpt-4o-mini",
+    enhancer_model: str = "gpt-4o-mini",
+    provider: str = "OpenAI"
+):
     logger.info(f"Creating podcasts. PDF file name: {pdf_content.filename}")
     if not pdf_content:
         logger.error("No PDF file provided")
@@ -112,9 +119,10 @@ async def create_podcasts_endpoint(api_key: Optional[str] = None, pdf_content: U
         # Read the content of the uploaded file
         pdf_bytes = await pdf_content.read()
 
-        # Log the API key status
+        # Log the API key status and model information
         api_key_status = "provided" if api_key else "not provided"
         logger.info(f"Creating podcasts with API key status: {api_key_status}")
+        logger.info(f"Using models - Summarizer: {summarizer_model}, Scriptwriter: {scriptwriter_model}, Enhancer: {enhancer_model}")
 
         # Get the last timestamp and a random timestamp
         logger.info("Getting timestamps")
@@ -124,8 +132,15 @@ async def create_podcasts_endpoint(api_key: Optional[str] = None, pdf_content: U
         if not all_timestamps:
             logger.info("No timestamps available, creating podcast without timestamp")
             # If no timestamps are available, create a podcast without a timestamp
-            podcast_audio = await create_podcast_audio(pdf_bytes, timestamp=None)
-            podcasts = [{"timestamp": None, "audio": podcast_audio}]
+            podcast_audio, dialogue_text = await create_podcast_audio(
+                pdf_bytes, timestamp=None,
+                summarizer_model=summarizer_model,
+                scriptwriter_model=scriptwriter_model,
+                enhancer_model=enhancer_model,
+                provider=provider,
+                api_key=api_key
+            )
+            podcasts = [{"timestamp": None, "audio": podcast_audio, "dialogue": dialogue_text}]
         else:
             logger.info("Timestamps available, creating podcasts with timestamps")
             last_timestamp = max(all_timestamps)
@@ -134,7 +149,14 @@ async def create_podcasts_endpoint(api_key: Optional[str] = None, pdf_content: U
             async def create_podcast_task(timestamp, podcast_type):
                 try:
                     logger.info(f"Creating podcast for timestamp {timestamp}")
-                    podcast_audio, dialogue_text = await create_podcast_audio(pdf_bytes, timestamp=timestamp)
+                    podcast_audio, dialogue_text = await create_podcast_audio(
+                        pdf_bytes, timestamp=timestamp,
+                        summarizer_model=summarizer_model,
+                        scriptwriter_model=scriptwriter_model,
+                        enhancer_model=enhancer_model,
+                        provider=provider,
+                        api_key=api_key
+                    )
 
                     logger.info(f"Podcast created successfully for timestamp {timestamp}")
 
