@@ -5,9 +5,14 @@ load_dotenv()
 from datetime import datetime
 import random
 import re
-from src.utils.utils import create_podcast, parse_dialogue, save_podcast_state, add_feedback_to_state, get_random_arxiv_file
-from src.utils.agents_and_workflows import FeedbackAgent, PersonalityCreatorAgent
-from src.utils.prompt_improving import optimize_prompt
+try:
+    from src.utils.utils import create_podcast, parse_dialogue, save_podcast_state, add_feedback_to_state, get_random_arxiv_file
+    from src.utils.agents_and_workflows import FeedbackAgent, PersonalityCreatorAgent
+    from src.utils.prompt_improving import optimize_prompt
+except ImportError:
+    from utils.utils import create_podcast, parse_dialogue, save_podcast_state, add_feedback_to_state, get_random_arxiv_file
+    from utils.agents_and_workflows import FeedbackAgent, PersonalityCreatorAgent
+    from utils.prompt_improving import optimize_prompt
 
 # Predefined values for provider and models
 podcast_provider = "OpenAI"
