@@ -1,1 +1,5 @@
-# This file is intentionally left empty to mark the directory as a Python package.
+"""
+This package contains the main components of the podcast generation system.
+
+It includes modules for podcast creation, evaluation, and prompt optimization.
+"""
