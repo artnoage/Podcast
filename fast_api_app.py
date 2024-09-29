@@ -115,8 +115,12 @@ async def create_podcasts_endpoint(request: CreatePodcastsRequest):
         api_key = request.api_key if request.api_key else None
 
         # Get the last timestamp and a random timestamp
+        logger.info("Getting timestamps")
         all_timestamps = get_all_timestamps()
+        logger.info(f"All timestamps: {all_timestamps}")
+
         if not all_timestamps:
+            logger.info("No timestamps available, creating podcast without timestamp")
             # If no timestamps are available, create a podcast without a timestamp
             podcast_state, message = await create_podcast(uploaded_pdf_content, timestamp=None, summarizer_model="gpt-4o-mini", scriptwriter_model="gpt-4o-mini", enhancer_model="gpt-4o-mini", provider="OpenAI", api_key=api_key)
             if podcast_state is None:
@@ -124,19 +128,22 @@ async def create_podcasts_endpoint(request: CreatePodcastsRequest):
                 raise HTTPException(status_code=500, detail=f"Failed to create podcast: {message}")
             podcasts = [podcast_state]
         else:
+            logger.info("Timestamps available, creating podcasts with timestamps")
             last_timestamp = max(all_timestamps)
             random_timestamp = random.choice([t for t in all_timestamps if t != last_timestamp])
             
             async def create_podcast_task(timestamp, podcast_type):
+                logger.info(f"Creating podcast for timestamp {timestamp}")
                 podcast_state, message = await create_podcast(uploaded_pdf_content, timestamp=timestamp, summarizer_model="gpt-4o-mini", scriptwriter_model="gpt-4o-mini", enhancer_model="gpt-4o-mini", provider="OpenAI", api_key=api_key)
                 
                 if podcast_state is None:
                     logger.error(f"Failed to create podcast for timestamp {timestamp}: {message}")
                     raise HTTPException(status_code=500, detail=f"Failed to create podcast for timestamp {timestamp}: {message}")
                 
-                # Save the podcast state
+                logger.info(f"Saving podcast state for timestamp {timestamp}")
                 save_podcast_state(podcast_state, timestamp)
                 
+                logger.info(f"Generating audio for timestamp {timestamp}")
                 # Generate audio
                 enhanced_script = podcast_state["enhanced_script"].content
                 dialogue_pieces = parse_dialogue(enhanced_script)
@@ -161,6 +168,7 @@ async def create_podcasts_endpoint(request: CreatePodcastsRequest):
                 os.makedirs(os.path.dirname(audio_path), exist_ok=True)
                 combined_audio.export(audio_path, format="mp3")
                 
+                logger.info(f"Podcast created successfully for timestamp {timestamp}")
                 # Add audio_url, timestamp, and type to the podcast_state
                 return {
                     "timestamp": timestamp,
@@ -172,6 +180,7 @@ async def create_podcasts_endpoint(request: CreatePodcastsRequest):
                     "audio_url": f"http://localhost:8000/static/{audio_filename}"
                 }
             
+            logger.info("Creating both podcasts concurrently")
             # Create both podcasts concurrently
             podcasts = await asyncio.gather(
                 create_podcast_task(random_timestamp, "random"),
@@ -181,7 +190,7 @@ async def create_podcasts_endpoint(request: CreatePodcastsRequest):
         logger.info("Podcasts created successfully")
         return {"podcasts": podcasts}
     except Exception as e:
-        logger.error(f"Error in create_podcasts_endpoint: {str(e)}")
+        logger.error(f"Error in create_podcasts_endpoint: {str(e)}", exc_info=True)
         if isinstance(e, HTTPException):
             raise e
         error_detail = str(e)

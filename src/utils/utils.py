@@ -183,17 +183,22 @@ def parse_dialogue(text: str) -> List[str]:
     return dialogue_pieces
 
 async def create_podcast(pdf_content: bytes, timestamp: str = None, summarizer_model: str = "openai/gpt-4o-mini", scriptwriter_model: str = "openai/gpt-4o-mini", enhancer_model: str = "openai/gpt-4o-mini", provider: str = "OpenRouter", api_key: str = None) -> Tuple[Optional[PodcastState], str]:
+    logger.info(f"Creating podcast with timestamp: {timestamp}")
     text, token_count = extract_text_from_pdf(pdf_content)
 
     if text is None:
+        logger.error("Error extracting text from PDF")
         return None, "Error extracting text from PDF"
 
     if token_count > 40000:
+        logger.error(f"PDF content exceeds 40,000 tokens (current: {token_count})")
         return None, f"PDF content exceeds 40,000 tokens (current: {token_count})"
 
     if not text.strip():
+        logger.error("Extracted text is empty")
         return None, "Extracted text is empty"
 
+    logger.info(f"Creating PodcastCreationWorkflow with models: {summarizer_model}, {scriptwriter_model}, {enhancer_model}")
     # If api_key is None, don't pass it to PodcastCreationWorkflow
     workflow_obj = PodcastCreationWorkflow(summarizer_model, scriptwriter_model, enhancer_model, timestamp, provider, api_key) if api_key else PodcastCreationWorkflow(summarizer_model, scriptwriter_model, enhancer_model, timestamp, provider)
     workflow = workflow_obj.create_workflow()
@@ -206,7 +211,10 @@ async def create_podcast(pdf_content: bytes, timestamp: str = None, summarizer_m
         enhanced_script=None)
 
     try:
+        logger.info("Invoking workflow")
         final_state = await workflow.ainvoke(state)
+        logger.info("Workflow completed successfully")
         return final_state, "Success"
     except Exception as e:
+        logger.error(f"Error creating podcast: {str(e)}", exc_info=True)
         return None, f"Error creating podcast: {str(e)}"
