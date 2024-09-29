@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 
 // Error handling function
@@ -25,8 +25,21 @@ function App() {
   const [isApiKeyValid, setIsApiKeyValid] = useState(false);
   const [selectedPodcast, setSelectedPodcast] = useState(null);
   const [hasVoted, setHasVoted] = useState(false);
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const API_BASE_URL = 'http://localhost:8000';
+
+  useEffect(() => {
+    const voted = localStorage.getItem('hasVoted');
+    if (voted) {
+      setHasVoted(true);
+    }
+
+    if (apiKey) {
+      validateApiKey(apiKey);
+    }
+  }, []);
 
   const validateApiKey = async () => {
     if (!apiKey) {
@@ -404,23 +417,11 @@ function App() {
     localStorage.setItem('apiKey', newApiKey);
     setIsApiKeyValid(false); // Reset validation state when the key changes
 
-    // Check if there's a stored 'hasVoted' value in localStorage
-    const voted = localStorage.getItem('hasVoted');
-    if (voted) {
-      setHasVoted(true);
-    }
-
-    // Validate the API key if it's not empty
     if (newApiKey) {
       validateApiKey(newApiKey);
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-gray-200">
-      {/* ... (rest of the JSX) */}
-    </div>
-  );
-}
+  // ... (rest of the component code)
 
 export default App;
