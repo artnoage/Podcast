@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
+import { validateApiKey, uploadFile, createPodcasts, submitVote, submitFeedback } from './api';
 import './App.css';
 
 // Error handling function
@@ -27,74 +28,34 @@ function App() {
   const [hasVoted, setHasVoted] = useState(false);
   const [error, setError] = useState(null);
 
-  const API_BASE_URL = 'http://localhost:8000';
+  useEffect(() => {
+    const voted = localStorage.getItem('hasVoted');
+    if (voted) {
+      setHasVoted(true);
+    }
+  }, []);
 
-  const validateApiKey = useCallback(async () => {
-    if (!apiKey) {
-      setIsApiKeyValid(false);
-      alert('Please enter an API key');
-      return;
-    }
+  const handleValidateApiKey = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/validate_api_key`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ api_key: apiKey }),
-        mode: 'cors', // Explicitly set CORS mode
-      });
-      const data = await response.json();
-      if (response.ok) {
-        setIsApiKeyValid(true);
-        alert('API key is valid!');
-      } else {
-        setIsApiKeyValid(false);
-        if (response.status === 401) {
-          alert('Invalid API key: The provided API key is incorrect.');
-        } else {
-          alert(`Error validating API key: ${data.detail || 'Unknown error'}`);
-        }
-      }
+      await validateApiKey(apiKey);
+      setIsApiKeyValid(true);
+      localStorage.setItem('apiKey', apiKey);
+      alert('API key is valid!');
     } catch (error) {
-      console.error('Error:', error);
       setIsApiKeyValid(false);
-      if (error.name === 'TypeError' && error.message === 'Failed to fetch') {
-        alert('Network error: Unable to connect to the server. Please check if the backend is running and accessible.');
-      } else {
-        alert(`Error validating API key: ${error.message}`);
-      }
+      alert(error.message);
     }
-  }, [apiKey, API_BASE_URL]);
+  };
 
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
     if (file) {
-      const formData = new FormData();
-      formData.append('file', file);
-
       try {
-        console.log('Attempting to upload file to:', `${API_BASE_URL}/upload_pdf`);
-        const response = await fetch(`${API_BASE_URL}/upload_pdf`, {
-          method: 'POST',
-          body: formData,
-          mode: 'cors',  // Explicitly set CORS mode
-        });
-        
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
-        }
-        
-        await response.json(); // We're not using the result, but we still want to await the response
+        await uploadFile(file);
         console.log("File uploaded:", file.name);
       } catch (error) {
         console.error('Error:', error);
-        if (error.name === 'TypeError' && error.message === 'Failed to fetch') {
-          alert('Network error: Unable to connect to the server. Please check if the backend is running and accessible.');
-        } else {
-          alert(`Error uploading PDF: ${error.message}`);
-        }
+        alert(`Error uploading PDF: ${error.message}`);
       }
     }
   };
@@ -102,18 +63,7 @@ function App() {
   const handleCreatePodcasts = async () => {
     try {
       setError(null);
-      const response = await fetch(`${API_BASE_URL}/create_podcasts`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ api_key: isApiKeyValid ? apiKey : null })
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || 'Unknown error occurred');
-      }
-      const result = await response.json();
+      const result = await createPodcasts(isApiKeyValid ? apiKey : null);
       setPodcasts({
         random: result.podcasts.find(p => p.type === 'random'),
         last: result.podcasts.find(p => p.type === 'last')
@@ -135,13 +85,7 @@ function App() {
     const timestamp = podcasts[type]?.timestamp;
     if (timestamp) {
       try {
-        await fetch(`${API_BASE_URL}/vote`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ timestamp }),
-        });
+        await submitVote(timestamp);
         setHasVoted(true);
         localStorage.setItem('hasVoted', 'true');
       } catch (error) {
@@ -155,17 +99,7 @@ function App() {
     event.preventDefault();
     if (feedback && podcasts.last) {
       try {
-        await fetch(`${API_BASE_URL}/process_feedback`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            podcast_state: podcasts.last,
-            feedback: feedback,
-            timestamp: podcasts.last.timestamp
-          })
-        });
+        await submitFeedback(podcasts.last, feedback, podcasts.last.timestamp);
         console.log("Feedback submitted:", feedback);
         setFeedback('');
       } catch (error) {
@@ -184,20 +118,8 @@ function App() {
   const handleApiKeyChange = (event) => {
     const newApiKey = event.target.value;
     setApiKey(newApiKey);
-    localStorage.setItem('apiKey', newApiKey);
-    setIsApiKeyValid(false); // Reset validation state when the key changes
+    setIsApiKeyValid(false);
   };
-
-  useEffect(() => {
-    const voted = localStorage.getItem('hasVoted');
-    if (voted) {
-      setHasVoted(true);
-    }
-
-    if (apiKey) {
-      validateApiKey();
-    }
-  }, [apiKey, validateApiKey]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-gray-200">
@@ -215,11 +137,10 @@ function App() {
           <p className="text-3xl sm:text-4xl md:text-5xl font-extralight">
             where <span className="font-normal text-blue-400 animate-pulse">you</span>{' '}
             <span className="font-normal">are the</span>{' '}
-
             <span className="font-normal text-blue-400 animate-pulse"> gradient</span>
           </p>
         </div>
-
+  
         <div className="w-full max-w-6xl px-4">
           <div className="backdrop-blur-md bg-white/10 p-8 rounded-lg shadow-xl mb-8">
             <h2 className="text-4xl font-light text-center text-gray-100 mb-6">Create Your Podcasts</h2>
@@ -317,10 +238,9 @@ function App() {
                     className={`w-full p-3 bg-gray-800 text-gray-200 text-xl rounded-md border ${
                       isApiKeyValid ? 'border-green-500' : 'border-gray-700'
                     } focus:border-gray-500 focus:ring focus:ring-gray-500 focus:ring-opacity-50`}
-                    readOnly={false}
                   />
                   <button
-                    onClick={validateApiKey}
+                    onClick={handleValidateApiKey}
                     className={`w-full py-3 px-4 text-gray-200 text-xl rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition duration-300 ${
                       isApiKeyValid
                         ? 'bg-green-600 hover:bg-green-700'
@@ -350,7 +270,7 @@ function App() {
               </form>
             </div>
           </div>
-
+  
           <div className="mt-8 space-y-6 backdrop-blur-md bg-white/10 p-8 rounded-lg shadow-xl">
             <h3 className="text-3xl font-light text-gray-100 mb-4">Learn More</h3>
             <p className="text-xl text-gray-300 mb-6">If you want to learn about the specific idea, watch the left video. If you want to learn more about text grad, watch the right video.</p>
@@ -413,6 +333,5 @@ function App() {
       </div>
     </div>
   );
-}
-
+} 
 export default App;
