@@ -36,6 +36,39 @@ def generate_tts(text, voice="onyx"):
         logger.error(f"Error in OpenAI TTS API call: {str(e)}", exc_info=True)
         raise
 
+# Create a thread-local storage for OpenAI clients
+import threading
+thread_local = threading.local()
+
+def get_openai_client():
+    if not hasattr(thread_local, "openai_client"):
+        thread_local.openai_client = OpenAI()
+    return thread_local.openai_client
+
+async def generate_tts_async(text, voice="onyx"):
+    """
+    Asynchronously generates text-to-speech audio using OpenAI's API.
+
+    Args:
+    text (str): The text to convert to speech.
+    voice (str, optional): The voice to use for TTS. Defaults to "onyx".
+
+    Returns:
+    bytes: The generated audio content.
+    """
+    try:
+        client = get_openai_client()
+        response = await client.audio.speech.acreate(
+            model="tts-1",
+            voice=voice,
+            input=text
+        )
+        logger.info(f"TTS audio generated asynchronously using voice: {voice}")
+        return response.content
+    except Exception as e:
+        logger.error(f"Error in asynchronous OpenAI TTS API call: {str(e)}", exc_info=True)
+        raise
+
 def create_podcast_audio(pdf_path, timestamp=None):
     """
     Creates an audio podcast from the given PDF file using the provided timestamp.

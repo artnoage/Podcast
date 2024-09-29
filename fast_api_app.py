@@ -16,7 +16,7 @@ import os
 
 from src.utils.utils import create_podcast, save_podcast_state, add_feedback_to_state, get_all_timestamps
 from src.utils.textGDwithWeightClipping import optimize_prompt
-from src.paudio import generate_tts, parse_dialogue
+from src.paudio import generate_tts_async, parse_dialogue
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -150,7 +150,7 @@ async def create_podcasts_endpoint(api_key: Optional[str] = None, pdf_content: U
                     async def generate_audio_segment(piece):
                         speaker, text = piece.split(': ', 1)
                         voice = "onyx" if speaker == "Host" else "nova"
-                        return await asyncio.to_thread(generate_tts, text, voice=voice)
+                        return await generate_tts_async(text, voice=voice)
         
                     audio_segments = await asyncio.gather(*[generate_audio_segment(piece) for piece in dialogue_pieces])
         
