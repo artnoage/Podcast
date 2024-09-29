@@ -280,7 +280,7 @@ def parse_dialogue(text: str) -> List[str]:
         dialogue_pieces.append(f"{pieces[i].strip()} {pieces[i+1].strip()}")
     return dialogue_pieces
 
-def create_podcast(pdf_path: str, timestamp: str = None, summarizer_model: str = "openai/gpt-4o-mini", scriptwriter_model: str = "openai/gpt-4o-mini", enhancer_model: str = "openai/gpt-4o-mini", provider: str = "OpenRouter", api_key: str = None) -> Tuple[PodcastState, str]:
+def create_podcast(pdf_path: str, timestamp: str = None, summarizer_model: str = "openai/gpt-4o-mini", scriptwriter_model: str = "openai/gpt-4o-mini", enhancer_model: str = "openai/gpt-4o-mini", provider: str = "OpenRouter", api_key: str = None) -> Tuple[Optional[PodcastState], str]:
     if not os.path.exists(pdf_path):
         return None, "PDF file not found"
 
@@ -306,7 +306,6 @@ def create_podcast(pdf_path: str, timestamp: str = None, summarizer_model: str =
 
     try:
         final_state = workflow.invoke(state)
-    except Exception:
-        return None
-
-    return final_state
+        return final_state, "Success"
+    except Exception as e:
+        return None, f"Error creating podcast: {str(e)}"

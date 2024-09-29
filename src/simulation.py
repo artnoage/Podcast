@@ -61,8 +61,8 @@ def process_pdf_and_improve_prompts():
         print(f"Error creating podcast: {message}")
         return False
 
-    if not isinstance(final_state, dict):
-        print("Error: final_state is not a dictionary")
+    if final_state is None:
+        print("Error: final_state is None")
         return False
 
     # Parse the dialogue
