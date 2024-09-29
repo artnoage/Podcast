@@ -416,9 +416,7 @@ function App() {
     }
   };
 
-  return (
-    // ... (rest of the JSX)
-  );
+  // ... (rest of the JSX)
 }
 
 export default App;
