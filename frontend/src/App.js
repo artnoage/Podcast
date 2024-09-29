@@ -220,6 +220,14 @@ function App() {
                         >
                           Your browser does not support the audio element.
                         </audio>
+                        {podcasts.random?.audio_url && (
+                          <button
+                            onClick={() => URL.revokeObjectURL(podcasts.random.audio_url)}
+                            className="mt-2 text-sm text-gray-400 hover:text-gray-300"
+                          >
+                            Release audio memory
+                          </button>
+                        )}
                       </div>
                       <div className="bg-gray-800 p-4 rounded-lg">
                         <h4 className="text-xl font-light text-gray-100 mb-2">Last Podcast</h4>
@@ -231,6 +239,14 @@ function App() {
                         >
                           Your browser does not support the audio element.
                         </audio>
+                        {podcasts.last?.audio_url && (
+                          <button
+                            onClick={() => URL.revokeObjectURL(podcasts.last.audio_url)}
+                            className="mt-2 text-sm text-gray-400 hover:text-gray-300"
+                          >
+                            Release audio memory
+                          </button>
+                        )}
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4 mt-4">

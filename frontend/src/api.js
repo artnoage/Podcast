@@ -36,6 +36,14 @@ export const createPodcasts = async (apiKey, pdfFile) => {
     }
     const result = await response.json();
     console.log('Podcasts created successfully:', result);
+
+    // Process audio segments for each podcast
+    result.podcasts = result.podcasts.map(podcast => {
+      const audioBlob = new Blob(podcast.audio_segments, { type: 'audio/mpeg' });
+      const audioUrl = URL.createObjectURL(audioBlob);
+      return { ...podcast, audio_url: audioUrl };
+    });
+
     return result;
   } catch (error) {
     console.error('Error creating podcasts:', error);

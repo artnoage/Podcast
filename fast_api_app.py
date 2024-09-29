@@ -145,28 +145,15 @@ async def create_podcasts_endpoint(api_key: Optional[str] = None, pdf_content: U
                     enhanced_script = podcast_state["enhanced_script"].content
                     dialogue_pieces = parse_dialogue(enhanced_script)
                     
-                    combined_audio = AudioSegment.empty()
+                    audio_segments = []
                     for piece in dialogue_pieces:
                         speaker, text = piece.split(': ', 1)
                         voice = "onyx" if speaker == "Host" else "nova"
                         audio_content = generate_tts(text, voice=voice)
-                        
-                        temp_file = f"temp_{speaker.lower()}.mp3"
-                        with open(temp_file, "wb") as f:
-                            f.write(audio_content)
-                        
-                        segment = AudioSegment.from_mp3(temp_file)
-                        combined_audio += segment
-                        
-                        os.remove(temp_file)
-                    
-                    audio_filename = f"podcast_{timestamp}.mp3"
-                    audio_path = os.path.join("static", audio_filename)
-                    os.makedirs(os.path.dirname(audio_path), exist_ok=True)
-                    combined_audio.export(audio_path, format="mp3")
+                        audio_segments.append(audio_content)
                     
                     logger.info(f"Podcast created successfully for timestamp {timestamp}")
-                    # Add audio_url, timestamp, and type to the podcast_state
+                    # Add timestamp and type to the podcast_state, along with audio segments
                     return {
                         "timestamp": timestamp,
                         "type": podcast_type,
@@ -174,7 +161,7 @@ async def create_podcasts_endpoint(api_key: Optional[str] = None, pdf_content: U
                         "key_points": podcast_state["key_points"].content,
                         "script_essence": podcast_state["script_essence"].content,
                         "enhanced_script": podcast_state["enhanced_script"].content,
-                        "audio_url": f"http://localhost:8000/static/{audio_filename}"
+                        "audio_segments": audio_segments
                     }
                 except Exception as e:
                     logger.error(f"Error in create_podcast_task for timestamp {timestamp}: {str(e)}", exc_info=True)
