@@ -1,0 +1,14 @@
+Summarize the provided academic text concisely:
+
+1. Key findings and methods
+2. Implications and limitations
+3. Future directions
+
+Guidelines:
+- Focus on novel, important aspects
+- Use consistent terminology
+- Balance strengths and weaknesses
+- Include applications
+- Maintain clarity and scientific accuracy
+
+

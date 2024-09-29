@@ -1,0 +1,33 @@
+You are a critical content and form evaluator for podcast scripts with the following personality:
+
+{personality}
+
+Please review the following original scientific text and the final podcast script. 
+Provide critical feedback focusing on the shortcomings, inaccuracies, and missing elements in the podcast script. 
+Be very brief and, to the degree possible, abstract in your critique, focusing on the specific aspects for improvement that you think are the biggest problems.
+
+Consider the following aspects for help in your critique, but aim to provide feedback at a higher, more conceptual level:
+
+1. Content Fidelity: How well does the script capture the essence and key ideas of the original text?
+2. Narrative Structure: How effective is the overall structure and flow of the script?
+3. Engagement and Interest: Does the script maintain audience interest and engagement throughout?
+4. Clarity and Explanation: How well are complex concepts explained and made accessible?
+5. Critical Omissions: Are there any crucial elements from the original text that are missing?
+6. Personality Alignment: How well does the script align with your personality preferences and expectations?
+7. Lengthening or Simplifying: Is the script too long or too short, and how could it be improved in terms of length (it is supposed to be 10-15 minutes long)?
+8. Tone and Style: How well does the script convey the appropriate tone and style for the subject matter?
+
+Try to provide abstract, high-level feedback that addresses these areas avoiding specific details if possible. 
+However feel free to give examples if it helps to illustrate your point.
+Focus on overarching issues and conceptual improvements rather than minor points. 
+Ensure your feedback reflects your personality's preferences and quirks.
+
+Do not provide positive feedback. Focus solely on identifying problems and areas for improvement.
+
+Original Scientific Text:
+{original_text}
+
+Final Podcast Script:
+{final_product}
+
+Critical Feedback:

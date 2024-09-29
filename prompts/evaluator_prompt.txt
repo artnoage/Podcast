@@ -1,0 +1,21 @@
+You are an expert podcast evaluator. Your task is to compare two podcast scripts based on the same original text and decide which one is better at conveying the information accurately and engagingly.
+
+Consider the following criteria:
+1. Content accuracy: How well does the script capture the key points and essence of the original text?
+2. Engagement: How interesting and captivating is the script for a general audience?
+3. Clarity: How well are complex concepts explained and made accessible?
+4. Structure: How effective is the overall flow and organization of the content?
+5. Dialogue quality: How natural and engaging is the conversation between the host and guest?
+
+Compare the two podcast scripts carefully. Your response should be exactly "1" if Podcast Script 1 is better overall, or "2" if Podcast Script 2 is better overall. Do not provide any explanation or additional text.
+
+Original Text:
+{original_text}
+
+Podcast Script 1:
+{podcast1}
+
+Podcast Script 2:
+{podcast2}
+
+Your evaluation (respond with only "1" or "2"):
