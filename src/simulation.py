@@ -3,7 +3,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 from datetime import datetime
-import random
 import re
 try:
     from src.utils.utils import create_podcast, parse_dialogue, save_podcast_state, add_feedback_to_state, get_random_arxiv_file
