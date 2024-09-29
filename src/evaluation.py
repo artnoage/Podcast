@@ -76,23 +76,28 @@ def plot_scores(scores,  evaluator_model, prompt_model):
 def process_evaluation(evaluator, prompt_model, prompt_provider, i) -> Tuple[Optional[str], Optional[str], Optional[str]]:
     print(f"{i}-th generation")
     pdf_path = get_random_arxiv_file()
-    if pdf_path is None or pdf_path == "No PDF files found in the arxiv_folder.":
+    if pdf_path is None:
         print("No more PDF files available in the arxiv_folder. Stopping the evaluation process.")
         return None, None, None
     
     try:
-        original_text = extract_text_from_pdf(pdf_path)
+        original_text, token_count = extract_text_from_pdf(pdf_path)
+        if original_text is None:
+            print(f"Failed to extract text from PDF: {pdf_path}")
+            return None, None, None
 
         timestamp1, timestamp2 = choose_random_timestamps(2)
         
         podcast1, message1 = create_podcast(pdf_path, timestamp=timestamp1, summarizer_model=prompt_model, scriptwriter_model=prompt_model, enhancer_model=prompt_model, provider=prompt_provider, api_key=os.getenv("OPENAI_API_KEY"))
         if podcast1 is None or message1 != "Success":
-            raise ValueError(f"Failed to create podcast1: {message1}")
+            print(f"Failed to create podcast1: {message1}")
+            return None, None, None
         
         api_key = os.getenv("OPENAI_API_KEY") if prompt_provider == "OpenAI" else os.getenv("OPENROUTER_API_KEY")
         podcast2, message2 = create_podcast(pdf_path, timestamp=timestamp2, summarizer_model=prompt_model, scriptwriter_model=prompt_model, enhancer_model=prompt_model, provider=prompt_provider, api_key=api_key)
         if podcast2 is None or message2 != "Success":
-            raise ValueError(f"Failed to create podcast2: {message2}")
+            print(f"Failed to create podcast2: {message2}")
+            return None, None, None
         
         evaluation = evaluator.evaluate_podcasts(original_text, podcast1["enhanced_script"].content, podcast2["enhanced_script"].content)
         
