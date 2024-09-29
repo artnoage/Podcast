@@ -110,26 +110,38 @@ This self-improvement cycle allows the system to refine its performance incremen
 
 ## Usage
 
-This project offers four main ways to interact with the system:
+This project offers multiple ways to interact with the system:
 
 1. **Generate a Podcast from a PDF (Best Prompt)**
    To create a podcast using the current best prompt:
    ```
-   python paudio.py <path_to_pdf_file> [--timestamp YYYYMMDD_HHMMSS]
+   python src/paudio.py <path_to_pdf_file> [--timestamp YYYYMMDD_HHMMSS]
+   ```
+   or
+   ```
+   python -m src.paudio <path_to_pdf_file> [--timestamp YYYYMMDD_HHMMSS]
    ```
    This will generate an audio file and a dialogue transcript using the most optimized prompts.
 
 2. **Run Self-Improving Simulation**
    To start the self-improvement process:
    ```
-   python simulation.py
+   python src/simulation.py
+   ```
+   or
+   ```
+   python -m src.simulation
    ```
    This will process random PDFs, generate podcasts, and continuously improve the prompts based on feedback.
 
 3. **Evaluate Self-Improvement Process**
    To quantify and evaluate the self-improvement process:
    ```
-   python evaluation.py
+   python src/evaluation.py
+   ```
+   or
+   ```
+   python -m src.evaluation
    ```
    This script compares podcast scripts generated using different prompts and tracks improvements over time.
 
@@ -139,6 +151,14 @@ This project offers four main ways to interact with the system:
    a. Start the backend server:
    ```
    uvicorn backend.fast_api_app:app --reload
+   ```
+   or
+   ```
+   python -m uvicorn backend.fast_api_app:app --reload
+   ```
+   or from inside the `backend` directory:
+   ```
+   uvicorn fast_api_app:app --reload
    ```
    
    b. Start the frontend development server:
