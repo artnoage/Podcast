@@ -42,7 +42,7 @@ export const createPodcasts = async (apiKey) => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ api_key: apiKey })
+      body: JSON.stringify({ api_key: apiKey || null })
     });
     if (!response.ok) {
       const errorData = await response.json();

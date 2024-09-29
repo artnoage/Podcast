@@ -111,6 +111,9 @@ async def create_podcasts_endpoint(request: CreatePodcastsRequest):
         api_key_status = "provided" if request.api_key else "not provided"
         logger.info(f"Creating podcasts with API key status: {api_key_status}")
 
+        # If no API key is provided, use None
+        api_key = request.api_key if request.api_key else None
+
         # Get the last timestamp and a random timestamp
         all_timestamps = get_all_timestamps()
         if not all_timestamps:

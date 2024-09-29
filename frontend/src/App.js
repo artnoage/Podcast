@@ -24,7 +24,7 @@ function App() {
   const [feedback, setFeedback] = useState('');
   const [experimentIdea, setExperimentIdea] = useState('');
   const [apiKey, setApiKey] = useState('');
-  const [isApiKeyValid, setIsApiKeyValid] = useState(false);
+  const [isApiKeyValid, setIsApiKeyValid] = useState(true);
   const [showApiKey, setShowApiKey] = useState(false);
   const [selectedPodcast, setSelectedPodcast] = useState(null);
   const [hasVoted, setHasVoted] = useState(false);
@@ -39,6 +39,10 @@ function App() {
   }, []);
 
   const handleValidateApiKey = async () => {
+    if (!apiKey.trim()) {
+      setIsApiKeyValid(true);
+      return;
+    }
     try {
       await validateApiKey(apiKey);
       setIsApiKeyValid(true);
