@@ -215,9 +215,9 @@ async def process_feedback(request: FeedbackRequest):
     add_feedback_to_state(old_timestamp, feedback)
 
     # Optimize prompts
-    optimize_prompt("summarizer", old_timestamp, new_timestamp, "gpt-4o-mini", "gpt-4o")
-    optimize_prompt("scriptwriter", old_timestamp, new_timestamp, "gpt-4o-mini", "gpt-4o")
-    optimize_prompt("enhancer", old_timestamp, new_timestamp, "gpt-4o-mini", "gpt-4o")
+    optimize_prompt("summarizer", old_timestamp, new_timestamp, "gpt-4o-mini", "gpt-4o-mini")
+    optimize_prompt("scriptwriter", old_timestamp, new_timestamp, "gpt-4o-mini", "gpt-4o-mini")
+    optimize_prompt("enhancer", old_timestamp, new_timestamp, "gpt-4o-mini", "gpt-4o-mini")
 
     return {"message": "Feedback processed and prompts optimized"}
 
