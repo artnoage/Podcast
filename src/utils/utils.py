@@ -68,11 +68,12 @@ def pdf_to_markdown(pdf_path: str) -> None:
 def get_random_arxiv_file():
     arxiv_folder = "arxiv_papers"
     if not os.path.exists(arxiv_folder):
-        raise FileNotFoundError(f"The '{arxiv_folder}' folder does not exist.")
+        os.makedirs(arxiv_folder)
+        print(f"Created '{arxiv_folder}' folder.")
     
     pdf_files = [f for f in os.listdir(arxiv_folder) if f.endswith('.pdf')]
     if not pdf_files:
-        raise FileNotFoundError(f"No PDF files found in the '{arxiv_folder}' folder.")
+        raise FileNotFoundError(f"No PDF files found in the '{arxiv_folder}' folder. Please add some PDF files to continue.")
     
     return os.path.join(arxiv_folder, random.choice(pdf_files))
 
