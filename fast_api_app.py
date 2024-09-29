@@ -95,8 +95,10 @@ async def upload_pdf(file: UploadFile = File(...)):
 
 from pydantic import BaseModel
 
+from typing import Optional
+
 class CreatePodcastsRequest(BaseModel):
-    api_key: str
+    api_key: Optional[str] = None
 
 @app.post("/create_podcasts")
 async def create_podcasts_endpoint(request: CreatePodcastsRequest):
@@ -111,8 +113,8 @@ async def create_podcasts_endpoint(request: CreatePodcastsRequest):
         api_key_status = "provided" if request.api_key else "not provided"
         logger.info(f"Creating podcasts with API key status: {api_key_status}")
 
-        # If no API key is provided, use None
-        api_key = request.api_key if request.api_key else None
+        # Use the api_key directly from the request
+        api_key = request.api_key
 
         # Get the last timestamp and a random timestamp
         logger.info("Getting timestamps")
