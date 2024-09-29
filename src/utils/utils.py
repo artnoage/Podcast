@@ -200,7 +200,9 @@ def load_prompt(role, timestamp=None):
 
 def load_podcast_state(timestamp):
     state_file = f"podcast_state_{timestamp}.json"
-    podcast_states_dir = "podcast_states"
+    # Get the absolute path to the project root directory
+    current_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    podcast_states_dir = os.path.join(current_dir, "podcast_states")
     state_file_path = os.path.join(podcast_states_dir, state_file)
     if os.path.exists(state_file_path):
         print(f"Loading podcast state from: {state_file_path}")
@@ -208,7 +210,7 @@ def load_podcast_state(timestamp):
             return json.load(f)
     else:
         print(f"No podcast state found for timestamp: {timestamp}")
-        raise FileNotFoundError(f"No podcast state found for timestamp: {timestamp}")
+        return None
 
 def format_text_with_line_breaks(text, words_per_line=15):
     words = text.split()

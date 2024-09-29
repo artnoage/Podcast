@@ -37,20 +37,27 @@ def optimize_prompt(role, old_timestamp, new_timestamp, engine_model, backward_e
     # Load the podcast state using the new timestamp
     data = load_podcast_state(new_timestamp)
 
-    # Define the user prompt (fixed) using the data from the JSON
-    user_prompt = tg.Variable(data[json_key], 
-                              requires_grad=False, 
-                              role_description=f"input for {role}")
+    if data is None:
+        print(f"No podcast state found for timestamp: {new_timestamp}. Continuing without feedback.")
+        user_prompt = tg.Variable("", requires_grad=False, role_description=f"input for {role}")
+        target = tg.Variable(f"Optimize the prompt for {role} without specific feedback", 
+                             requires_grad=False, 
+                             role_description=f"target output for {role}")
+    else:
+        # Define the user prompt (fixed) using the data from the JSON
+        user_prompt = tg.Variable(data[json_key], 
+                                  requires_grad=False, 
+                                  role_description=f"input for {role}")
 
-    # Define the target using the feedback from the JSON
-    feedback = data["feedback"]
-    target = tg.Variable(f"""create a detailed set of instructions for a ({role}) within a group consisting of a key_point extractor/summarizer from academic texts, 
-                        a scriptwriter and a script enhancer, under the following three rules:
-                        1) Role boundaries are clear. 
-                        2) Guidelines are topic-agnostic/abstract enough. Any feedback maybe topic related but guidelines must be abstract enough to apply to any topic.
-                        3) Guidelines are good enough to avoid the following feedback within the role of {role}. Feedback: """ + feedback, 
-              requires_grad=False, 
-              role_description=f"target output for {role}")
+        # Define the target using the feedback from the JSON
+        feedback = data.get("feedback", "No feedback available")
+        target = tg.Variable(f"""create a detailed set of instructions for a ({role}) within a group consisting of a key_point extractor/summarizer from academic texts, 
+                            a scriptwriter and a script enhancer, under the following three rules:
+                            1) Role boundaries are clear. 
+                            2) Guidelines are topic-agnostic/abstract enough. Any feedback maybe topic related but guidelines must be abstract enough to apply to any topic.
+                            3) Guidelines are good enough to avoid the following feedback within the role of {role}. Feedback: """ + feedback, 
+                  requires_grad=False, 
+                  role_description=f"target output for {role}")
 
     # Define the loss function
     loss_fn = tg.TextLoss(target)
