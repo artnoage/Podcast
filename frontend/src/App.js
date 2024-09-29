@@ -63,12 +63,18 @@ function App() {
   const handleCreatePodcasts = async () => {
     try {
       setError(null);
+      console.log('Creating podcasts. API key valid:', isApiKeyValid);
       const result = await createPodcasts(isApiKeyValid ? apiKey : null);
-      setPodcasts({
-        random: result.podcasts.find(p => p.type === 'random'),
-        last: result.podcasts.find(p => p.type === 'last')
-      });
-      console.log('Podcasts created successfully!');
+      console.log('Create podcasts result:', result);
+      if (result.podcasts && result.podcasts.length > 0) {
+        setPodcasts({
+          random: result.podcasts.find(p => p.type === 'random'),
+          last: result.podcasts.find(p => p.type === 'last')
+        });
+        console.log('Podcasts created successfully!');
+      } else {
+        throw new Error('No podcasts returned from the server');
+      }
     } catch (error) {
       console.error('Error creating podcasts:', error);
       setError(`Error creating podcasts: ${error.message}`);

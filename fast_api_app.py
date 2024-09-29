@@ -76,8 +76,10 @@ async def upload_pdf(file: UploadFile = File(...)):
     try:
         content = await file.read()
         uploaded_pdf_content = content
+        logger.info("PDF uploaded successfully")
         return {"message": "PDF uploaded successfully"}
     except Exception as e:
+        logger.error(f"An error occurred while uploading the file: {str(e)}")
         raise HTTPException(status_code=500, detail=f"An error occurred while uploading the file: {str(e)}")
 
 from pydantic import BaseModel
@@ -88,7 +90,9 @@ class CreatePodcastsRequest(BaseModel):
 @app.post("/create_podcasts")
 async def create_podcasts_endpoint(request: CreatePodcastsRequest):
     global uploaded_pdf_content
-    if not uploaded_pdf_content:
+    logger.info(f"Creating podcasts. PDF content available: {uploaded_pdf_content is not None}")
+    if uploaded_pdf_content is None:
+        logger.error("No PDF uploaded")
         raise HTTPException(status_code=400, detail="No PDF uploaded")
 
     try:
@@ -102,6 +106,7 @@ async def create_podcasts_endpoint(request: CreatePodcastsRequest):
             # If no timestamps are available, create a podcast without a timestamp
             podcast_state, message = create_podcast(uploaded_pdf_content, timestamp=None, summarizer_model="gpt-4o-mini", scriptwriter_model="gpt-4o-mini", enhancer_model="gpt-4o-mini", provider="OpenAI", api_key=request.api_key if request.api_key else None)
             if podcast_state is None:
+                logger.error(f"Failed to create podcast: {message}")
                 raise HTTPException(status_code=500, detail=f"Failed to create podcast: {message}")
             podcasts = [podcast_state]
         else:
@@ -112,6 +117,7 @@ async def create_podcasts_endpoint(request: CreatePodcastsRequest):
                 podcast_state, message = create_podcast(uploaded_pdf_content, timestamp=timestamp, summarizer_model="gpt-4o-mini", scriptwriter_model="gpt-4o-mini", enhancer_model="gpt-4o-mini", provider="OpenAI", api_key=request.api_key if request.api_key else None)
                 
                 if podcast_state is None:
+                    logger.error(f"Failed to create podcast for timestamp {timestamp}: {message}")
                     raise HTTPException(status_code=500, detail=f"Failed to create podcast for timestamp {timestamp}: {message}")
                 
                 # Save the podcast state
@@ -135,10 +141,9 @@ async def create_podcasts_endpoint(request: CreatePodcastsRequest):
                 
                 podcasts.append(podcast_state_dict)
         
-        uploaded_pdf_content = None
+        logger.info("Podcasts created successfully")
         return {"podcasts": podcasts}
     except Exception as e:
-        uploaded_pdf_content = None
         logger.error(f"Error in create_podcasts_endpoint: {str(e)}")
         if isinstance(e, HTTPException):
             raise e
@@ -146,6 +151,9 @@ async def create_podcasts_endpoint(request: CreatePodcastsRequest):
         if len(error_detail) > 100:
             error_detail = error_detail[:100] + "... (truncated)"
         raise HTTPException(status_code=422, detail=f"An error occurred: {error_detail}")
+    finally:
+        uploaded_pdf_content = None
+        logger.info("Cleared uploaded PDF content")
 
 @app.post("/process_feedback")
 async def process_feedback(request: FeedbackRequest):

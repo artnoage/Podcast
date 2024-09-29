@@ -36,6 +36,7 @@ export const uploadFile = async (file) => {
 
 export const createPodcasts = async (apiKey) => {
   try {
+    console.log('Creating podcasts with API key:', apiKey ? 'API key provided' : 'No API key');
     const response = await fetch(`${API_BASE_URL}/create_podcasts`, {
       method: 'POST',
       headers: {
@@ -45,9 +46,12 @@ export const createPodcasts = async (apiKey) => {
     });
     if (!response.ok) {
       const errorData = await response.json();
+      console.error('Error response:', errorData);
       throw new Error(errorData.detail || 'Unknown error occurred');
     }
-    return response.json();
+    const result = await response.json();
+    console.log('Podcasts created successfully:', result);
+    return result;
   } catch (error) {
     console.error('Error creating podcasts:', error);
     throw error;
