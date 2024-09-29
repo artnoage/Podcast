@@ -1,3 +1,4 @@
+import logging
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -9,6 +10,10 @@ from datetime import datetime
 import random
 import json
 import openai
+
+# Set up logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
@@ -86,7 +91,7 @@ async def create_podcasts_endpoint(request: CreatePodcastsRequest):
     try:
         # Log the last 4 characters of the API key if provided
         api_key_suffix = request.api_key[-4:] if request.api_key else "None"
-        print(f"Creating podcasts using API key ending with ...{api_key_suffix}")
+        logger.info(f"Creating podcasts using API key ending with ...{api_key_suffix}")
 
         # Get the last timestamp and a random timestamp
         all_timestamps = get_all_timestamps()
@@ -131,7 +136,7 @@ async def create_podcasts_endpoint(request: CreatePodcastsRequest):
         return {"podcasts": podcasts}
     except Exception as e:
         uploaded_pdf_content = None
-        print(f"Error in create_podcasts_endpoint: {str(e)}")
+        logger.error(f"Error in create_podcasts_endpoint: {str(e)}")
         if isinstance(e, HTTPException):
             raise e
         raise HTTPException(status_code=422, detail=f"An error occurred: {str(e)}")
