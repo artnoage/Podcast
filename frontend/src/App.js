@@ -61,25 +61,26 @@ function App() {
     };
   }, []);
 
-  const handleFileUpload = async (event) => {
+  const [pdfFile, setPdfFile] = useState(null);
+
+  const handleFileUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
-      try {
-        await uploadFile(file);
-        console.log("File uploaded:", file.name);
-      } catch (error) {
-        console.error('Error:', error);
-        alert(`Error uploading PDF: ${error.message}`);
-      }
+      setPdfFile(file);
+      console.log("File selected:", file.name);
     }
   };
 
   const handleCreatePodcasts = async () => {
+    if (!pdfFile) {
+      alert("Please upload a PDF file first.");
+      return;
+    }
     try {
       setError(null);
       setIsLoading(true);
       console.log('Creating podcasts. API key valid:', isApiKeyValid);
-      const result = await createPodcasts(isApiKeyValid ? apiKey : null);
+      const result = await createPodcasts(isApiKeyValid ? apiKey : null, pdfFile);
       console.log('Create podcasts result:', result);
       if (result.podcasts && result.podcasts.length === 2) {
         const randomPodcast = result.podcasts.find(p => p.type === 'random');

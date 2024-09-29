@@ -71,7 +71,6 @@ class FeedbackRequest(BaseModel):
 class VoteRequest(BaseModel):
     timestamp: str
 
-uploaded_pdf_content = None
 VOTES_FILE = "votes.json"
 
 def load_votes():
@@ -84,18 +83,6 @@ def save_votes(votes):
     with open(VOTES_FILE, 'w') as f:
         json.dump(votes, f)
 
-@app.post("/upload_pdf")
-async def upload_pdf(file: UploadFile = File(...)):
-    global uploaded_pdf_content
-    try:
-        content = await file.read()
-        uploaded_pdf_content = content
-        logger.info("PDF uploaded successfully")
-        return {"message": "PDF uploaded successfully"}
-    except Exception as e:
-        logger.error(f"An error occurred while uploading the file: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"An error occurred while uploading the file: {str(e)}")
-    
 class CreatePodcastsRequest(BaseModel):
     api_key: Optional[str] = None
     pdf_content: bytes

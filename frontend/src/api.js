@@ -19,30 +19,15 @@ export const validateApiKey = async (apiKey) => {
   return true;
 };
 
-export const uploadFile = async (file) => {
-  const formData = new FormData();
-  formData.append('file', file);
-  const response = await fetch(`${API_BASE_URL}/upload_pdf`, {
-    method: 'POST',
-    body: formData,
-    mode: 'cors',
-  });
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
-  }
-  return response.json();
-};
-
-export const createPodcasts = async (apiKey) => {
+export const createPodcasts = async (apiKey, pdfFile) => {
   try {
     console.log('Creating podcasts with API key:', apiKey ? 'API key provided' : 'No API key');
+    const formData = new FormData();
+    formData.append('api_key', apiKey || '');
+    formData.append('pdf_content', pdfFile);
     const response = await fetch(`${API_BASE_URL}/create_podcasts`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ api_key: apiKey || null })
+      body: formData
     });
     if (!response.ok) {
       const errorData = await response.json();
