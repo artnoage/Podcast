@@ -9,13 +9,14 @@ import os
 from datetime import datetime
 import random
 import json
-import openai
+from openai import OpenAI
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
+client = OpenAI()
 
 # Add CORS middleware
 app.add_middleware(
@@ -37,14 +38,16 @@ class ApiKeyRequest(BaseModel):
 @app.post("/validate_api_key")
 async def validate_api_key(request: ApiKeyRequest):
     try:
-        openai.api_key = request.api_key
+        client.api_key = request.api_key
         # Make a simple API call to test the key
-        openai.Model.list()
+        client.models.list()
         return {"message": "API key is valid"}
-    except openai.error.AuthenticationError:
-        raise HTTPException(status_code=401, detail="Invalid API key")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error validating API key: {str(e)}")
+        if "Invalid API key" in str(e):
+            raise HTTPException(status_code=401, detail="Invalid API key")
+        else:
+            logger.error(f"Error validating API key: {str(e)}")
+            raise HTTPException(status_code=500, detail=f"Error validating API key: {str(e)}")
 
 class FeedbackRequest(BaseModel):
     podcast_state: dict
@@ -139,7 +142,10 @@ async def create_podcasts_endpoint(request: CreatePodcastsRequest):
         logger.error(f"Error in create_podcasts_endpoint: {str(e)}")
         if isinstance(e, HTTPException):
             raise e
-        raise HTTPException(status_code=422, detail=f"An error occurred: {str(e)}")
+        error_detail = str(e)
+        if len(error_detail) > 100:
+            error_detail = error_detail[:100] + "... (truncated)"
+        raise HTTPException(status_code=422, detail=f"An error occurred: {error_detail}")
 
 @app.post("/process_feedback")
 async def process_feedback(request: FeedbackRequest):
