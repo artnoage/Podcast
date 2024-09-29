@@ -161,6 +161,8 @@ def create_podcast(pdf_path: str, timestamp: str = None, summarizer_model: str =
 
 def load_prompt(role, timestamp=None):
     prompt_file = f"{role}_prompt.txt"
+    prompts_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "prompts")
+    
     if timestamp:
         prompt_history_dir = "prompt_history"
         history_file = f"{role}_prompt.txt_{timestamp}"
@@ -174,8 +176,9 @@ def load_prompt(role, timestamp=None):
             print(f"No history found for {role} with timestamp {timestamp}")
     
     # If no timestamp provided or file not found, fall back to the original prompt file
-    print(f"Loading original prompt for {role} from: {prompt_file}")
-    with open(prompt_file, 'r') as file:
+    prompt_path = os.path.join(prompts_dir, prompt_file)
+    print(f"Loading original prompt for {role} from: {prompt_path}")
+    with open(prompt_path, 'r') as file:
         return file.read().strip()
 
 def load_podcast_state(timestamp):
