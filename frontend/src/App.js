@@ -39,6 +39,13 @@ function App() {
     }
   }, []);
 
+  useEffect(() => {
+    if (podcasts.random && podcasts.last) {
+      setHasVoted(false);
+      localStorage.removeItem('hasVoted');
+    }
+  }, [podcasts]);
+
   const handleValidateApiKey = async () => {
     if (!apiKey.trim()) {
       setIsApiKeyValid(true);
@@ -100,6 +107,8 @@ function App() {
             setNewTimestamp(lastPodcast.new_timestamp);
           }
           console.log('Podcasts created successfully!');
+          setHasVoted(false);
+          localStorage.removeItem('hasVoted');
         } else {
           throw new Error('Missing random or last podcast in the server response');
         }
