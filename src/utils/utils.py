@@ -6,7 +6,10 @@ import markdown
 import random
 import json
 from typing import List, Tuple, Optional
-from src.utils.agents_and_workflows import PodcastCreationWorkflow, PodcastState
+try:
+    from src.utils.agents_and_workflows import PodcastCreationWorkflow, PodcastState
+except ImportError:
+    from utils.agents_and_workflows import PodcastCreationWorkflow, PodcastState
 from langchain_core.messages import HumanMessage
 import tiktoken
 
