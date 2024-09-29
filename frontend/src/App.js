@@ -404,4 +404,15 @@ export default App;
     setApiKey(newApiKey);
     localStorage.setItem('apiKey', newApiKey);
     setIsApiKeyValid(false); // Reset validation state when the key changes
+
+    // Check if there's a stored 'hasVoted' value in localStorage
+    const voted = localStorage.getItem('hasVoted');
+    if (voted) {
+      setHasVoted(true);
+    }
+
+    // Validate the API key if it's not empty
+    if (newApiKey) {
+      validateApiKey(newApiKey);
+    }
   };
