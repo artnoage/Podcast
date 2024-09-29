@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { validateApiKey, uploadFile, createPodcasts, submitVote, submitFeedback } from './api';
 import './App.css';
+import LoadingSpinner from './LoadingSpinner';
 
 // Error handling function
 const handleGooglePlayError = (error) => {
@@ -27,6 +28,7 @@ function App() {
   const [selectedPodcast, setSelectedPodcast] = useState(null);
   const [hasVoted, setHasVoted] = useState(false);
   const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const voted = localStorage.getItem('hasVoted');
@@ -63,6 +65,7 @@ function App() {
   const handleCreatePodcasts = async () => {
     try {
       setError(null);
+      setIsLoading(true);
       console.log('Creating podcasts. API key valid:', isApiKeyValid);
       const result = await createPodcasts(isApiKeyValid ? apiKey : null);
       console.log('Create podcasts result:', result);
@@ -78,6 +81,8 @@ function App() {
     } catch (error) {
       console.error('Error creating podcasts:', error);
       setError(`Error creating podcasts: ${error.message}`);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -177,8 +182,9 @@ function App() {
                     <button
                       onClick={handleCreatePodcasts}
                       className="w-full py-3 px-6 bg-gray-700 text-gray-200 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition duration-300 text-xl font-light"
+                      disabled={isLoading}
                     >
-                      Create Podcasts
+                      {isLoading ? <LoadingSpinner /> : 'Create Podcasts'}
                     </button>
                   </div>
                   <div className="md:w-2/3 space-y-4">
@@ -189,7 +195,7 @@ function App() {
                         <audio 
                           controls 
                           className="w-full" 
-                          src={podcasts.random?.audio_url || undefined}
+                          src={podcasts.random?.audio_url}
                           disabled={!podcasts.random}
                         >
                           Your browser does not support the audio element.
@@ -200,7 +206,7 @@ function App() {
                         <audio 
                           controls 
                           className="w-full" 
-                          src={podcasts.last?.audio_url || undefined}
+                          src={podcasts.last?.audio_url}
                           disabled={!podcasts.last}
                         >
                           Your browser does not support the audio element.

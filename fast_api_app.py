@@ -129,15 +129,19 @@ async def create_podcasts_endpoint(request: CreatePodcastsRequest):
                 audio_path = os.path.join("static", audio_filename)
                 # TODO: Implement audio generation and save to audio_path
                 
+                # For now, let's create a dummy audio file
+                with open(audio_path, 'wb') as f:
+                    f.write(b'Dummy audio content')
+                
                 # Add audio_url, timestamp, and type to the podcast_state
                 return {
                     "timestamp": timestamp,
                     "type": "last" if timestamp == last_timestamp else "random",
-                    "main_text": podcast_state["main_text"],
-                    "key_points": podcast_state["key_points"],
-                    "script_essence": podcast_state["script_essence"],
-                    "enhanced_script": podcast_state["enhanced_script"],
-                    "audio_url": f"/static/{audio_filename}"
+                    "main_text": podcast_state["main_text"].content,
+                    "key_points": podcast_state["key_points"].content,
+                    "script_essence": podcast_state["script_essence"].content,
+                    "enhanced_script": podcast_state["enhanced_script"].content,
+                    "audio_url": f"http://localhost:8000/static/{audio_filename}"
                 }
             
             # Create both podcasts concurrently
