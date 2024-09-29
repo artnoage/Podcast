@@ -20,7 +20,12 @@ logger = logging.getLogger(__name__)
 app = FastAPI()
 client = OpenAI()
 
+import os
 from fastapi.staticfiles import StaticFiles
+
+# Create the 'static' directory if it doesn't exist
+os.makedirs("static", exist_ok=True)
+
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Add CORS middleware
