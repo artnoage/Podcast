@@ -28,25 +28,6 @@ function App() {
 
   const API_BASE_URL = 'http://localhost:8000';
 
-  useEffect(() => {
-    const voted = localStorage.getItem('hasVoted');
-    if (voted) {
-      setHasVoted(true);
-    }
-    const storedApiKey = localStorage.getItem('apiKey');
-    if (storedApiKey) {
-      setApiKey(storedApiKey);
-      validateApiKey(storedApiKey);
-    }
-  }, [validateApiKey]);
-
-  const handleApiKeyChange = (event) => {
-    const newApiKey = event.target.value;
-    setApiKey(newApiKey);
-    localStorage.setItem('apiKey', newApiKey);
-    setIsApiKeyValid(false); // Reset validation state when the key changes
-  };
-
   const validateApiKey = async () => {
     if (!apiKey) {
       setIsApiKeyValid(false);
