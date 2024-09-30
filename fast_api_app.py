@@ -224,6 +224,7 @@ async def vote(request: VoteRequest):
     else:
         votes[timestamp] = 1
     save_votes(votes)
+    logger.info(f"Vote recorded for timestamp: {timestamp}")
     return {"message": "Vote recorded successfully"}
 
 @app.post("/submit_experiment_idea")
