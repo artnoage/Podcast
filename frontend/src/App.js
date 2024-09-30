@@ -154,18 +154,22 @@ function App() {
 
   const handleFeedbackSubmit = (event) => {
     event.preventDefault();
-    if (feedback && podcasts.last && podcasts.last.timestamp && newTimestamp) {
+    if (feedback && newTimestamp) {
+      const oldTimestamp = podcasts.last ? podcasts.last.timestamp : null;
       // Submit feedback asynchronously
-      submitFeedback(feedback, podcasts.last.timestamp, newTimestamp)
-        .catch(error => console.error('Error:', error));
-      
-      // Immediately show thank you message and disable feedback box
-      console.log("Feedback submitted:", feedback);
-      setFeedbackState(FEEDBACK_STATES.THANK_YOU);
-      setTimeout(() => {
-        setFeedbackState(FEEDBACK_STATES.DISABLED);
-        setFeedback('');
-      }, 3000); // Reset after 3 seconds
+      submitFeedback(feedback, oldTimestamp, newTimestamp)
+        .then(() => {
+          console.log("Feedback submitted:", feedback);
+          setFeedbackState(FEEDBACK_STATES.THANK_YOU);
+          setTimeout(() => {
+            setFeedbackState(FEEDBACK_STATES.DISABLED);
+            setFeedback('');
+          }, 3000); // Reset after 3 seconds
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Error submitting feedback. Please try again.');
+        });
     } else {
       alert('Please ensure you have created podcasts and provided feedback before submitting.');
     }

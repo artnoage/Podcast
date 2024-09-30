@@ -198,13 +198,18 @@ async def process_feedback(request: FeedbackRequest):
     logger.info(f"Old timestamp: {old_timestamp}")
     logger.info(f"New timestamp: {new_timestamp}")
 
-    # Add feedback to the podcast state
-    add_feedback_to_state(old_timestamp, feedback)
+    # Add feedback to the podcast state if old_timestamp is not None
+    if old_timestamp is not None:
+        add_feedback_to_state(old_timestamp, feedback)
 
     # Optimize prompts
-    optimize_prompt("summarizer", old_timestamp, new_timestamp, "gpt-4o-mini", "gpt-4o-mini")
-    optimize_prompt("scriptwriter", old_timestamp, new_timestamp, "gpt-4o-mini", "gpt-4o-mini")
-    optimize_prompt("enhancer", old_timestamp, new_timestamp, "gpt-4o-mini", "gpt-4o-mini")
+    try:
+        optimize_prompt("summarizer", old_timestamp, new_timestamp, "gpt-4o-mini", "gpt-4o-mini")
+        optimize_prompt("scriptwriter", old_timestamp, new_timestamp, "gpt-4o-mini", "gpt-4o-mini")
+        optimize_prompt("enhancer", old_timestamp, new_timestamp, "gpt-4o-mini", "gpt-4o-mini")
+    except Exception as e:
+        logger.error(f"Error optimizing prompts: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Error optimizing prompts: {str(e)}")
 
     return {"message": "Feedback processed and prompts optimized"}
 

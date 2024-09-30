@@ -72,13 +72,15 @@ export const submitFeedback = async (feedback, oldTimestamp, newTimestamp) => {
     },
     body: JSON.stringify({
       feedback: feedback,
-      old_timestamp: oldTimestamp,
+      old_timestamp: oldTimestamp || null,
       new_timestamp: newTimestamp
     })
   });
   if (!response.ok) {
-    throw new Error('Error processing feedback');
+    const errorData = await response.json();
+    throw new Error(errorData.detail || 'Error processing feedback');
   }
+  return await response.json();
 };
 
 export const submitExperimentIdea = async (idea) => {
