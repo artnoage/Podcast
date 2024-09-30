@@ -64,8 +64,8 @@ export const submitVote = async (timestamp) => {
   }
 };
 
-export const submitFeedback = async (feedback, oldTimestamp, newTimestamp) => {
-  const response = await fetch(`${API_BASE_URL}/process_feedback`, {
+export const submitFeedback = (feedback, oldTimestamp, newTimestamp) => {
+  fetch(`${API_BASE_URL}/process_feedback`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -75,12 +75,9 @@ export const submitFeedback = async (feedback, oldTimestamp, newTimestamp) => {
       old_timestamp: oldTimestamp || null,
       new_timestamp: newTimestamp
     })
+  }).catch(error => {
+    console.error('Error submitting feedback:', error);
   });
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.detail || 'Error processing feedback');
-  }
-  return await response.json();
 };
 
 export const submitExperimentIdea = async (idea) => {
