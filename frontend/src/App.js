@@ -140,15 +140,14 @@ function App() {
 
     setSelectedPodcast(type);
     const timestamp = podcasts[type]?.timestamp;
-    if (timestamp) {
-      try {
-        await submitVote(timestamp);
-        setHasVoted(true);
-        localStorage.setItem('hasVoted', 'true');
-      } catch (error) {
-        console.error('Error:', error);
-        alert('Error recording vote');
-      }
+    try {
+      const result = await submitVote(timestamp);
+      console.log("Vote submitted successfully:", result);
+      setHasVoted(true);
+      localStorage.setItem('hasVoted', 'true');
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error recording vote: ' + error.message);
     }
   };
 

@@ -60,8 +60,10 @@ export const submitVote = async (timestamp) => {
     body: JSON.stringify({ timestamp: timestamp === null ? "original" : timestamp }),
   });
   if (!response.ok) {
-    throw new Error('Error recording vote');
+    const errorData = await response.json();
+    throw new Error(errorData.detail || 'Error recording vote');
   }
+  return await response.json();
 };
 
 export const submitFeedback = (feedback, oldTimestamp, newTimestamp) => {
