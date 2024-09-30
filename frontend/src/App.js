@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { validateApiKey, createPodcasts, submitVote, submitFeedback, submitExperimentIdea } from './api';
+import { validateApiKey, createPodcasts, submitVote, submitFeedback, submitExperimentIdea, checkHealth } from '../frontend/src/api';
 import './App.css';
-import LoadingSpinner from './LoadingSpinner';
+import LoadingSpinner from '../frontend/src/LoadingSpinner';
 
 // New state variable for feedback box
 const FEEDBACK_STATES = {
@@ -31,7 +31,7 @@ function App() {
   const [feedback, setFeedback] = useState('');
   const [experimentIdea, setExperimentIdea] = useState('');
   const [apiKey, setApiKey] = useState('');
-  const [isApiKeyValid, setIsApiKeyValid] = useState(true);
+  const [isApiKeyValid, setIsApiKeyValid] = useState(false);
   const [showApiKey, setShowApiKey] = useState(false);
   const [selectedPodcast, setSelectedPodcast] = useState(null);
   const [hasVoted, setHasVoted] = useState(false);
@@ -39,6 +39,26 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [newTimestamp, setNewTimestamp] = useState(null);
   const [feedbackState, setFeedbackState] = useState(FEEDBACK_STATES.DISABLED);
+  const [progress, setProgress] = useState('');
+  const [pdfFile, setPdfFile] = useState(null);
+  const [serverHealth, setServerHealth] = useState(null);
+
+  useEffect(() => {
+    const checkServerHealth = async () => {
+      try {
+        const health = await checkHealth();
+        setServerHealth(health.status);
+      } catch (error) {
+        console.error('Error checking server health:', error);
+        setServerHealth('ERROR');
+      }
+    };
+
+    checkServerHealth();
+    const healthInterval = setInterval(checkServerHealth, 60000); // Check every minute
+
+    return () => clearInterval(healthInterval);
+  }, []);
 
   useEffect(() => {
     const voted = localStorage.getItem('hasVoted');
@@ -56,28 +76,18 @@ function App() {
 
   const handleValidateApiKey = async () => {
     if (!apiKey.trim()) {
-      setIsApiKeyValid(true);
+      setIsApiKeyValid(false);
       return;
     }
     try {
       await validateApiKey(apiKey);
       setIsApiKeyValid(true);
-      setApiKey('');
       alert('API key is valid!');
     } catch (error) {
       setIsApiKeyValid(false);
       alert(error.message);
     }
   };
-
-  useEffect(() => {
-    return () => {
-      setApiKey('');
-      setIsApiKeyValid(false);
-    };
-  }, []);
-
-  const [pdfFile, setPdfFile] = useState(null);
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
@@ -89,48 +99,50 @@ function App() {
 
   const handleCreatePodcasts = async () => {
     if (!pdfFile) {
-      alert("Please upload a PDF file first.");
+      setError("Please upload a PDF file first.");
       return;
     }
     try {
       setError(null);
       setIsLoading(true);
+      setProgress("Initiating podcast creation...");
       console.log('Creating podcasts. API key valid:', isApiKeyValid);
-      const result = await createPodcasts(isApiKeyValid ? apiKey : null, pdfFile);
-      console.log('Create podcasts result:', result);
-      if (result.podcasts && result.podcasts.length === 2) {
-        const processedPodcasts = result.podcasts.map(podcast => {
-          const audioBlob = new Blob([Uint8Array.from(atob(podcast.audio), c => c.charCodeAt(0))], { type: 'audio/mpeg' });
-          const audioUrl = URL.createObjectURL(audioBlob);
-          return { ...podcast, audio_url: audioUrl };
-        });
-        const randomPodcast = processedPodcasts.find(p => p.type === 'random');
-        const lastPodcast = processedPodcasts.find(p => p.type === 'last');
-        if (randomPodcast && lastPodcast) {
-          setPodcasts({
-            random: randomPodcast,
-            last: lastPodcast
-          });
-          if (lastPodcast.new_timestamp) {
-            setNewTimestamp(lastPodcast.new_timestamp);
-          }
-          console.log('Podcasts created successfully!');
-          setHasVoted(false);
-          localStorage.removeItem('hasVoted');
-          setFeedbackState(FEEDBACK_STATES.ENABLED);
-        } else {
-          throw new Error('Missing random or last podcast in the server response');
+
+      const result = await createPodcasts(
+        isApiKeyValid ? apiKey : null,
+        pdfFile,
+        (progressData) => {
+          console.log('Progress update:', progressData);
+          setProgress(`Processing... ${progressData.status}`);
         }
+      );
+
+      console.log('Podcasts created successfully:', result);
+      setProgress("Podcasts created successfully!");
+
+      if (result.podcasts && result.podcasts.length === 2) {
+        setPodcasts({
+          random: result.podcasts.find(p => p.type === 'random'),
+          last: result.podcasts.find(p => p.type === 'last')
+        });
+        if (result.podcasts.find(p => p.type === 'last')?.new_timestamp) {
+          setNewTimestamp(result.podcasts.find(p => p.type === 'last').new_timestamp);
+        }
+        setHasVoted(false);
+        localStorage.removeItem('hasVoted');
+        setFeedbackState(FEEDBACK_STATES.ENABLED);
       } else {
         throw new Error('Incorrect number of podcasts returned from the server');
       }
     } catch (error) {
       console.error('Error creating podcasts:', error);
       setError(`Error creating podcasts: ${error.message}`);
+      setProgress("Podcast creation failed.");
     } finally {
       setIsLoading(false);
     }
   };
+
 
   const handlePodcastSelection = async (type) => {
     if (hasVoted) {
@@ -151,18 +163,22 @@ function App() {
     }
   };
 
-  const handleFeedbackSubmit = (event) => {
+  const handleFeedbackSubmit = async (event) => {
     event.preventDefault();
     if (feedback && newTimestamp) {
       const oldTimestamp = podcasts.last ? podcasts.last.timestamp : null;
-      // Submit feedback without waiting for response
-      submitFeedback(feedback, oldTimestamp, newTimestamp);
-      console.log("Feedback submitted:", feedback);
-      setFeedbackState(FEEDBACK_STATES.THANK_YOU);
-      setTimeout(() => {
-        setFeedbackState(FEEDBACK_STATES.DISABLED);
-        setFeedback('');
-      }, 3000); // Reset after 3 seconds
+      try {
+        await submitFeedback(feedback, oldTimestamp, newTimestamp);
+        console.log("Feedback submitted:", feedback);
+        setFeedbackState(FEEDBACK_STATES.THANK_YOU);
+        setTimeout(() => {
+          setFeedbackState(FEEDBACK_STATES.DISABLED);
+          setFeedback('');
+        }, 3000); // Reset after 3 seconds
+      } catch (error) {
+        console.error('Error submitting feedback:', error);
+        alert('Error submitting feedback. Please try again.');
+      }
     } else {
       alert('Please ensure you have created podcasts and provided feedback before submitting.');
     }
@@ -215,6 +231,11 @@ function App() {
                 {error}
               </div>
             )}
+            {serverHealth && (
+              <div className={`p-2 mb-4 rounded-md ${serverHealth === 'OK' ? 'bg-green-500' : 'bg-red-500'}`}>
+                Server Status: {serverHealth}
+              </div>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="space-y-4 md:col-span-3">
                 <div className="flex flex-col md:flex-row md:space-x-4">
@@ -241,6 +262,9 @@ function App() {
                     >
                       {isLoading ? <LoadingSpinner /> : 'Create Podcasts'}
                     </button>
+                    {progress && (
+                      <div className="mt-2 text-sm text-gray-300">{progress}</div>
+                    )}
                   </div>
                   <div className="md:w-2/3 space-y-4">
                     <h3 className="text-2xl font-light text-gray-100 mb-2">Podcast Playback</h3>
