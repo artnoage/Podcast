@@ -80,8 +80,10 @@ class FeedbackRequest(BaseModel):
     old_timestamp: str
     new_timestamp: str
 
+from typing import Optional
+
 class VoteRequest(BaseModel):
-    timestamp: str
+    timestamp: Optional[str] = None
 
 class ExperimentIdeaRequest(BaseModel):
     idea: str
@@ -216,7 +218,7 @@ async def process_feedback(request: FeedbackRequest):
 @app.post("/vote")
 async def vote(request: VoteRequest):
     votes = load_votes()
-    timestamp = request.timestamp
+    timestamp = request.timestamp if request.timestamp is not None else "original"
     if timestamp in votes:
         votes[timestamp] += 1
     else:

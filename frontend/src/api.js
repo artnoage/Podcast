@@ -57,7 +57,7 @@ export const submitVote = async (timestamp) => {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ timestamp }),
+    body: JSON.stringify({ timestamp: timestamp || null }),
   });
   if (!response.ok) {
     throw new Error('Error recording vote');
