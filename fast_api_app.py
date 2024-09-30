@@ -94,7 +94,9 @@ EXPERIMENT_IDEAS_FILE = "experiment_ideas.md"
 def load_votes():
     if os.path.exists(VOTES_FILE):
         with open(VOTES_FILE, 'r') as f:
-            return json.load(f)
+            content = f.read().strip()
+            if content:
+                return json.loads(content)
     return {}
 
 def save_votes(votes):
