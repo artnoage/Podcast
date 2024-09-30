@@ -392,7 +392,7 @@ function App() {
   
           <div className="mt-8 space-y-6 backdrop-blur-md bg-white/10 p-8 rounded-lg shadow-xl">
             <h3 className="text-3xl font-light text-gray-100 mb-4">Learn More</h3>
-            <p className="text-xl text-gray-300 mb-6">If you want to learn about the specific idea, watch the left video. If you want to learn more about text grad, watch the right video.</p>
+            <p className="text-xl text-gray-300 mb-6">If you want to learn about the specific idea, watch the left video. If you want to learn more about text grad, watch the right video (pan inteded).</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-6">
                 <div className="aspect-w-16 aspect-h-9">
@@ -423,7 +423,10 @@ function App() {
           <div className="mt-8 space-y-6 backdrop-blur-md bg-white/10 p-8 rounded-lg shadow-xl">
             <h3 className="text-3xl font-light text-gray-100">How you can help</h3>
             <p className="text-xl text-gray-300 mb-6">
-              There are many ways to support this experiment, and I will appreciate every single one. The most important is by sharing or starring my git repo. If I get visibility, I will go for some minor sponsorships to add better TTS like ElevenLabs or some custom TTS on HuggingFace. If you are a front-end developer, you can support by turning this monstrosity of a page into something visually appealing. If this goes well, I a) will put more features like adding questions for the text before the podcast creation where you want the podcast to focus, b) Make some interactive podcast where you can interrupt and ask questions. Also, please provide feedback for the project or ideas for other world-scale gradient descent experiments.
+              There are many ways to support this experiment, and I will appreciate every single one. The most important is by sharing or starring my git repo (https://github.com/artnoage/Podcast.git). If I get visibility, 
+              I will go for some minor sponsorships to add better TTS like ElevenLabs or some custom TTS on HuggingFace. If you are a front-end developer, you can support by turning this monstrosity of a page into something visually appealing. 
+              If this goes well, I a) will put more features like adding questions for the text before the podcast creation where you want the podcast to focus, b) Make some interactive podcast where you can interrupt and ask questions. 
+              Also, please provide feedback for the project or ideas for other world-scale gradient descent experiments.
             </p>
             <h4 className="text-2xl font-light text-gray-100 mt-6">Submit Experiment Ideas</h4>
             <form onSubmit={handleExperimentIdeaSubmit} className="space-y-6">
@@ -445,7 +448,9 @@ function App() {
           <div className="mt-8 space-y-6 backdrop-blur-md bg-white/10 p-8 rounded-lg shadow-xl">
             <h3 className="text-3xl font-light text-gray-100">Acknowledgments</h3>
             <p className="text-xl text-gray-300 mb-6">
-              This entire application was created with the assistance of <a href="https://aider.chat/" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">aider</a>, an AI-powered coding assistant. We'd like to express our gratitude to the aider team for their innovative tool that made this project possible.
+              This entire application was created with the assistance of <a href="https://aider.chat/" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">aider</a>, an AI-powered coding assistant. 
+              I want to thank AICodeKing (https://www.youtube.com/@AICodeKing) that intoduced me to it. I also want to mention some of my favorit AI youtubers that somehow influenced this project: 1) https://www.youtube.com/channel/UCfOvNb3xj28SNqPQ_JIbumg
+              , 2) https://www.youtube.com/channel/UCHsThxa9HvDpSywv4bP55NA, 3)https://www.youtube.com/channel/UC6MhHkSosYXAD-LTXBWyLMg 
             </p>
           </div>
         </div>
