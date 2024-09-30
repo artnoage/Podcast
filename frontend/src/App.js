@@ -3,6 +3,13 @@ import { validateApiKey, createPodcasts, submitVote, submitFeedback, submitExper
 import './App.css';
 import LoadingSpinner from './LoadingSpinner';
 
+// New state variable for feedback box
+const FEEDBACK_STATES = {
+  DISABLED: 'DISABLED',
+  ENABLED: 'ENABLED',
+  THANK_YOU: 'THANK_YOU',
+};
+
 // Error handling function
 const handleGooglePlayError = (error) => {
   if (error.message.includes('net::ERR_BLOCKED_BY_CLIENT')) {
@@ -31,6 +38,7 @@ function App() {
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [newTimestamp, setNewTimestamp] = useState(null);
+  const [feedbackState, setFeedbackState] = useState(FEEDBACK_STATES.DISABLED);
 
   useEffect(() => {
     const voted = localStorage.getItem('hasVoted');
@@ -109,6 +117,7 @@ function App() {
           console.log('Podcasts created successfully!');
           setHasVoted(false);
           localStorage.removeItem('hasVoted');
+          setFeedbackState(FEEDBACK_STATES.ENABLED);
         } else {
           throw new Error('Missing random or last podcast in the server response');
         }
@@ -147,10 +156,15 @@ function App() {
     event.preventDefault();
     if (feedback && podcasts.last && podcasts.last.timestamp && newTimestamp) {
       submitFeedback(feedback, podcasts.last.timestamp, newTimestamp)
-        .then(() => console.log("Feedback submitted:", feedback))
+        .then(() => {
+          console.log("Feedback submitted:", feedback);
+          setFeedbackState(FEEDBACK_STATES.THANK_YOU);
+          setTimeout(() => {
+            setFeedbackState(FEEDBACK_STATES.DISABLED);
+            setFeedback('');
+          }, 3000); // Reset after 3 seconds
+        })
         .catch(error => console.error('Error:', error));
-      setFeedback('');
-      alert('Thanks for the feedback! You were a helpful gradient. Have a nice day!');
     } else {
       alert('Please ensure you have created podcasts and provided feedback before submitting.');
     }
@@ -346,19 +360,31 @@ function App() {
               <form onSubmit={handleFeedbackSubmit} className="space-y-4 md:col-span-2">
                 <h3 className="text-xl font-light text-gray-100">Provide feedback for the Last podcast to generate gradient</h3>
                 <p className="text-red-500 text-sm">Please provide feedback only if you think it's necessary</p>
-                <textarea
-                  value={feedback}
-                  onChange={(e) => setFeedback(e.target.value)}
-                  placeholder="Share your thoughts on the Last podcast..."
-                  className="w-full p-3 bg-gray-800/50 text-gray-200 rounded-md border border-gray-700 focus:border-gray-500 focus:ring focus:ring-gray-500 focus:ring-opacity-50"
-                  rows={4}
-                />
-                <button
-                  type="submit"
-                  className="w-full py-3 px-6 bg-gray-700 text-gray-200 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition duration-300 text-xl font-light"
-                >
-                  Send Feedback
-                </button>
+                {feedbackState === FEEDBACK_STATES.THANK_YOU ? (
+                  <div className="w-full p-3 bg-green-600 text-white rounded-md">
+                    Thanks for the feedback! You were a helpful gradient. Have a nice day!
+                  </div>
+                ) : (
+                  <>
+                    <textarea
+                      value={feedback}
+                      onChange={(e) => setFeedback(e.target.value)}
+                      placeholder="Share your thoughts on the Last podcast..."
+                      className="w-full p-3 bg-gray-800/50 text-gray-200 rounded-md border border-gray-700 focus:border-gray-500 focus:ring focus:ring-gray-500 focus:ring-opacity-50"
+                      rows={4}
+                      disabled={feedbackState === FEEDBACK_STATES.DISABLED}
+                    />
+                    <button
+                      type="submit"
+                      className={`w-full py-3 px-6 bg-gray-700 text-gray-200 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition duration-300 text-xl font-light ${
+                        feedbackState === FEEDBACK_STATES.DISABLED ? 'opacity-50 cursor-not-allowed' : ''
+                      }`}
+                      disabled={feedbackState === FEEDBACK_STATES.DISABLED}
+                    >
+                      Send Feedback
+                    </button>
+                  </>
+                )}
               </form>
             </div>
           </div>
