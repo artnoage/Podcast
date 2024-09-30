@@ -64,7 +64,7 @@ This project implements an automated workflow for creating engaging podcasts fro
      ```
    - Start the frontend:
      ```
-     cd creator-front-end
+     cd frontend
      npm start
      ```
    - Access the interface at `http://localhost:3000`
