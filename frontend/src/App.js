@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { validateApiKey, createPodcasts, submitVote, submitFeedback, submitExperimentIdea, checkHealth } from '../frontend/src/api';
+import { validateApiKey, createPodcasts, submitVote, submitFeedback, submitExperimentIdea, checkHealth } from './api';
 import './App.css';
 import LoadingSpinner from '../frontend/src/LoadingSpinner';
 
