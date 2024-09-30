@@ -129,22 +129,46 @@ async def create_podcasts_endpoint(
         all_timestamps = get_all_timestamps()
         logger.info(f"All timestamps: {all_timestamps}")
 
-        if not all_timestamps:
-            logger.info("No timestamps available, creating podcast without timestamp")
-            # If no timestamps are available, create a podcast without a timestamp
-            podcast_audio, dialogue_text = await create_podcast_audio(
-                pdf_bytes, timestamp=None,
-                summarizer_model=summarizer_model,
-                scriptwriter_model=scriptwriter_model,
-                enhancer_model=enhancer_model,
-                provider=provider,
-                api_key=api_key
+        logger.info("Creating podcasts")
+        last_timestamp = max(all_timestamps) if all_timestamps else None
+        other_timestamps = [t for t in all_timestamps if t != last_timestamp]
+        random_timestamp = random.choice(other_timestamps) if other_timestamps else None
+
+        async def create_podcast_task(timestamp, podcast_type):
+            try:
+                logger.info(f"Creating podcast for timestamp {timestamp}")
+                podcast_audio, dialogue_text, new_timestamp = await create_podcast_audio(
+                    pdf_bytes, timestamp=timestamp,
+                    summarizer_model=summarizer_model,
+                    scriptwriter_model=scriptwriter_model,
+                    enhancer_model=enhancer_model,
+                    provider=provider,
+                    api_key=api_key
+                )
+
+                logger.info(f"Podcast created successfully for timestamp {timestamp}")
+                logger.info(f"New timestamp for saved podcast state: {new_timestamp}")
+
+                return {
+                    "timestamp": timestamp,
+                    "new_timestamp": new_timestamp,
+                    "type": podcast_type,
+                    "audio": podcast_audio,
+                    "dialogue": dialogue_text
+                }
+            except Exception as e:
+                logger.error(f"Error in create_podcast_task for timestamp {timestamp}: {str(e)}", exc_info=True)
+                raise
+
+        logger.info("Creating both podcasts concurrently")
+        try:
+            podcasts = await asyncio.gather(
+                create_podcast_task(random_timestamp, "random"),
+                create_podcast_task(last_timestamp, "last")
             )
-            podcasts = [{"timestamp": None, "audio": podcast_audio, "dialogue": dialogue_text}]
-        else:
-            logger.info("Timestamps available, creating podcasts with timestamps")
-            last_timestamp = max(all_timestamps)
-            random_timestamp = random.choice([t for t in all_timestamps if t != last_timestamp])
+        except Exception as e:
+            logger.error(f"Error in asyncio.gather: {str(e)}", exc_info=True)
+            raise HTTPException(status_code=500, detail=f"Failed to create podcasts: {str(e)}")
             
             async def create_podcast_task(timestamp, podcast_type):
                 try:
