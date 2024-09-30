@@ -5,7 +5,7 @@ import json
 import asyncio
 import base64
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -77,7 +77,7 @@ async def validate_api_key(request: ApiKeyRequest):
 
 class FeedbackRequest(BaseModel):
     feedback: str
-    old_timestamp: str
+    old_timestamp: Optional[str] = None
     new_timestamp: str
 
 from typing import Optional
@@ -201,7 +201,7 @@ async def process_feedback(request: FeedbackRequest):
     logger.info(f"New timestamp: {new_timestamp}")
 
     # Add feedback to the podcast state if old_timestamp is not None
-    if old_timestamp is not None:
+    if old_timestamp:
         add_feedback_to_state(old_timestamp, feedback)
 
     # Optimize prompts
