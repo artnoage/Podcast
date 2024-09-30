@@ -397,7 +397,7 @@ function App() {
               <div className="space-y-6">
                 <div className="aspect-w-16 aspect-h-9">
                   <iframe
-                    src="https://www.youtube-nocookie.com/embed/8jIbgJfP0Dw"
+                    src="https://www.youtube-nocookie.com/embed/c2W2VNZQBi4"
                     title="Specific Idea Video"
                     frameBorder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
