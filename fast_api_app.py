@@ -170,43 +170,6 @@ async def create_podcasts_endpoint(
             logger.error(f"Error in asyncio.gather: {str(e)}", exc_info=True)
             raise HTTPException(status_code=500, detail=f"Failed to create podcasts: {str(e)}")
             
-            async def create_podcast_task(timestamp, podcast_type):
-                try:
-                    logger.info(f"Creating podcast for timestamp {timestamp}")
-                    podcast_audio, dialogue_text, new_timestamp = await create_podcast_audio(
-                        pdf_bytes, timestamp=timestamp,
-                        summarizer_model=summarizer_model,
-                        scriptwriter_model=scriptwriter_model,
-                        enhancer_model=enhancer_model,
-                        provider=provider,
-                        api_key=api_key
-                    )
-
-                    logger.info(f"Podcast created successfully for timestamp {timestamp}")
-                    logger.info(f"New timestamp for saved podcast state: {new_timestamp}")
-
-                    # Add timestamp and type to the podcast_state, along with audio and dialogue
-                    return {
-                        "timestamp": timestamp,
-                        "new_timestamp": new_timestamp,
-                        "type": podcast_type,
-                        "audio": podcast_audio,
-                        "dialogue": dialogue_text
-                    }
-                except Exception as e:
-                    logger.error(f"Error in create_podcast_task for timestamp {timestamp}: {str(e)}", exc_info=True)
-                    raise
-            
-            logger.info("Creating both podcasts concurrently")
-            # Create both podcasts concurrently
-            try:
-                podcasts = await asyncio.gather(
-                    create_podcast_task(random_timestamp, "random"),
-                    create_podcast_task(last_timestamp, "last")
-                )
-            except Exception as e:
-                logger.error(f"Error in asyncio.gather: {str(e)}", exc_info=True)
-                raise HTTPException(status_code=500, detail=f"Failed to create podcasts: {str(e)}")
         
         logger.info("Podcasts created successfully")
         # Convert audio content to base64 for JSON serialization

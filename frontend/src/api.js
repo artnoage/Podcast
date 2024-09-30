@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://fastapi.metaskepsis.com';
+const API_BASE_URL = 'http://localhost:8000'; // Replace with your API base URL
 
 export const validateApiKey = async (apiKey) => {
   if (!apiKey) {
