@@ -452,9 +452,9 @@ function App() {
               I want to thank <a href="https://www.youtube.com/@AICodeKing" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">AICodeKing</a> that introduced me to it. I also want to mention some of my favorite AI YouTubers that somehow influenced this project:
             </p>
             <ol className="list-decimal list-inside space-y-2 text-xl text-gray-300">
-              <li><a href="https://www.youtube.com/channel/UCfOvNb3xj28SNqPQ_JIbumg" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">Yannic Kilcher</a></li>
-              <li><a href="https://www.youtube.com/channel/UCHsThxa9HvDpSywv4bP55NA" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">Two Minute Papers</a></li>
-              <li><a href="https://www.youtube.com/channel/UC6MhHkSosYXAD-LTXBWyLMg" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">Lex Fridman</a></li>
+              <li><a href="https://www.youtube.com/channel/UCfOvNb3xj28SNqPQ_JIbumg" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">Discover AI</a></li>
+              <li><a href="https://www.youtube.com/channel/UCHsThxa9HvDpSywv4bP55NA" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">J. Gravelles</a></li>
+              <li><a href="https://www.youtube.com/channel/UC6MhHkSosYXAD-LTXBWyLMg" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">Neural Breakdown with AVB</a></li>
             </ol>
           </div>
         </div>
