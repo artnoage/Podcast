@@ -11,7 +11,6 @@ export const validateApiKey = async (apiKey) => {
     },
     body: JSON.stringify({ api_key: apiKey }),
     mode: 'cors',
-    credentials: 'include',
   });
   if (!response.ok) {
     const data = await response.json();
@@ -94,7 +93,6 @@ export const submitVote = async (timestamp) => {
     },
     body: JSON.stringify({ timestamp: timestamp === null ? "original" : timestamp }),
     mode: 'cors',
-    credentials: 'include',
   });
   if (!response.ok) {
     const errorData = await response.json();
@@ -116,7 +114,6 @@ export const submitFeedback = async (feedback, oldTimestamp, newTimestamp) => {
         new_timestamp: newTimestamp
       }),
       mode: 'cors',
-      credentials: 'include',
     });
 
     if (!response.ok) {
@@ -140,7 +137,6 @@ export const submitExperimentIdea = async (idea) => {
       },
       body: JSON.stringify({ idea }),
       mode: 'cors',
-      credentials: 'include',
     });
 
     if (!response.ok) {
