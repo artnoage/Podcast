@@ -48,19 +48,17 @@ function App() {
   const [feedbackState, setFeedbackState] = useState(FEEDBACK_STATES.DISABLED);
   const [progress, setProgress] = useState('');
   const [pdfFile, setPdfFile] = useState(null);
-  const [hasVoted, setHasVoted] = useState(false);
-
   useEffect(() => {
     const voted = localStorage.getItem('hasVoted');
     if (voted) {
-      setHasVoted(true);
+      setVoteState(VOTE_STATES.VOTED);
     }
   }, []);
 
   useEffect(() => {
     if (podcasts.random && podcasts.last) {
-      setHasVoted(false);
       localStorage.removeItem('hasVoted');
+      setVoteState(VOTE_STATES.ENABLED);
     }
   }, [podcasts]);
 
