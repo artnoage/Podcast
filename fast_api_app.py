@@ -35,7 +35,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=False,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -254,8 +254,9 @@ async def vote(request: VoteRequest):
 @app.post("/submit_experiment_idea")
 async def submit_experiment_idea(request: ExperimentIdeaRequest):
     idea = request.idea
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     with open(EXPERIMENT_IDEAS_FILE, "a") as f:
-        f.write(f"\n\n---\n\n# New Experiment Idea\n\n{idea}\n")
+        f.write(f"\n\n---\n\nNew Experiment Idea (submitted on {timestamp}):\n\n{idea}\n")
     return {"message": "Experiment idea submitted successfully"}
 
 if __name__ == "__main__":
