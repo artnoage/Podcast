@@ -10,7 +10,6 @@ export const validateApiKey = async (apiKey) => {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ api_key: apiKey }),
-    mode: 'cors',
   });
   if (!response.ok) {
     const data = await response.json();
@@ -91,7 +90,6 @@ export const submitVote = async (timestamp) => {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ timestamp: timestamp === null ? "original" : timestamp }),
-    mode: 'cors',
   });
   if (!response.ok) {
     const errorData = await response.json();
@@ -112,7 +110,6 @@ export const submitFeedback = async (feedback, oldTimestamp, newTimestamp) => {
         old_timestamp: oldTimestamp || null,
         new_timestamp: newTimestamp
       }),
-      mode: 'cors',
     });
 
     if (!response.ok) {
@@ -135,7 +132,6 @@ export const submitExperimentIdea = async (idea) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ idea }),
-      mode: 'cors',
     });
 
     if (!response.ok) {
