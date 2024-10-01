@@ -121,12 +121,20 @@ function App() {
       setProgress("Podcasts created successfully!");
 
       if (result.podcasts && result.podcasts.length === 2) {
+        const randomPodcast = result.podcasts.find(p => p.type === 'random');
+        const lastPodcast = result.podcasts.find(p => p.type === 'last');
         setPodcasts({
-          random: result.podcasts.find(p => p.type === 'random'),
-          last: result.podcasts.find(p => p.type === 'last')
+          random: {
+            ...randomPodcast,
+            audio_url: randomPodcast.audio_url
+          },
+          last: {
+            ...lastPodcast,
+            audio_url: lastPodcast.audio_url
+          }
         });
-        if (result.podcasts.find(p => p.type === 'last')?.new_timestamp) {
-          setNewTimestamp(result.podcasts.find(p => p.type === 'last').new_timestamp);
+        if (lastPodcast?.new_timestamp) {
+          setNewTimestamp(lastPodcast.new_timestamp);
         }
         setHasVoted(false);
         localStorage.removeItem('hasVoted');
@@ -271,7 +279,7 @@ function App() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="bg-gray-800 p-4 rounded-lg">
                         <h4 className="text-xl font-light text-gray-100 mb-2">Random Podcast</h4>
-                        {podcasts.random?.audio_url ? (
+                        {podcasts.random && podcasts.random.audio_url ? (
                           <>
                             <audio 
                               controls 
@@ -296,7 +304,7 @@ function App() {
                       </div>
                       <div className="bg-gray-800 p-4 rounded-lg">
                         <h4 className="text-xl font-light text-gray-100 mb-2">Last Podcast</h4>
-                        {podcasts.last?.audio_url ? (
+                        {podcasts.last && podcasts.last.audio_url ? (
                           <>
                             <audio 
                               controls 
