@@ -94,10 +94,9 @@ function App() {
       setError(null);
       setIsLoading(true);
       setProgress("Initiating podcast creation...");
-      console.log('Creating podcasts. API key valid:', isApiKeyValid);
+      console.log('Creating podcasts.');
 
       const result = await createPodcasts(
-        isApiKeyValid ? apiKey : null,
         pdfFile,
         (progressData) => {
           console.log('Progress update:', progressData);

@@ -19,11 +19,10 @@ export const validateApiKey = async (apiKey) => {
   return true;
 };
 
-export const createPodcasts = (apiKey, pdfFile, onProgress) => {
+export const createPodcasts = (pdfFile, onProgress) => {
   return new Promise((resolve, reject) => {
-    console.log('createPodcasts called with:', { apiKey: apiKey ? 'provided' : 'not provided', pdfFile: pdfFile.name });
+    console.log('createPodcasts called with:', { pdfFile: pdfFile.name });
     const formData = new FormData();
-    formData.append('api_key', apiKey || '');
     formData.append('pdf_content', pdfFile);
     formData.append('summarizer_model', 'gpt-4o-mini');
     formData.append('scriptwriter_model', 'gpt-4o-mini');
