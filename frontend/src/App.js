@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { validateApiKey, createPodcasts, submitVote, submitFeedback, submitExperimentIdea, checkHealth } from './api';
 import './App.css';
-import LoadingSpinner from '../frontend/src/LoadingSpinner';
+import LoadingSpinner from './LoadingSpinner';
 
 // New state variable for feedback box
 const FEEDBACK_STATES = {
