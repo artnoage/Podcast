@@ -11,6 +11,7 @@ export const validateApiKey = async (apiKey) => {
     },
     body: JSON.stringify({ api_key: apiKey }),
     mode: 'cors',
+    credentials: 'include',
   });
   if (!response.ok) {
     const data = await response.json();
@@ -19,34 +20,69 @@ export const validateApiKey = async (apiKey) => {
   return true;
 };
 
-export const createPodcasts = async (apiKey, pdfFile) => {
-  try {
-    console.log('Creating podcasts with API key:', apiKey ? 'API key provided' : 'No API key');
+export const createPodcasts = (apiKey, pdfFile, onProgress) => {
+  return new Promise((resolve, reject) => {
+    console.log('createPodcasts called with:', { apiKey: apiKey ? 'provided' : 'not provided', pdfFile: pdfFile.name });
     const formData = new FormData();
     formData.append('api_key', apiKey || '');
     formData.append('pdf_content', pdfFile);
-    const response = await fetch(`${API_BASE_URL}/create_podcasts`, {
+    formData.append('summarizer_model', 'gpt-4o-mini');
+    formData.append('scriptwriter_model', 'gpt-4o-mini');
+    formData.append('enhancer_model', 'gpt-4o-mini');
+    formData.append('provider', 'OpenAI');
+
+    fetch(`${API_BASE_URL}/create_podcasts`, {
       method: 'POST',
-      body: formData
+      body: formData,
+    }).then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    }).then(data => {
+      const taskId = data.task_id;
+      console.log('Podcast creation started, task ID:', taskId);
+      
+      const pollInterval = setInterval(async () => {
+        try {
+          const statusResponse = await fetch(`${API_BASE_URL}/podcast_status/${taskId}`);
+          if (!statusResponse.ok) {
+            throw new Error(`HTTP error! status: ${statusResponse.status}`);
+          }
+          const statusData = await statusResponse.json();
+          console.log('Podcast status:', statusData);
+
+          if (statusData.status === 'completed') {
+            clearInterval(pollInterval);
+            resolve(statusData.result);
+          } else if (statusData.status === 'failed') {
+            clearInterval(pollInterval);
+            reject(new Error(statusData.error || 'Podcast creation failed'));
+          } else if (onProgress) {
+            onProgress(statusData);
+          }
+        } catch (error) {
+          console.error('Error polling podcast status:', error);
+          clearInterval(pollInterval);
+          reject(error);
+        }
+      }, 5000); // Poll every 5 seconds
+    }).catch(error => {
+      console.error('Error in createPodcasts:', error);
+      reject(error);
     });
+  });
+};
+
+export const checkHealth = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/health`);
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error('Error response:', errorData);
-      throw new Error(errorData.detail || 'Unknown error occurred');
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
-    const result = await response.json();
-    console.log('Podcasts created successfully:', result);
-
-    // Process audio segments for each podcast
-    result.podcasts = result.podcasts.map(podcast => {
-      const audioBlob = new Blob(podcast.audio_segments, { type: 'audio/mpeg' });
-      const audioUrl = URL.createObjectURL(audioBlob);
-      return { ...podcast, audio_url: audioUrl };
-    });
-
-    return result;
+    return await response.json();
   } catch (error) {
-    console.error('Error creating podcasts:', error);
+    console.error('Error checking server health:', error);
     throw error;
   }
 };
@@ -58,6 +94,8 @@ export const submitVote = async (timestamp) => {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ timestamp: timestamp === null ? "original" : timestamp }),
+    mode: 'cors',
+    credentials: 'include',
   });
   if (!response.ok) {
     const errorData = await response.json();
@@ -66,31 +104,55 @@ export const submitVote = async (timestamp) => {
   return await response.json();
 };
 
-export const submitFeedback = (feedback, oldTimestamp, newTimestamp) => {
-  fetch(`${API_BASE_URL}/process_feedback`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      feedback: feedback,
-      old_timestamp: oldTimestamp || null,
-      new_timestamp: newTimestamp
-    })
-  }).catch(error => {
+export const submitFeedback = async (feedback, oldTimestamp, newTimestamp) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/process_feedback`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        feedback: feedback,
+        old_timestamp: oldTimestamp || null,
+        new_timestamp: newTimestamp
+      }),
+      mode: 'cors',
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || 'Error submitting feedback');
+    }
+
+    return await response.json();
+  } catch (error) {
     console.error('Error submitting feedback:', error);
-  });
+    throw error;
+  }
 };
 
 export const submitExperimentIdea = async (idea) => {
-  const response = await fetch(`${API_BASE_URL}/submit_experiment_idea`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ idea })
-  });
-  if (!response.ok) {
-    throw new Error('Error submitting experiment idea');
+  try {
+    const response = await fetch(`${API_BASE_URL}/submit_experiment_idea`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ idea }),
+      mode: 'cors',
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || 'Error submitting experiment idea');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error submitting experiment idea:', error);
+    throw error;
   }
 };
+
