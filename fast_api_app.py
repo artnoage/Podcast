@@ -8,9 +8,10 @@ from datetime import datetime
 from typing import Optional, List, Dict
 from uuid import uuid4
 
-from fastapi import FastAPI, UploadFile, File, Form, HTTPException, BackgroundTasks
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException, BackgroundTasks, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+import base64
 from pydantic import BaseModel
 from openai import OpenAI
 
@@ -133,6 +134,20 @@ async def get_podcast_status(task_id: str):
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
     return task
+
+@app.get("/get_podcast_audio/{task_id}")
+async def get_podcast_audio(task_id: str):
+    task = tasks.get(task_id)
+    if not task or task["status"] != "completed":
+        raise HTTPException(status_code=404, detail="Audio not found or task not completed")
+    
+    # Assuming the audio data is stored in the task result
+    podcasts = task["result"]["podcasts"]
+    
+    # Combine audio data from both podcasts
+    audio_data = b''.join([base64.b64decode(podcast["audio"]) for podcast in podcasts])
+    
+    return Response(content=audio_data, media_type="audio/mpeg")
 
 async def process_podcast_creation(
     task_id: str, 
