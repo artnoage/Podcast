@@ -74,18 +74,6 @@ export const createPodcasts = (apiKey, pdfFile, onProgress) => {
   });
 };
 
-export const checkHealth = async () => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/health`);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    return await response.json();
-  } catch (error) {
-    console.error('Error checking server health:', error);
-    throw error;
-  }
-};
 
 export const submitVote = async (timestamp) => {
   const response = await fetch(`${API_BASE_URL}/vote`, {

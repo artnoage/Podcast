@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { validateApiKey, createPodcasts, submitVote, submitFeedback, submitExperimentIdea, checkHealth } from './api';
+import { validateApiKey, createPodcasts, submitVote, submitFeedback, submitExperimentIdea } from './api';
 import './App.css';
 import LoadingSpinner from './LoadingSpinner';
 
@@ -48,25 +48,6 @@ function App() {
   const [feedbackState, setFeedbackState] = useState(FEEDBACK_STATES.DISABLED);
   const [progress, setProgress] = useState('');
   const [pdfFile, setPdfFile] = useState(null);
-  const [serverHealth, setServerHealth] = useState(null);
-
-  useEffect(() => {
-    const checkServerHealth = async () => {
-      try {
-        const health = await checkHealth();
-        setServerHealth(health.status);
-      } catch (error) {
-        console.error('Error checking server health:', error);
-        setServerHealth('ERROR');
-      }
-    };
-
-    checkServerHealth();
-    const healthInterval = setInterval(checkServerHealth, 60000); // Check every minute
-
-    return () => clearInterval(healthInterval);
-  }, []);
-
   useEffect(() => {
     const voted = localStorage.getItem('hasVoted');
     if (voted) {
@@ -243,11 +224,6 @@ function App() {
             {error && (
               <div className="bg-red-500 text-white p-4 rounded-md mb-4">
                 {error}
-              </div>
-            )}
-            {serverHealth && (
-              <div className={`p-2 mb-4 rounded-md ${serverHealth === 'OK' ? 'bg-green-500' : 'bg-red-500'}`}>
-                Server Status: {serverHealth}
               </div>
             )}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
