@@ -135,17 +135,19 @@ async def get_podcast_status(task_id: str):
         raise HTTPException(status_code=404, detail="Task not found")
     return task
 
-@app.get("/get_podcast_audio/{task_id}")
-async def get_podcast_audio(task_id: str):
+@app.get("/get_podcast_audio/{task_id}/{podcast_type}")
+async def get_podcast_audio(task_id: str, podcast_type: str):
     task = tasks.get(task_id)
     if not task or task["status"] != "completed":
         raise HTTPException(status_code=404, detail="Audio not found or task not completed")
     
-    # Assuming the audio data is stored in the task result
     podcasts = task["result"]["podcasts"]
+    podcast = next((p for p in podcasts if p["type"] == podcast_type), None)
     
-    # Combine audio data from both podcasts
-    audio_data = b''.join([base64.b64decode(podcast["audio"]) for podcast in podcasts])
+    if not podcast:
+        raise HTTPException(status_code=404, detail=f"Podcast of type {podcast_type} not found")
+    
+    audio_data = base64.b64decode(podcast["audio"])
     
     return Response(content=audio_data, media_type="audio/mpeg")
 

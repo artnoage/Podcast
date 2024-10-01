@@ -51,16 +51,21 @@ export const createPodcasts = (pdfFile, onProgress) => {
 
           if (statusData.status === 'completed') {
             clearInterval(pollInterval);
-            // Fetch the audio data
-            const audioResponse = await fetch(`${API_BASE_URL}/get_podcast_audio/${taskId}`);
-            if (!audioResponse.ok) {
-              throw new Error(`HTTP error! status: ${audioResponse.status}`);
+            // Fetch the audio data for both podcasts
+            const randomAudioResponse = await fetch(`${API_BASE_URL}/get_podcast_audio/${taskId}/random`);
+            const lastAudioResponse = await fetch(`${API_BASE_URL}/get_podcast_audio/${taskId}/last`);
+            
+            if (!randomAudioResponse.ok || !lastAudioResponse.ok) {
+              throw new Error(`HTTP error! status: ${randomAudioResponse.status} or ${lastAudioResponse.status}`);
             }
-            const audioData = await audioResponse.arrayBuffer();
+            
+            const randomAudioData = await randomAudioResponse.arrayBuffer();
+            const lastAudioData = await lastAudioResponse.arrayBuffer();
+            
             // Add audio data to the result
             statusData.result.podcasts = statusData.result.podcasts.map(podcast => ({
               ...podcast,
-              audio_data: audioData
+              audio_data: podcast.type === 'random' ? randomAudioData : lastAudioData
             }));
             resolve(statusData.result);
           } else if (statusData.status === 'failed') {
