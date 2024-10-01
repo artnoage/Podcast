@@ -10,6 +10,13 @@ const FEEDBACK_STATES = {
   THANK_YOU: 'THANK_YOU',
 };
 
+// New state variable for voting buttons
+const VOTE_STATES = {
+  DISABLED: 'DISABLED',
+  ENABLED: 'ENABLED',
+  VOTED: 'VOTED',
+};
+
 // Error handling function
 const handleGooglePlayError = (error) => {
   if (error.message.includes('net::ERR_BLOCKED_BY_CLIENT')) {
@@ -34,7 +41,7 @@ function App() {
   const [isApiKeyValid, setIsApiKeyValid] = useState(false);
   const [showApiKey, setShowApiKey] = useState(false);
   const [selectedPodcast, setSelectedPodcast] = useState(null);
-  const [hasVoted, setHasVoted] = useState(false);
+  const [voteState, setVoteState] = useState(VOTE_STATES.DISABLED);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [newTimestamp, setNewTimestamp] = useState(null);
@@ -136,7 +143,7 @@ function App() {
         if (lastPodcast?.new_timestamp) {
           setNewTimestamp(lastPodcast.new_timestamp);
         }
-        setHasVoted(false);
+        setVoteState(VOTE_STATES.ENABLED);
         localStorage.removeItem('hasVoted');
         setFeedbackState(FEEDBACK_STATES.ENABLED);
       } else {
@@ -153,8 +160,7 @@ function App() {
 
 
   const handlePodcastSelection = async (type) => {
-    if (hasVoted) {
-      alert("You have already voted.");
+    if (voteState !== VOTE_STATES.ENABLED) {
       return;
     }
 
@@ -163,7 +169,7 @@ function App() {
     try {
       const result = await submitVote(timestamp);
       console.log("Vote submitted successfully:", result);
-      setHasVoted(true);
+      setVoteState(VOTE_STATES.VOTED);
       localStorage.setItem('hasVoted', 'true');
     } catch (error) {
       console.error('Error:', error);
@@ -331,19 +337,19 @@ function App() {
                     <div className="grid grid-cols-2 gap-4 mt-4">
                       <button
                         onClick={() => handlePodcastSelection('random')}
-                        disabled={hasVoted}
+                        disabled={voteState !== VOTE_STATES.ENABLED}
                         className={`w-full py-2 px-4 rounded-md transition duration-300 ${
                           selectedPodcast === 'random' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-200 hover:bg-gray-600'
-                        } ${hasVoted ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        } ${voteState !== VOTE_STATES.ENABLED ? 'opacity-50 cursor-not-allowed' : ''}`}
                       >
                         Random is Better
                       </button>
                       <button
                         onClick={() => handlePodcastSelection('last')}
-                        disabled={hasVoted}
+                        disabled={voteState !== VOTE_STATES.ENABLED}
                         className={`w-full py-2 px-4 rounded-md transition duration-300 ${
                           selectedPodcast === 'last' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-200 hover:bg-gray-600'
-                        } ${hasVoted ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        } ${voteState !== VOTE_STATES.ENABLED ? 'opacity-50 cursor-not-allowed' : ''}`}
                       >
                         Last is Better
                       </button>
