@@ -3,9 +3,6 @@ import { validateApiKey, createPodcasts, submitVote, submitFeedback, submitExper
 import './App.css';
 import LoadingSpinner from './LoadingSpinner';
 
-// New state variable for tracking if user has voted
-const [hasVoted, setHasVoted] = useState(false);
-
 // New state variable for feedback box
 const FEEDBACK_STATES = {
   DISABLED: 'DISABLED',
@@ -51,6 +48,8 @@ function App() {
   const [feedbackState, setFeedbackState] = useState(FEEDBACK_STATES.DISABLED);
   const [progress, setProgress] = useState('');
   const [pdfFile, setPdfFile] = useState(null);
+  const [hasVoted, setHasVoted] = useState(false);
+
   useEffect(() => {
     const voted = localStorage.getItem('hasVoted');
     if (voted) {
