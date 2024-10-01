@@ -111,16 +111,22 @@ function App() {
       if (result.podcasts && result.podcasts.length === 2) {
         const randomPodcast = result.podcasts.find(p => p.type === 'random');
         const lastPodcast = result.podcasts.find(p => p.type === 'last');
+
+        // Create Blobs and URLs for the audio data
+        const randomAudioBlob = new Blob([randomPodcast.audio_data], { type: 'audio/mpeg' });
+        const lastAudioBlob = new Blob([lastPodcast.audio_data], { type: 'audio/mpeg' });
+
         setPodcasts({
           random: {
             ...randomPodcast,
-            audio_url: randomPodcast.audio_url
+            audio_url: URL.createObjectURL(randomAudioBlob)
           },
           last: {
             ...lastPodcast,
-            audio_url: lastPodcast.audio_url
+            audio_url: URL.createObjectURL(lastAudioBlob)
           }
         });
+
         if (lastPodcast?.new_timestamp) {
           setNewTimestamp(lastPodcast.new_timestamp);
         }

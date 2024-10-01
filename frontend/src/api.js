@@ -54,6 +54,17 @@ export const createPodcasts = (apiKey, pdfFile, onProgress) => {
 
           if (statusData.status === 'completed') {
             clearInterval(pollInterval);
+            // Fetch the audio data
+            const audioResponse = await fetch(`${API_BASE_URL}/get_podcast_audio/${taskId}`);
+            if (!audioResponse.ok) {
+              throw new Error(`HTTP error! status: ${audioResponse.status}`);
+            }
+            const audioData = await audioResponse.arrayBuffer();
+            // Add audio data to the result
+            statusData.result.podcasts = statusData.result.podcasts.map(podcast => ({
+              ...podcast,
+              audio_data: audioData
+            }));
             resolve(statusData.result);
           } else if (statusData.status === 'failed') {
             clearInterval(pollInterval);
