@@ -269,15 +269,24 @@ function App() {
                             >
                               Your browser does not support the audio element.
                             </audio>
-                            <button
-                              onClick={() => {
-                                URL.revokeObjectURL(podcasts.random.audio_url);
-                                setPodcasts(prev => ({...prev, random: {...prev.random, audio_url: null}}));
-                              }}
-                              className="mt-2 text-sm text-gray-400 hover:text-gray-300"
-                            >
-                              Release audio memory
-                            </button>
+                            <div className="flex justify-between mt-2">
+                              <button
+                                onClick={() => {
+                                  URL.revokeObjectURL(podcasts.random.audio_url);
+                                  setPodcasts(prev => ({...prev, random: {...prev.random, audio_url: null}}));
+                                }}
+                                className="text-sm text-gray-400 hover:text-gray-300"
+                              >
+                                Release audio memory
+                              </button>
+                              <a
+                                href={podcasts.random.audio_url}
+                                download="random_podcast.mp3"
+                                className="text-sm text-blue-400 hover:text-blue-300"
+                              >
+                                Download
+                              </a>
+                            </div>
                           </>
                         ) : (
                           <p className="text-gray-400">No audio available</p>
@@ -294,15 +303,24 @@ function App() {
                             >
                               Your browser does not support the audio element.
                             </audio>
-                            <button
-                              onClick={() => {
-                                URL.revokeObjectURL(podcasts.last.audio_url);
-                                setPodcasts(prev => ({...prev, last: {...prev.last, audio_url: null}}));
-                              }}
-                              className="mt-2 text-sm text-gray-400 hover:text-gray-300"
-                            >
-                              Release audio memory
-                            </button>
+                            <div className="flex justify-between mt-2">
+                              <button
+                                onClick={() => {
+                                  URL.revokeObjectURL(podcasts.last.audio_url);
+                                  setPodcasts(prev => ({...prev, last: {...prev.last, audio_url: null}}));
+                                }}
+                                className="text-sm text-gray-400 hover:text-gray-300"
+                              >
+                                Release audio memory
+                              </button>
+                              <a
+                                href={podcasts.last.audio_url}
+                                download="last_podcast.mp3"
+                                className="text-sm text-blue-400 hover:text-blue-300"
+                              >
+                                Download
+                              </a>
+                            </div>
                           </>
                         ) : (
                           <p className="text-gray-400">No audio available</p>
