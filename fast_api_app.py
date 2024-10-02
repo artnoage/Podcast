@@ -78,24 +78,9 @@ def save_votes(votes):
 async def health_check():
     return {"status": "OK"}
 
-@app.post("/validate_api_key")
-async def validate_api_key(request: ApiKeyRequest):
-    try:
-        client.api_key = request.api_key
-        client.models.list()
-        return {"message": "API key is valid"}
-    except Exception as e:
-        if "Invalid API key" in str(e):
-            logger.warning("Invalid API key provided")
-            raise HTTPException(status_code=401, detail="Invalid API key")
-        else:
-            logger.error("Error validating API key", exc_info=True)
-            raise HTTPException(status_code=500, detail="Error validating API key")
-
 @app.post("/create_podcasts")
 async def create_podcasts_endpoint(
     background_tasks: BackgroundTasks,
-    api_key: Optional[str] = Form(None),
     pdf_content: UploadFile = File(...),
     summarizer_model: str = Form("gpt-4o-mini"),
     scriptwriter_model: str = Form("gpt-4o-mini"),
