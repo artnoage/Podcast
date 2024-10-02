@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:8000'; // Replace with your API base URL
+const API_BASE_URL = 'https://fastapi.metaskepsis.com'; // Replace with your API base URL
 
 export const validateApiKey = async (apiKey) => {
   if (!apiKey) {
@@ -134,14 +134,14 @@ export const submitExperimentIdea = async (idea) => {
     const response = await fetch(`${API_BASE_URL}/submit_experiment_idea`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'text/plain',
       },
-      body: JSON.stringify({ idea }),
+      body: idea,
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.detail || 'Error submitting experiment idea');
+      const errorText = await response.text();
+      throw new Error(errorText || 'Error submitting experiment idea');
     }
 
     return await response.json();

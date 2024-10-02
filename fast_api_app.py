@@ -14,6 +14,7 @@ from fastapi.staticfiles import StaticFiles
 import base64
 from pydantic import BaseModel
 from openai import OpenAI
+from fastapi import Request
 
 from src.utils.utils import add_feedback_to_state, get_all_timestamps
 from src.utils.textGDwithWeightClipping import optimize_prompt
@@ -56,6 +57,7 @@ class VoteRequest(BaseModel):
 
 class ExperimentIdeaRequest(BaseModel):
     idea: str
+
 
 VOTES_FILE = "votes.json"
 EXPERIMENT_IDEAS_FILE = "experiment_ideas.md"
@@ -253,12 +255,16 @@ async def vote(request: VoteRequest):
     logger.info(f"Vote recorded for timestamp: {timestamp}")
     return {"message": "Vote recorded successfully", "timestamp": timestamp}
 
+
 @app.post("/submit_experiment_idea")
-async def submit_experiment_idea(request: ExperimentIdeaRequest):
-    idea = request.idea
+async def submit_experiment_idea(request: Request):
+    idea = await request.body()
+    idea_text = idea.decode('utf-8')
+    
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     with open(EXPERIMENT_IDEAS_FILE, "a") as f:
-        f.write(f"\n\n---\n\nNew Experiment Idea (submitted on {timestamp}):\n\n{idea}\n")
+        f.write(f"\n\n---\n\nNew Experiment Idea (submitted on {timestamp}):\n\n{idea_text}\n")
+    
     return {"message": "Experiment idea submitted successfully"}
 
 if __name__ == "__main__":
