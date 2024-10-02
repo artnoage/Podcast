@@ -59,20 +59,6 @@ function App() {
     }
   }, [podcasts]);
 
-  const handleValidateApiKey = async () => {
-    if (!apiKey.trim()) {
-      setIsApiKeyValid(false);
-      return;
-    }
-    try {
-      await validateApiKey(apiKey);
-      setIsApiKeyValid(true);
-      alert('API key is valid!');
-    } catch (error) {
-      setIsApiKeyValid(false);
-      alert(error.message);
-    }
-  };
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
