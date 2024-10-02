@@ -379,7 +379,7 @@ function App() {
           <div className="mt-8 space-y-6 backdrop-blur-md bg-white/10 p-8 rounded-lg shadow-xl">
             <h3 className="text-3xl font-light text-gray-100">How you can help</h3>
             <p className="text-xl text-gray-300 mb-6">
-              There are many ways to support this experiment, and I will appreciate every single one. The most important is by sharing or starring my <a href="https://github.com/artnoage/Podcast.git" className="text-blue-400 hover:text-blue-300">git repo</a>. If I get visibility, 
+              There are many ways to support this experiment, and I will appreciate every single one. The most important is by forking or starring my <a href="https://github.com/artnoage/Podcast.git" className="text-blue-400 hover:text-blue-300">git repo</a>. If I get visibility, 
               I will go for some minor sponsorships to add better TTS like ElevenLabs or some custom TTS on HuggingFace. If you are a front-end developer, you can support by turning this monstrosity of a page into something visually appealing. 
               If this goes well, I a) will put more features like adding questions for the text before the podcast creation where you want the podcast to focus, b) Make some interactive podcast where you can interrupt and ask questions. 
               Also, please provide feedback for the project or ideas for other world-scale gradient descent experiments.
