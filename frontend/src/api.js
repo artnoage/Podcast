@@ -1,22 +1,5 @@
 const API_BASE_URL = 'https://fastapi.metaskepsis.com'; // Replace with your API base URL
 
-export const validateApiKey = async (apiKey) => {
-  if (!apiKey) {
-    throw new Error('Please enter an API key');
-  }
-  const response = await fetch(`${API_BASE_URL}/validate_api_key`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ api_key: apiKey }),
-  });
-  if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.detail || 'Error validating API key');
-  }
-  return true;
-};
 
 export const createPodcasts = (pdfFile, onProgress) => {
   return new Promise((resolve, reject) => {

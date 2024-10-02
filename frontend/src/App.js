@@ -37,9 +37,6 @@ function App() {
   const [podcasts, setPodcasts] = useState({ random: null, last: null });
   const [feedback, setFeedback] = useState('');
   const [experimentIdea, setExperimentIdea] = useState('');
-  const [apiKey, setApiKey] = useState('');
-  const [isApiKeyValid, setIsApiKeyValid] = useState(false);
-  const [showApiKey, setShowApiKey] = useState(false);
   const [selectedPodcast, setSelectedPodcast] = useState(null);
   const [voteState, setVoteState] = useState(VOTE_STATES.DISABLED);
   const [error, setError] = useState(null);
@@ -338,38 +335,7 @@ function App() {
             </div>
             <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="space-y-4">
-                <p className="text-lg text-gray-200">Please provide your own OpenAI key if possible, I am just a poor postdoc. Each podcast costs around 20-30 cents with the feedback application.</p>
-                <p className="text-red-500 text-lg font-bold">We don't keep any keys</p>
-                <div className="flex flex-col space-y-2">
-                  <div className="relative">
-                    <input
-                      type={showApiKey ? "text" : "password"}
-                      placeholder="Enter your OpenAI API key"
-                      value={apiKey}
-                      onChange={handleApiKeyChange}
-                      className={`w-full p-3 bg-gray-800 text-gray-200 text-xl rounded-md border ${
-                        isApiKeyValid ? 'border-green-500' : 'border-gray-700'
-                      } focus:border-gray-500 focus:ring focus:ring-gray-500 focus:ring-opacity-50`}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowApiKey(!showApiKey)}
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
-                    >
-                      {showApiKey ? 'Hide' : 'Show'}
-                    </button>
-                  </div>
-                  <button
-                    onClick={handleValidateApiKey}
-                    className={`w-full py-3 px-4 text-gray-200 text-xl rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition duration-300 ${
-                      isApiKeyValid
-                        ? 'bg-green-600 hover:bg-green-700'
-                        : 'bg-gray-700 hover:bg-gray-600'
-                    }`}
-                  >
-                    {isApiKeyValid ? 'API Key Valid' : 'Validate Key'}
-                  </button>
-                </div>
+                <p className="text-lg text-gray-200">Each podcast costs around 20-30 cents with the feedback application. We appreciate your understanding and support.</p>
               </div>
               <form onSubmit={handleFeedbackSubmit} className="space-y-4 md:col-span-2">
                 <h3 className="text-xl font-light text-gray-100">Provide feedback for the Last podcast to generate gradient</h3>
