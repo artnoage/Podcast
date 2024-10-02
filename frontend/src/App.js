@@ -3,21 +3,18 @@ import { createPodcasts, submitVote, submitFeedback, submitExperimentIdea } from
 import './App.css';
 import LoadingSpinner from './LoadingSpinner';
 
-// New state variable for feedback box
 const FEEDBACK_STATES = {
   DISABLED: 'DISABLED',
   ENABLED: 'ENABLED',
   THANK_YOU: 'THANK_YOU',
 };
 
-// New state variable for voting buttons
 const VOTE_STATES = {
   DISABLED: 'DISABLED',
   ENABLED: 'ENABLED',
   VOTED: 'VOTED',
 };
 
-// Error handling function
 const handleGooglePlayError = (error) => {
   if (error.message.includes('net::ERR_BLOCKED_BY_CLIENT')) {
     console.warn('A request to Google Play was blocked, likely by an ad-blocker. This won\'t affect the app\'s functionality.');
@@ -28,7 +25,6 @@ const handleGooglePlayError = (error) => {
   }
 };
 
-// Add error event listener
 window.addEventListener('error', (event) => {
   handleGooglePlayError(event.error);
 });

@@ -156,7 +156,6 @@ async def get_podcast_audio(task_id: str, podcast_type: str):
 async def process_podcast_creation(
     task_id: str, 
     pdf_bytes: bytes, 
-    api_key: Optional[str], 
     summarizer_model: str,
     scriptwriter_model: str,
     enhancer_model: str,
@@ -164,8 +163,6 @@ async def process_podcast_creation(
 ):
     try:
         logger.info(f"Processing podcast creation for task {task_id}")
-        api_key_status = "provided" if api_key else "not provided"
-        logger.info(f"Creating podcasts with API key status: {api_key_status}")
         logger.info(f"Using models - Summarizer: {summarizer_model}, Scriptwriter: {scriptwriter_model}, Enhancer: {enhancer_model}")
 
         all_timestamps = get_all_timestamps()
@@ -183,8 +180,7 @@ async def process_podcast_creation(
                     summarizer_model=summarizer_model,
                     scriptwriter_model=scriptwriter_model,
                     enhancer_model=enhancer_model,
-                    provider=provider,
-                    api_key=api_key
+                    provider=provider
                 )
 
                 logger.info(f"Podcast created successfully for timestamp {timestamp}")
