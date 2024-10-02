@@ -103,7 +103,6 @@ async def create_podcasts_endpoint(
             process_podcast_creation, 
             task_id, 
             pdf_bytes, 
-            api_key, 
             summarizer_model, 
             scriptwriter_model, 
             enhancer_model, 
