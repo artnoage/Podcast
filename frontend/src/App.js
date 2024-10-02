@@ -207,7 +207,52 @@ function App() {
                 {error}
               </div>
             )}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="mt-8">
+              <h3 className="text-2xl font-light text-gray-100 mb-4">Upload Your PDF</h3>
+              <div 
+                className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center"
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const files = e.dataTransfer.files;
+                  if (files.length) {
+                    handleFileUpload({ target: { files: [files[0]] } });
+                  }
+                }}
+              >
+                <input
+                  type="file"
+                  accept=".pdf"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                  id="file-upload"
+                />
+                <label 
+                  htmlFor="file-upload"
+                  className="cursor-pointer text-gray-300 hover:text-gray-100"
+                >
+                  <span className="text-xl">Drag and drop your PDF here, or click to select a file</span>
+                </label>
+                {pdfFile && (
+                  <p className="mt-2 text-gray-300">Selected file: {pdfFile.name}</p>
+                )}
+              </div>
+              {progress && (
+                <div className="mt-2 text-sm text-gray-300">{progress}</div>
+              )}
+              <button
+                onClick={handleCreatePodcasts}
+                className="w-full mt-4 py-2 px-4 bg-gray-700 text-gray-200 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition duration-300 text-xl font-light"
+                disabled={isLoading || !pdfFile}
+              >
+                {isLoading ? <LoadingSpinner /> : 'Create Podcasts'}
+              </button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
               <div className="space-y-4 md:col-span-3">
                 <div className="flex flex-col md:flex-row md:space-x-4">
                   <div className="md:w-full space-y-4">
@@ -287,51 +332,6 @@ function App() {
                   </div>
                 </div>
               </div>
-            </div>
-            <div className="mt-8">
-              <h3 className="text-2xl font-light text-gray-100 mb-4">Upload Your PDF</h3>
-              <div 
-                className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center"
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                }}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  const files = e.dataTransfer.files;
-                  if (files.length) {
-                    handleFileUpload({ target: { files: [files[0]] } });
-                  }
-                }}
-              >
-                <input
-                  type="file"
-                  accept=".pdf"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                  id="file-upload"
-                />
-                <label 
-                  htmlFor="file-upload"
-                  className="cursor-pointer text-gray-300 hover:text-gray-100"
-                >
-                  <span className="text-xl">Drag and drop your PDF here, or click to select a file</span>
-                </label>
-                {pdfFile && (
-                  <p className="mt-2 text-gray-300">Selected file: {pdfFile.name}</p>
-                )}
-              </div>
-              {progress && (
-                <div className="mt-2 text-sm text-gray-300">{progress}</div>
-              )}
-              <button
-                onClick={handleCreatePodcasts}
-                className="w-full mt-4 py-2 px-4 bg-gray-700 text-gray-200 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition duration-300 text-xl font-light"
-                disabled={isLoading || !pdfFile}
-              >
-                {isLoading ? <LoadingSpinner /> : 'Create Podcasts'}
-              </button>
             </div>
             <div className="mt-8">
               <form onSubmit={handleFeedbackSubmit} className="space-y-4">
