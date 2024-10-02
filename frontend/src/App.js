@@ -319,11 +319,8 @@ function App() {
                 </div>
               </div>
             </div>
-            <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="space-y-4">
-                <p className="text-lg text-gray-200">Each podcast costs around 20-30 cents with the feedback application. We appreciate your understanding and support.</p>
-              </div>
-              <form onSubmit={handleFeedbackSubmit} className="space-y-4 md:col-span-2">
+            <div className="mt-8">
+              <form onSubmit={handleFeedbackSubmit} className="space-y-4">
                 <h3 className="text-xl font-light text-gray-100">Provide feedback for the Last podcast to generate gradient</h3>
                 <p className="text-red-500 text-sm">Please provide feedback only if you think it's necessary</p>
                 {feedbackState === FEEDBACK_STATES.THANK_YOU ? (
@@ -337,7 +334,7 @@ function App() {
                       onChange={(e) => setFeedback(e.target.value)}
                       placeholder="Share your thoughts on the Last podcast..."
                       className="w-full p-3 bg-gray-800/50 text-gray-200 rounded-md border border-gray-700 focus:border-gray-500 focus:ring focus:ring-gray-500 focus:ring-opacity-50"
-                      rows={4}
+                      rows={6}
                       disabled={feedbackState === FEEDBACK_STATES.DISABLED}
                     />
                     <button
