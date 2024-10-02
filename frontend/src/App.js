@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { validateApiKey, createPodcasts, submitVote, submitFeedback, submitExperimentIdea } from './api';
+import { createPodcasts, submitVote, submitFeedback, submitExperimentIdea } from './api';
 import './App.css';
 import LoadingSpinner from './LoadingSpinner';
 
@@ -176,11 +176,6 @@ function App() {
     }
   };
 
-  const handleApiKeyChange = (event) => {
-    const newApiKey = event.target.value;
-    setApiKey(newApiKey);
-    setIsApiKeyValid(false);
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-gray-200">
