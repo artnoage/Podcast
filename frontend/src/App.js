@@ -225,13 +225,6 @@ function App() {
                           cursor-pointer"
                       />
                     </label>
-                    <button
-                      onClick={handleCreatePodcasts}
-                      className="w-full py-3 px-6 bg-gray-700 text-gray-200 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition duration-300 text-xl font-light"
-                      disabled={isLoading}
-                    >
-                      {isLoading ? <LoadingSpinner /> : 'Create Podcasts'}
-                    </button>
                     {progress && (
                       <div className="mt-2 text-sm text-gray-300">{progress}</div>
                     )}
@@ -290,7 +283,14 @@ function App() {
                         )}
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-4 mt-4">
+                    <div className="grid grid-cols-3 gap-4 mt-4">
+                      <button
+                        onClick={handleCreatePodcasts}
+                        className="w-full py-2 px-4 bg-gray-700 text-gray-200 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition duration-300 text-xl font-light"
+                        disabled={isLoading}
+                      >
+                        {isLoading ? <LoadingSpinner /> : 'Create Podcasts'}
+                      </button>
                       <button
                         onClick={() => handlePodcastSelection('random')}
                         disabled={voteState !== VOTE_STATES.ENABLED}
