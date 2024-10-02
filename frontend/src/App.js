@@ -194,7 +194,6 @@ function App() {
             where <span className="font-normal text-blue-400 animate-pulse">you</span>{' '}
             <span className="font-normal">are the</span>{' '}
             <span className="font-normal text-blue-400 animate-pulse"> gradient</span>
-            <span className="block">Site is down for technical reasons</span>
           </p>
         </div>
   
