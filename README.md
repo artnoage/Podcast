@@ -39,15 +39,6 @@ This project implements an automated workflow for creating engaging podcasts fro
 
 This integrated system creates a feedback loop where each podcast generation, user interaction, and optimization cycle contributes to improving the overall quality of the AI-generated podcasts. The use of timestamps throughout the process ensures version control and allows for detailed analysis of the system's evolution over time.
 
-## TextGrad and Weight Clipping
-
-This project utilizes concepts from TextGrad, a novel approach to optimization in the realm of natural language processing. One key feature is the implementation of a "weight clipper" concept, which draws an interesting parallel to traditional stochastic gradient descent (SGD) optimization techniques.
-
-In standard SGD, techniques like gradient clipping are often used to prevent exploding gradients and ensure stable training. Similarly, in our implementation inspired by TextGrad, the weight clipper serves to constrain the modifications made to prompts or other textual elements during the optimization process. This helps maintain coherence and prevents drastic, potentially nonsensical changes to the text.
-
-Just as gradient clipping in SGD keeps the optimization process within reasonable bounds, the weight clipper in our system ensures that textual modifications remain meaningful and aligned with the original intent. This approach adapts optimization concepts to the unique challenges of working with natural language, bridging the gap between traditional machine learning techniques and the emerging field of language model optimization.
-
-The TextGrad concept was introduced by Mert Yuksekgonul, Federico Bianchi, Joseph Boen, Sheng Liu, Zhi Huang, Carlos Guestrin, and James Zou. While they are not contributors to this project, their work has informed our approach to prompt optimization.
 
 ## Timestamps
 
@@ -191,3 +182,12 @@ npm --version
 This project uses OpenAI's GPT models, which require an API key and may incur costs. Ensure you have appropriate credits or billing set up with OpenAI.
 
 For detailed information on setup, usage, and the self-improvement mechanism, please refer to the sections below.
+
+## TextGrad and Weight Clipping
+
+
+This project draws inspiration from TextGrad, a novel approach to optimization in natural language processing introduced by Mert Yuksekgonul, Federico Bianchi, Joseph Boen, Sheng Liu, Zhi Huang, Carlos Guestrin, and James Zou.
+
+An additional feature implemented here is a "weight clipper" concept, which draws an interesting parallel to gradient clipping in traditional stochastic gradient descent (SGD). In SGD, gradient clipping prevents exploding gradients and ensures stable training. Similarly, in this TextGrad-inspired implementation, the weight clipper constrains modifications to prompts or other textual elements during the optimization process. This helps maintain coherence, prevents drastic changes to the text, and keeps textual modifications meaningful and aligned with the original intent. This approach adapts optimization concepts to the unique challenges of working with natural language, bridging the gap between traditional machine learning techniques and language model optimization.
+
+Another challenge addressed in this project is applying gradients to a chain of agents in LangGraph. The solution implemented here uses a role-specific loss function for each agent, while providing the same final feedback to all agents. This approach allows each agent to determine independently what changes to make based on their specific role and the overall feedback. It's worth noting that feedback allocation is a distinct and complex problem in reinforcement learning, and there's no one-size-fits-all solution. By implementing this method, the system attempts to optimize the entire chain of agents while respecting their individual functions within the larger process, though it's an area that likely warrants further exploration and refinement.
