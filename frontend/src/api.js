@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.REACT_APP_ENVIRONMENT === 'server' 
+const API_BASE_URL = process.env.REACT_APP_ENVIRONMENT === 'production' 
   ? 'https://fastapi.metaskepsis.com' 
   : 'http://localhost:8000';
 
