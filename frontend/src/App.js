@@ -351,7 +351,7 @@ function App() {
               <form onSubmit={handleFeedbackSubmit} className="space-y-4">
                 <h3 className="text-xl font-light text-gray-100">Provide feedback for the Last podcast to generate gradient</h3>
                 <p className="text-red-500 text-sm">Please provide feedback only if you think it's necessary</p>
-                <p className="text-red-500 text-sm">Note: Feedback takes 2-3 minutes to be applied. If you want to see any changes you suggest, please try again later.</p>
+                <p className="text-red-500 text-sm">Note: Feedback is processed on the back and takes 2-3 minutes to be applied. You don't have to wait - if you want to see any changes you suggest, please create a new podcast later.</p>
                 {feedbackState === FEEDBACK_STATES.THANK_YOU ? (
                   <div className="w-full p-3 bg-green-600 text-white rounded-md">
                     Thanks for the feedback! You were a helpful gradient. Have a nice day!
