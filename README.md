@@ -76,6 +76,37 @@ This project implements an automated workflow for creating engaging podcasts fro
 - Required Python packages (install via `pip install -r requirements.txt`)
 - Node.js and npm for the frontend
 
+### Installing Node.js and npm
+
+Node.js and npm are required for the frontend. Here's how to install them on different operating systems:
+
+#### Windows:
+1. Download the installer from the official Node.js website: https://nodejs.org/
+2. Run the installer and follow the installation wizard.
+3. Restart your computer after installation.
+
+#### macOS:
+1. Using Homebrew (recommended):
+   ```
+   brew install node
+   ```
+2. Alternatively, download the macOS installer from https://nodejs.org/ and run it.
+
+#### Linux:
+For Ubuntu or Debian-based distributions:
+```
+sudo apt update
+sudo apt install nodejs npm
+```
+
+For other distributions, refer to your package manager or the official Node.js documentation.
+
+Verify the installation by running:
+```
+node --version
+npm --version
+```
+
 ## Project Structure
 
 - `src/paudio.py`: Main script for podcast creation
@@ -83,7 +114,7 @@ This project implements an automated workflow for creating engaging podcasts fro
 - `src/simulation.py`: Simulation of the self-improvement process
 - `src/evaluation.py`: Evaluation script for generated podcasts
 - `backend/fast_api_app.py`: FastAPI backend application
-- `creator-front-end/`: React-based frontend application
+- `frontend/`: React-based frontend application
 
 ## Note
 
