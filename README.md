@@ -41,11 +41,13 @@ This integrated system creates a feedback loop where each podcast generation, us
 
 ## TextGrad and Weight Clipping
 
-TextGrad introduces a novel approach to optimization in the realm of natural language processing. One key feature is the implementation of a "weight clipper" concept, which draws an interesting parallel to traditional stochastic gradient descent (SGD) optimization techniques.
+This project utilizes concepts from TextGrad, a novel approach to optimization in the realm of natural language processing. One key feature is the implementation of a "weight clipper" concept, which draws an interesting parallel to traditional stochastic gradient descent (SGD) optimization techniques.
 
-In standard SGD, we often use techniques like gradient clipping to prevent exploding gradients and ensure stable training. Similarly, in TextGrad, the weight clipper serves to constrain the modifications made to prompts or other textual elements during the optimization process. This helps maintain coherence and prevents drastic, potentially nonsensical changes to the text.
+In standard SGD, techniques like gradient clipping are often used to prevent exploding gradients and ensure stable training. Similarly, in our implementation inspired by TextGrad, the weight clipper serves to constrain the modifications made to prompts or other textual elements during the optimization process. This helps maintain coherence and prevents drastic, potentially nonsensical changes to the text.
 
-Just as gradient clipping in SGD keeps the optimization process within reasonable bounds, the weight clipper in TextGrad ensures that textual modifications remain meaningful and aligned with the original intent. This analogy highlights how TextGrad adapts familiar optimization concepts to the unique challenges of working with natural language, bridging the gap between traditional machine learning techniques and the emerging field of language model optimization.
+Just as gradient clipping in SGD keeps the optimization process within reasonable bounds, the weight clipper in our system ensures that textual modifications remain meaningful and aligned with the original intent. This approach adapts optimization concepts to the unique challenges of working with natural language, bridging the gap between traditional machine learning techniques and the emerging field of language model optimization.
+
+The TextGrad concept was introduced by Mert Yuksekgonul, Federico Bianchi, Joseph Boen, Sheng Liu, Zhi Huang, Carlos Guestrin, and James Zou. While they are not contributors to this project, their work has informed our approach to prompt optimization.
 
 ## Timestamps
 
