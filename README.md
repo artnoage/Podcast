@@ -70,7 +70,8 @@ Timestamps are used in this project to version control the prompts used by the A
 
    Options:
    - `<path_to_pdf_file>`: Path to the PDF file you want to convert into a podcast.
-   - `--timestamp YYYYMMDD_HHMMSS`: (Optional) Use prompts from a specific timestamp. If not provided, it uses the most recent prompts.
+   - `--timestamp YYYYMMDD_HHMMSS`: (Optional) Use prompts from a specific timestamp.
+   - `--timestamp last`: Use the most recent timestamp (default behavior if no timestamp is provided).
 
    The script will:
    - Create a podcast using the specified or most recent prompts
@@ -80,10 +81,17 @@ Timestamps are used in this project to version control the prompts used by the A
    - Use the feedback to optimize the prompts for future use, creating a new set of prompts with the new timestamp
 
    How it works with timestamps:
-   - If no timestamp is provided, it uses the most recent set of prompts
+   - If no timestamp is provided or 'last' is specified, it uses the most recent set of prompts
    - It generates a new timestamp for the created podcast
    - Feedback and optimized prompts are associated with this new timestamp
    - This allows for tracking the evolution of prompts over time and using specific versions when needed
+
+   Examples:
+   ```
+   python src/paudiowithfeedback.py path/to/your/file.pdf
+   python src/paudiowithfeedback.py path/to/your/file.pdf --timestamp 20230615_120000
+   python src/paudiowithfeedback.py path/to/your/file.pdf --timestamp last
+   ```
 
 3. **Run Self-Improving Simulation:**
    ```

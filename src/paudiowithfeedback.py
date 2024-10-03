@@ -11,8 +11,8 @@ except ImportError:
     from utils.textGDwithWeightClipping import optimize_prompt
 
 async def create_podcast_with_feedback(pdf_path, timestamp=None):
-    # Get the last timestamp if not provided
-    if timestamp is None or timestamp == "last":
+    # Get the last timestamp if not provided or if 'last' is specified
+    if timestamp is None or timestamp.lower() == "last":
         timestamp = get_last_timestamp()
     
     print(f"Creating podcast using timestamp: {timestamp}")
@@ -73,7 +73,7 @@ if __name__ == "__main__":
     
     parser = argparse.ArgumentParser(description="Create a podcast with feedback from a PDF file.")
     parser.add_argument("pdf_path", help="Path to the PDF file")
-    parser.add_argument("--timestamp", help="Timestamp to use for prompts (format: YYYYMMDD_HHMMSS or 'last' for the most recent)")
+    parser.add_argument("--timestamp", help="Timestamp to use for prompts (format: YYYYMMDD_HHMMSS, or 'last' for the most recent). If not provided, uses the most recent.")
     args = parser.parse_args()
     
     asyncio.run(create_podcast_with_feedback(args.pdf_path, args.timestamp))
