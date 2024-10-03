@@ -149,4 +149,8 @@ if __name__ == "__main__":
     parser.add_argument("--timestamp", help="Timestamp to use for prompts (format: YYYYMMDD_HHMMSS or 'last' for the most recent)")
     args = parser.parse_args()
     
-    asyncio.run(create_podcast_audio(args.pdf_path, args.timestamp))
+    # Read the PDF file as bytes
+    with open(args.pdf_path, 'rb') as pdf_file:
+        pdf_content = pdf_file.read()
+    
+    asyncio.run(create_podcast_audio(pdf_content, args.timestamp))
