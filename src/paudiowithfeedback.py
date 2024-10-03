@@ -2,7 +2,7 @@ import asyncio
 import os
 from datetime import datetime
 from src.paudio import create_podcast_audio
-from src.utils.utils import get_last_timestamp, add_feedback_to_state
+from src.utils.utils import get_last_timestamp, add_feedback_to_state, PROJECT_ROOT
 from src.utils.textGDwithWeightClipping import optimize_prompt
 
 async def create_podcast_with_feedback(pdf_path, timestamp=None):
