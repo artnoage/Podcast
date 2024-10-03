@@ -36,3 +36,6 @@ yarn-debug.log*
 yarn-error.log*
 
 *.txt
+votes.json
+!requirements.txt
+experiment_ideas.md
