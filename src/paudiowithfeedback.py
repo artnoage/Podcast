@@ -65,5 +65,10 @@ async def create_podcast_with_feedback(pdf_path, timestamp=None):
         print("No feedback provided. Prompts will not be optimized.")
 
 if __name__ == "__main__":
-    pdf_path = input("Enter the path to your PDF file: ")
-    asyncio.run(create_podcast_with_feedback(pdf_path))
+    import argparse
+    
+    parser = argparse.ArgumentParser(description="Create a podcast with feedback from a PDF file.")
+    parser.add_argument("pdf_path", help="Path to the PDF file")
+    args = parser.parse_args()
+    
+    asyncio.run(create_podcast_with_feedback(args.pdf_path))
