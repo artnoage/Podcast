@@ -64,18 +64,26 @@ Timestamps are used in this project to version control the prompts used by the A
 
 2. **Generate a Podcast with Feedback:**
    ```
-   python src/paudiowithfeedback.py <path_to_pdf_file>
+   python src/paudiowithfeedback.py <path_to_pdf_file> [--timestamp YYYYMMDD_HHMMSS]
    ```
    This script creates a podcast and allows you to provide feedback, which is then used to optimize the prompts.
 
    Options:
    - `<path_to_pdf_file>`: Path to the PDF file you want to convert into a podcast.
+   - `--timestamp YYYYMMDD_HHMMSS`: (Optional) Use prompts from a specific timestamp. If not provided, it uses the most recent prompts.
 
    The script will:
-   - Create a podcast using the most recent prompts
-   - Save the audio and dialogue text
+   - Create a podcast using the specified or most recent prompts
+   - Save the audio and dialogue text with a new timestamp
    - Ask for your feedback
-   - Use the feedback to optimize the prompts for future use
+   - Add the feedback to the podcast state with the new timestamp
+   - Use the feedback to optimize the prompts for future use, creating a new set of prompts with the new timestamp
+
+   How it works with timestamps:
+   - If no timestamp is provided, it uses the most recent set of prompts
+   - It generates a new timestamp for the created podcast
+   - Feedback and optimized prompts are associated with this new timestamp
+   - This allows for tracking the evolution of prompts over time and using specific versions when needed
 
 3. **Run Self-Improving Simulation:**
    ```
