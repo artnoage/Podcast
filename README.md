@@ -67,6 +67,8 @@ Timestamps are used in this project to version control the prompts used by the A
    python src/simulation.py
    ```
    This script runs a simulation of the podcast creation and prompt optimization process.
+   
+   Note: Before running the simulation, make sure to add PDF files to the `arxiv_papers` folder in the project root directory. The simulation will randomly select files from this folder for processing.
 
 3. **Evaluate Self-Improvement Process:**
    ```
