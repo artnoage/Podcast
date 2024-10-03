@@ -1,4 +1,6 @@
-const API_BASE_URL = 'https://fastapi.metaskepsis.com'; // Replace with your API base URL
+const API_BASE_URL = process.env.REACT_APP_ENVIRONMENT === 'server' 
+  ? 'https://fastapi.metaskepsis.com' 
+  : 'http://localhost:8000';
 
 
 export const createPodcasts = (pdfFile, onProgress) => {
