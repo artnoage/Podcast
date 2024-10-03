@@ -26,10 +26,17 @@ async def create_podcast_with_feedback(pdf_path, timestamp=None):
     print(f"New timestamp: {new_timestamp}")
     
     # Save the audio file
-    audio_filename = f"podcast_{new_timestamp}.mp3"
+    os.makedirs(os.path.join(PROJECT_ROOT, "audios"), exist_ok=True)
+    audio_filename = os.path.join(PROJECT_ROOT, "audios", f"podcast_{new_timestamp}.mp3")
     with open(audio_filename, "wb") as audio_file:
         audio_file.write(audio_bytes)
     print(f"Audio saved as: {audio_filename}")
+    
+    # Save the dialogue text
+    dialogue_filename = os.path.join(PROJECT_ROOT, "audios", f"dialogue_{new_timestamp}.txt")
+    with open(dialogue_filename, "w", encoding="utf-8") as dialogue_file:
+        dialogue_file.write(dialogue_text)
+    print(f"Dialogue saved as: {dialogue_filename}")
     
     # Print the dialogue
     print("\nGenerated Dialogue:")
