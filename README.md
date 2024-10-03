@@ -62,7 +62,22 @@ Timestamps are used in this project to version control the prompts used by the A
    python src/paudio.py path/to/your/file.pdf --timestamp last
    ```
 
-2. **Run Self-Improving Simulation:**
+2. **Generate a Podcast with Feedback:**
+   ```
+   python src/paudiowithfeedback.py <path_to_pdf_file>
+   ```
+   This script creates a podcast and allows you to provide feedback, which is then used to optimize the prompts.
+
+   Options:
+   - `<path_to_pdf_file>`: Path to the PDF file you want to convert into a podcast.
+
+   The script will:
+   - Create a podcast using the most recent prompts
+   - Save the audio and dialogue text
+   - Ask for your feedback
+   - Use the feedback to optimize the prompts for future use
+
+3. **Run Self-Improving Simulation:**
    ```
    python src/simulation.py
    ```
@@ -70,13 +85,13 @@ Timestamps are used in this project to version control the prompts used by the A
    
    Note: Before running the simulation, make sure to add PDF files to the `arxiv_papers` folder in the project root directory. The simulation will randomly select files from this folder for processing.
 
-3. **Evaluate Self-Improvement Process:**
+4. **Evaluate Self-Improvement Process:**
    ```
    python src/evaluation.py
    ```
    This script evaluates the quality of generated podcasts over time.
 
-4. **Web Interface:**
+5. **Web Interface:**
    - Start the backend:
      ```
      uvicorn backend.fast_api_app:app --reload
