@@ -6,9 +6,9 @@ from openai import OpenAI
 import logging
 from pydub import AudioSegment
 try:
-    from src.utils.utils import create_podcast, parse_dialogue, save_podcast_state, PROJECT_ROOT
+    from src.utils.utils import create_podcast, parse_dialogue, save_podcast_state, PROJECT_ROOT, get_last_timestamp
 except ImportError:
-    from utils.utils import create_podcast, parse_dialogue, save_podcast_state, PROJECT_ROOT
+    from utils.utils import create_podcast, parse_dialogue, save_podcast_state, PROJECT_ROOT, get_last_timestamp
 
 
 # Set up logging
@@ -80,7 +80,14 @@ async def create_podcast_audio(pdf_content, timestamp=None, summarizer_model="gp
     """
     Creates an audio podcast from the given PDF content using the provided timestamp and models.
     """
-    print(f"Using prompts from timestamp: {timestamp or 'default'}")
+    if timestamp == "last":
+        timestamp = get_last_timestamp()
+    
+    if timestamp:
+        print(f"Using prompts from timestamp: {timestamp}")
+    else:
+        print("Using default prompts")
+    
     print(f"Using models - Summarizer: {summarizer_model}, Scriptwriter: {scriptwriter_model}, Enhancer: {enhancer_model}")
     
     # Create the podcast
@@ -139,7 +146,7 @@ if __name__ == "__main__":
     
     parser = argparse.ArgumentParser(description="Create a podcast audio from a PDF file.")
     parser.add_argument("pdf_path", help="Path to the PDF file")
-    parser.add_argument("--timestamp", help="Timestamp to use for prompts (format: YYYYMMDD_HHMMSS)")
+    parser.add_argument("--timestamp", help="Timestamp to use for prompts (format: YYYYMMDD_HHMMSS or 'last' for the most recent)")
     args = parser.parse_args()
     
     asyncio.run(create_podcast_audio(args.pdf_path, args.timestamp))

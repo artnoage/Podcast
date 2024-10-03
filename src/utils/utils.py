@@ -50,7 +50,12 @@ def get_all_timestamps():
 
 def get_last_timestamp():
     timestamps = get_all_timestamps()
-    return timestamps[-1] if timestamps else None
+    if not timestamps:
+        print("No timestamps found. Using default prompts.")
+        return None
+    last_timestamp = timestamps[-1]
+    print(f"Using last timestamp: {last_timestamp}")
+    return last_timestamp
 
 
 def load_prompt(role, timestamp=None):
