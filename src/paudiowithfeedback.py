@@ -17,9 +17,13 @@ async def create_podcast_with_feedback(pdf_path, timestamp=None):
     
     print(f"Creating podcast using timestamp: {timestamp}")
     
+    # Read the PDF file as bytes
+    with open(pdf_path, 'rb') as pdf_file:
+        pdf_content = pdf_file.read()
+    
     # Create the podcast audio
     audio_bytes, dialogue_text, new_timestamp = await create_podcast_audio(
-        pdf_path,
+        pdf_content,
         timestamp=timestamp,
         summarizer_model="gpt-4o-mini",
         scriptwriter_model="gpt-4o-mini",
