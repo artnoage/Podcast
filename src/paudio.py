@@ -9,7 +9,7 @@ try:
     from src.utils.utils import create_podcast, parse_dialogue, save_podcast_state, PROJECT_ROOT, get_last_timestamp
 except ImportError:
     from utils.utils import create_podcast, parse_dialogue, save_podcast_state, PROJECT_ROOT, get_last_timestamp
-
+import threading
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -40,7 +40,6 @@ def generate_tts(text, voice="onyx"):
         raise
 
 # Create a thread-local storage for OpenAI clients
-import threading
 thread_local = threading.local()
 
 def get_openai_client():
