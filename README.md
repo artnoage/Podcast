@@ -97,15 +97,26 @@ Timestamps are used in this project to version control the prompts used by the A
    ```
    python src/simulation.py
    ```
-   This script runs a simulation of the podcast creation and prompt optimization process.
+   This script runs a simulation of the podcast creation and prompt optimization process:
+   - It randomly selects PDF files from the `arxiv_papers` folder in the project root directory.
+   - For each selected PDF, it generates a podcast using the current prompts.
+   - An AI agent provides feedback on the generated podcast, simulating human feedback.
+   - Based on this feedback, the system optimizes the prompts for future use.
+   - This process repeats, simulating the improvement of the system over time without human intervention.
    
-   Note: Before running the simulation, make sure to add PDF files to the `arxiv_papers` folder in the project root directory. The simulation will randomly select files from this folder for processing.
+   Note: Before running the simulation, make sure to add PDF files to the `arxiv_papers` folder.
 
 4. **Evaluate Self-Improvement Process:**
    ```
    python src/evaluation.py
    ```
-   This script evaluates the quality of generated podcasts over time.
+   This script evaluates the quality of generated podcasts over time:
+   - It randomly selects PDF files from the `arxiv_papers` folder.
+   - For each selected PDF, it generates two podcasts:
+     1. One using randomly selected prompts from different timestamps.
+     2. Another using the most recent prompts.
+   - An AI evaluator then compares these two podcasts and chooses the better one.
+   - This process helps assess whether the system's prompts are improving over time.
 
 5. **Web Interface:**
    - Start the backend:
