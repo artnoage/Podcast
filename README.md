@@ -40,22 +40,39 @@ This project implements an automated workflow for creating engaging podcasts fro
    - Prompts evolve over time, stored with timestamps for version control.
    - The system uses the most recent optimized prompts for each new podcast creation.
 
+## Timestamps
+
+Timestamps are used in this project to version control the prompts used by the AI agents. Each time the system generates a podcast and receives feedback, it optimizes the prompts and saves them with a new timestamp. This allows the system to track the evolution of prompts over time and use the most recent or specific versions when creating new podcasts.
+
 ## Usage
 
 1. **Generate a Podcast:**
    ```
    python src/paudio.py <path_to_pdf_file> [--timestamp YYYYMMDD_HHMMSS]
    ```
+   Options:
+   - `<path_to_pdf_file>`: Path to the PDF file you want to convert into a podcast.
+   - `--timestamp YYYYMMDD_HHMMSS`: (Optional) Use prompts from a specific timestamp. If not provided, it uses the most recent prompts.
+   - `--timestamp last`: Use the most recent timestamp (same as not providing a timestamp).
+
+   Examples:
+   ```
+   python src/paudio.py path/to/your/file.pdf
+   python src/paudio.py path/to/your/file.pdf --timestamp 20230615_120000
+   python src/paudio.py path/to/your/file.pdf --timestamp last
+   ```
 
 2. **Run Self-Improving Simulation:**
    ```
    python src/simulation.py
    ```
+   This script runs a simulation of the podcast creation and prompt optimization process.
 
 3. **Evaluate Self-Improvement Process:**
    ```
    python src/evaluation.py
    ```
+   This script evaluates the quality of generated podcasts over time.
 
 4. **Web Interface:**
    - Start the backend:
