@@ -4,24 +4,33 @@ This project implements an automated workflow for creating engaging podcasts fro
 
 ## Key Components
 
-1. **Podcast Creation (paudio.py)**
+1. **Podcast Creation (src/paudio.py)**
    - Extracts text from PDF files
    - Utilizes AI agents for summarization, script writing, and script enhancement
    - Generates audio using text-to-speech technology
    - Creates a complete podcast from academic content
 
-2. **Prompt Optimization (src/utils/textGDwithWeightClipping.py)**
+2. **Podcast Creation with Feedback (src/paudiowithfeedback.py)**
+   - Extends the functionality of paudio.py
+   - Allows users to provide feedback on generated podcasts
+   - Integrates with the prompt optimization process
+
+3. **Prompt Optimization (src/utils/textGDwithWeightClipping.py)**
    - Uses TextGrad for gradient-based optimization of prompts
    - Implements a WeightClippingAgent to maintain prompt generality
-   - Continuously improves the system based on user feedback
+   - Continuously improves the system based on user or simulated feedback
 
-3. **Simulation and Evaluation**
+4. **Simulation (src/simulation.py)**
    - Simulates the podcast creation and improvement process
-   - Evaluates the quality of generated podcasts over time
+   - Uses AI-generated feedback to optimize prompts without human intervention
 
-4. **Web Interface**
-   - React-based frontend for user interaction
-   - FastAPI backend for handling requests and managing the podcast creation process
+5. **Evaluation (src/evaluation.py)**
+   - Evaluates the quality of generated podcasts over time
+   - Compares podcasts created with different prompt versions
+
+6. **Web Interface**
+   - React-based frontend for user interaction (frontend/)
+   - FastAPI backend for handling requests and managing the podcast creation process (backend/fast_api_app.py)
 
 ## How It Works
 
@@ -29,16 +38,29 @@ This project implements an automated workflow for creating engaging podcasts fro
    - The system reads a PDF file and extracts its content.
    - AI agents summarize the content, create a script, and enhance it with engaging dialogue.
    - Text-to-speech technology converts the script into audio.
+   - The podcast is saved with a unique timestamp.
 
-2. **Prompt Optimization:**
-   - User feedback is collected on generated podcasts.
+2. **Feedback Collection and Prompt Optimization:**
+   - Users can provide feedback on generated podcasts using paudiowithfeedback.py.
+   - Feedback is stored with the podcast's timestamp.
    - TextGrad optimizes the prompts used by AI agents based on this feedback.
    - The WeightClippingAgent ensures prompts remain general and applicable across topics.
+   - New optimized prompts are saved with a new timestamp.
 
 3. **Continuous Improvement:**
    - Each podcast creation cycle contributes to the system's learning.
    - Prompts evolve over time, stored with timestamps for version control.
-   - The system uses the most recent optimized prompts for each new podcast creation.
+   - The system uses the most recent optimized prompts for each new podcast creation by default.
+   - Users can specify older timestamps to use previous versions of prompts if needed.
+
+4. **Simulation and Evaluation:**
+   - The simulation process automates podcast creation and feedback using AI agents.
+   - The evaluation process compares podcasts created with different prompt versions.
+   - These processes help assess and validate the system's improvement over time.
+
+5. **Web Interface:**
+   - Provides a user-friendly way to interact with the system.
+   - Allows users to upload PDFs, generate podcasts, and provide feedback through a web browser.
 
 ## Timestamps
 
