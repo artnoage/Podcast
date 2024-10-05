@@ -183,6 +183,10 @@ This project uses OpenAI's GPT models, which require an API key and may incur co
 
 For detailed information on setup, usage, and the self-improvement mechanism, please refer to the sections below.
 
+## Try It Out
+
+You can try this AI-powered podcast creation tool for free at [https://www.metaskepsis.com/](https://www.metaskepsis.com/). Experience the power of AI-generated podcasts and see how this system can transform academic texts into engaging audio content.
+
 ## TextGrad and Weight Clipping
 
 
