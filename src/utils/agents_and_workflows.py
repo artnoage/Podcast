@@ -264,7 +264,7 @@ class FeedbackAgent:
         return feedback
 
 class WeightClippingAgent:
-    def __init__(self, model="gpt-4o", provider="OpenAI"):
+    def __init__(self, model="o1-mini", provider="OpenAI"):
         self.provider = provider
         self.model = self._create_chat_model(model, 0)
         self.prompt_template = self.load_prompt("prompts/weight_clipper_prompt.txt")

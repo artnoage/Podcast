@@ -25,9 +25,9 @@ async def create_podcast_with_feedback(pdf_path, timestamp=None):
     audio_bytes, dialogue_text, new_timestamp = await create_podcast_audio(
         pdf_content,
         timestamp=timestamp,
-        summarizer_model="gpt-4o-mini",
-        scriptwriter_model="gpt-4o-mini",
-        enhancer_model="gpt-4o-mini",
+        summarizer_model="gpt-4o",
+        scriptwriter_model="gpt-4o",
+        enhancer_model="gpt-4o",
         provider="OpenAI"
     )
     
@@ -61,9 +61,9 @@ async def create_podcast_with_feedback(pdf_path, timestamp=None):
         
         # Optimize prompts
         print("\nOptimizing prompts based on feedback...")
-        optimize_prompt("summarizer", timestamp, new_timestamp, "gpt-4o-mini", "gpt-4o-mini")
-        optimize_prompt("scriptwriter", timestamp, new_timestamp, "gpt-4o-mini", "gpt-4o-mini")
-        optimize_prompt("enhancer", timestamp, new_timestamp, "gpt-4o-mini", "gpt-4o-mini")
+        optimize_prompt("summarizer", timestamp, new_timestamp, "gpt-4o", "gpt-4o")
+        optimize_prompt("scriptwriter", timestamp, new_timestamp, "gpt-4o", "gpt-4o")
+        optimize_prompt("enhancer", timestamp, new_timestamp, "gpt-4o", "gpt-4o")
         print("Prompts optimized successfully.")
     else:
         print("No feedback provided. Prompts will not be optimized.")
