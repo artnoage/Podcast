@@ -39,5 +39,5 @@ yarn-error.log*
 votes.json
 !requirements.txt
 experiment_ideas.md
-
+!LICENSE.txt
 audios/
