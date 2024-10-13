@@ -9,6 +9,8 @@ This project implements an automated workflow for creating engaging podcasts fro
   - [Setup Instructions](#setup-instructions)
     - [Prerequisites](#prerequisites)
     - [Backend Setup](#backend-setup)
+      - [Using System Environments](#using-system-environments)
+      - [Using .env file](#using-env-file)
     - [Frontend Setup](#frontend-setup)
   - [Timestamps](#timestamps)
   - [Usage](#usage)
@@ -88,7 +90,7 @@ This integrated system creates a feedback loop where each podcast generation, us
    pip install -r requirements.txt
    ```
 
-4. **Install Rust (required for jiter):**
+4. **Install Rust (Cargo required to install some packages):**
 
     If you received this error from previous step:
     ```
@@ -101,8 +103,29 @@ This integrated system creates a feedback loop where each podcast generation, us
     Make sure you follow instructions carefully for your preferred shell (bash, zsh, etc.) to add Rust to PATH and activating Cargo.
 
 5. **Set up OpenAI API key:**
-   - Create a `.env` file in the project root
-   - Add your OpenAI API key: `OPENAI_API_KEY=your_api_key_here`
+   Obtain your OpenAI API key from `https://platform.openai.com/api-keys`
+   
+   #### Using System Environments
+   - Windows (from Command Prompt):
+        ```
+        set OPENAI_API_KEY=your_openai_api_key_here
+        ```
+   - macOS/Linux (from Terminal):
+        ```
+        export OPENAI_API_KEY=your_openai_api_key_here
+        ```
+
+   #### Using .env file
+   - Copy the `sample.env` to `.env` file in the project root
+     - Windows (from Command Prompt):
+          ```
+          copy sample.env .env
+          ```
+     - macOS/Linux (from Terminal):
+          ```
+          cp sample.env .env
+          ```
+   - Open .env and add your OpenAI API key: `OPENAI_API_KEY=your_api_key_here`
 
 ### Frontend Setup
 
@@ -221,13 +244,14 @@ Timestamps are used in this project to version control the prompts used by the A
    - This process helps assess whether the system's prompts are improving over time.
 
 5. **Start the Web Interface:**
-   - Backend (make sure you setup the OPENAI_API_KEY first):
+   - Backend (make sure you follow setup instructions above first):
      ```
-     uvicorn backend.fast_api_app:app --reload
+     uvicorn fast_api_app:app --reload
      ```
-   - Frontend:
+   - Frontend (make sure you run: npm install inside frontend folder first):
      ```
      cd frontend
+     npm install
      npm start
      ```
    - Access the interface at `http://localhost:3000`
