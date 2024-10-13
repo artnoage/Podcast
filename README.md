@@ -58,8 +58,8 @@ This integrated system creates a feedback loop where each podcast generation, us
 
 ### Prerequisites
 
-- Python 3.9+
-- Rust (for [jiter](https://github.com/pydantic/jiter) installation)
+- Python 3.12
+- Rust (Cargo is required for [jiter](https://github.com/pydantic/jiter) installation)
 - [Uvicorn](https://github.com/encode/uvicorn) (for Python FastAPI)
 - Node.js and npm (for frontend)
 - OpenAI API key
@@ -68,31 +68,39 @@ This integrated system creates a feedback loop where each podcast generation, us
 
 1. **Create and activate a Conda environment:**
    ```
-   conda create -n podcast
+   conda create -n podcast python=3.12
    conda activate podcast
    conda install pip
    ```
 
-2. **Install jiter:**
+   or run as one single command:
    ```
-   cargo install jiter
+   conda create -n podcast python=3.12 -y && conda activate podcast && conda install pip -y
    ```
 
-3. **Install uvicorn:**
+2. **Install uvicorn:**
    ```
    pip install uvicorn
    ```
 
-4. **Install required Python packages:**
+3. **Install required Python packages:**
    ```
    pip install -r requirements.txt
    ```
 
-5. **Install Rust (required for jiter):**
+4. **Install Rust (required for jiter):**
 
-    Follow the instructions at https://www.rust-lang.org/tools/install
+    If you received this error from previous step:
+    ```
+    Cargo, the Rust package manager, is not installed or is not on PATH.
+    ```
+    That means the package (caused the error) requires Rust and Cargo to compile extensions. Install it through
+      the system's package manager, via https://rustup.rs
+    or follow the instructions at https://www.rust-lang.org/tools/install
 
-6. **Set up OpenAI API key:**
+    Make sure you follow instructions carefully for your preferred shell (bash, zsh, etc.) to add Rust to PATH and activating Cargo.
+
+5. **Set up OpenAI API key:**
    - Create a `.env` file in the project root
    - Add your OpenAI API key: `OPENAI_API_KEY=your_api_key_here`
 
@@ -213,7 +221,7 @@ Timestamps are used in this project to version control the prompts used by the A
    - This process helps assess whether the system's prompts are improving over time.
 
 5. **Start the Web Interface:**
-   - Backend:
+   - Backend (make sure you setup the OPENAI_API_KEY first):
      ```
      uvicorn backend.fast_api_app:app --reload
      ```
