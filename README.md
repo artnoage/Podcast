@@ -2,6 +2,23 @@
 
 This project implements an automated workflow for creating engaging podcasts from academic texts using AI-powered agents. The system takes a PDF file as input, processes its content, and generates an audio podcast with playful banter between a host and a guest. It also includes a self-improving mechanism that optimizes the prompts used in the podcast creation process based on user feedback.
 
+## Table of Contents
+- [AI-Powered Podcast Creation and Optimization System](#ai-powered-podcast-creation-and-optimization-system)
+  - [Table of Contents](#table-of-contents)
+  - [Key Components and How It Works](#key-components-and-how-it-works)
+  - [Setup Instructions](#setup-instructions)
+    - [Prerequisites](#prerequisites)
+    - [Backend Setup](#backend-setup)
+      - [Using System Environments](#using-system-environments)
+      - [Using .env file](#using-env-file)
+    - [Frontend Setup](#frontend-setup)
+  - [Timestamps](#timestamps)
+  - [Usage](#usage)
+  - [Project Structure](#project-structure)
+  - [Note](#note)
+  - [Try It Out](#try-it-out)
+  - [TextGrad and Weight Clipping](#textgrad-and-weight-clipping)
+
 ## Key Components and How It Works
 
 1. **Podcast Creation (src/paudio.py)**
@@ -39,6 +56,114 @@ This project implements an automated workflow for creating engaging podcasts fro
 
 This integrated system creates a feedback loop where each podcast generation, user interaction, and optimization cycle contributes to improving the overall quality of the AI-generated podcasts. The use of timestamps throughout the process ensures version control and allows for detailed analysis of the system's evolution over time.
 
+## Setup Instructions
+
+### Prerequisites
+
+- Python 3.12
+- Rust (Cargo is required for [jiter](https://github.com/pydantic/jiter) installation)
+- [Uvicorn](https://github.com/encode/uvicorn) (for Python FastAPI)
+- Node.js and npm (for frontend)
+- OpenAI API key
+
+### Backend Setup
+
+1. **Create and activate a Conda environment:**
+   ```
+   conda create -n podcast python=3.12
+   conda activate podcast
+   conda install pip
+   ```
+
+   or run as one single command:
+   ```
+   conda create -n podcast python=3.12 -y && conda activate podcast && conda install pip -y
+   ```
+
+2. **Install uvicorn:**
+   ```
+   pip install uvicorn
+   ```
+
+3. **Install required Python packages:**
+   ```
+   pip install -r requirements.txt
+   ```
+
+4. **Install Rust (Cargo required to install some packages):**
+
+    If you received this error from previous step:
+    ```
+    Cargo, the Rust package manager, is not installed or is not on PATH.
+    ```
+    That means the package (caused the error) requires Rust and Cargo to compile extensions. Install it through
+      the system's package manager, via https://rustup.rs
+    or follow the instructions at https://www.rust-lang.org/tools/install
+
+    Make sure you follow instructions carefully for your preferred shell (bash, zsh, etc.) to add Rust to PATH and activating Cargo.
+
+5. **Set up OpenAI API key:**
+   Obtain your OpenAI API key from `https://platform.openai.com/api-keys`
+   
+   #### Using System Environments
+   - Windows (from Command Prompt):
+        ```
+        set OPENAI_API_KEY=your_openai_api_key_here
+        ```
+   - macOS/Linux (from Terminal):
+        ```
+        export OPENAI_API_KEY=your_openai_api_key_here
+        ```
+
+   #### Using .env file
+   - Copy the `sample.env` to `.env` file in the project root
+     - Windows (from Command Prompt):
+          ```
+          copy sample.env .env
+          ```
+     - macOS/Linux (from Terminal):
+          ```
+          cp sample.env .env
+          ```
+   - Open .env and add your OpenAI API key: `OPENAI_API_KEY=your_api_key_here`
+
+### Frontend Setup
+
+1. **Install Node.js and npm:**
+    [Node.js](https://nodejs.org) and npm are required for the frontend. Here's how to install them on different operating systems:
+
+    #### Windows:
+    1. Download the installer from the official Node.js website: https://nodejs.org/
+    2. Run the installer and follow the installation wizard.
+    3. Restart your computer after installation.
+
+    #### macOS:
+    4. Using Homebrew (recommended):
+        ```
+        brew install node
+        ```
+    5. Alternatively, download the macOS installer from https://nodejs.org/ and run it.
+
+    #### Linux:
+        For Ubuntu or Debian-based distributions:
+        ```
+        sudo apt update
+        sudo apt install nodejs npm
+        ```
+
+        For other distributions, refer to your package manager or the official Node.js documentation.
+
+        Verify the installation by running:
+        ```
+        node --version
+        npm --version
+        ```
+
+2. **Install frontend dependencies:**
+    ```
+    cd frontend
+    npm install
+    ```
 
 ## Timestamps
 
@@ -118,64 +243,29 @@ Timestamps are used in this project to version control the prompts used by the A
    - An AI evaluator then compares these two podcasts and chooses the better one.
    - This process helps assess whether the system's prompts are improving over time.
 
-5. **Web Interface:**
-   - Start the backend:
+5. **Start the Web Interface:**
+   - Backend (make sure you follow setup instructions above first):
      ```
-     uvicorn backend.fast_api_app:app --reload
+     uvicorn fast_api_app:app --reload
      ```
-   - Start the frontend:
+   - Frontend (make sure you run: npm install inside frontend folder first):
      ```
      cd frontend
+     npm install
      npm start
      ```
    - Access the interface at `http://localhost:3000`
 
-## Requirements
-
-- Python 3.7+
-- OpenAI API key
-- Required Python packages (install via `pip install -r requirements.txt`)
-- Node.js and npm for the frontend
-
-### Installing Node.js and npm
-
-Node.js and npm are required for the frontend. Here's how to install them on different operating systems:
-
-#### Windows:
-1. Download the installer from the official Node.js website: https://nodejs.org/
-2. Run the installer and follow the installation wizard.
-3. Restart your computer after installation.
-
-#### macOS:
-1. Using Homebrew (recommended):
-   ```
-   brew install node
-   ```
-2. Alternatively, download the macOS installer from https://nodejs.org/ and run it.
-
-#### Linux:
-For Ubuntu or Debian-based distributions:
-```
-sudo apt update
-sudo apt install nodejs npm
-```
-
-For other distributions, refer to your package manager or the official Node.js documentation.
-
-Verify the installation by running:
-```
-node --version
-npm --version
-```
-
 ## Project Structure
 
 - `src/paudio.py`: Main script for podcast creation
+- `src/paudiowithfeedback.py`: Script for podcast creation with feedback collection
 - `src/utils/textGDwithWeightClipping.py`: Prompt optimization script
 - `src/simulation.py`: Simulation of the self-improvement process
 - `src/evaluation.py`: Evaluation script for generated podcasts
 - `backend/fast_api_app.py`: FastAPI backend application
 - `frontend/`: React-based frontend application
+- `requirements.txt`: List of Python dependencies
 
 ## Note
 
@@ -188,7 +278,6 @@ For detailed information on setup, usage, and the self-improvement mechanism, pl
 You can try this AI-powered podcast creation tool for free at [https://www.metaskepsis.com/](https://www.metaskepsis.com/). Experience the power of AI-generated podcasts and see how this system can transform academic texts into engaging audio content.
 
 ## TextGrad and Weight Clipping
-
 
 This project draws inspiration from TextGrad, a novel approach to optimization in natural language processing introduced by Mert Yuksekgonul, Federico Bianchi, Joseph Boen, Sheng Liu, Zhi Huang, Carlos Guestrin, and James Zou.
 

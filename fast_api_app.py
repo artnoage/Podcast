@@ -8,24 +8,58 @@ from datetime import datetime
 from typing import Optional, List, Dict
 from uuid import uuid4
 
-from fastapi import FastAPI, UploadFile, File, Form, HTTPException, BackgroundTasks, Response
+from fastapi import (
+    FastAPI,
+    UploadFile,
+    File,
+    Form,
+    HTTPException,
+    BackgroundTasks,
+    Response,
+)
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import base64
 from pydantic import BaseModel
 from openai import OpenAI
 from fastapi import Request
+from dotenv import load_dotenv
 
 from src.utils.utils import add_feedback_to_state, get_all_timestamps
 from src.utils.textGDwithWeightClipping import optimize_prompt
 from src.paudio import create_podcast_audio
 
 # Set up logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
 
+
+def load_openai_api_key():
+    # Load environment variables from .env file if it exists
+    load_dotenv()
+
+    # Try to get the API key from the environment
+    api_key = os.getenv("OPENAI_API_KEY")
+
+    if not api_key:
+        raise ValueError(
+            "OPENAI_API_KEY is not set. Please set it in your .env file or system environment variables."
+        )
+
+    return api_key
+
+
+try:
+    openai_api_key = load_openai_api_key()
+    client = OpenAI(api_key=openai_api_key)
+except ValueError as e:
+    logger.error(str(e))
+    print(str(e))
+    exit(1)
+
 app = FastAPI()
-client = OpenAI()
 
 # Create the 'static' directory if it doesn't exist
 os.makedirs("static", exist_ok=True)
@@ -44,16 +78,20 @@ app.add_middleware(
 # In-memory task storage (replace with a proper database in production)
 tasks: Dict[str, Dict] = {}
 
+
 class ApiKeyRequest(BaseModel):
     api_key: str
+
 
 class FeedbackRequest(BaseModel):
     feedback: str
     old_timestamp: Optional[str] = None
     new_timestamp: str
 
+
 class VoteRequest(BaseModel):
     timestamp: Optional[str] = None
+
 
 class ExperimentIdeaRequest(BaseModel):
     idea: str
@@ -62,21 +100,25 @@ class ExperimentIdeaRequest(BaseModel):
 VOTES_FILE = "votes.json"
 EXPERIMENT_IDEAS_FILE = "experiment_ideas.md"
 
+
 def load_votes():
     if os.path.exists(VOTES_FILE):
-        with open(VOTES_FILE, 'r') as f:
+        with open(VOTES_FILE, "r") as f:
             content = f.read().strip()
             if content:
                 return json.loads(content)
     return {}
 
+
 def save_votes(votes):
-    with open(VOTES_FILE, 'w') as f:
+    with open(VOTES_FILE, "w") as f:
         json.dump(votes, f)
+
 
 @app.get("/health")
 async def health_check():
     return {"status": "OK"}
+
 
 @app.post("/create_podcasts")
 async def create_podcasts_endpoint(
@@ -85,7 +127,7 @@ async def create_podcasts_endpoint(
     summarizer_model: str = Form("gpt-4o-mini"),
     scriptwriter_model: str = Form("gpt-4o-mini"),
     enhancer_model: str = Form("gpt-4o-mini"),
-    provider: str = Form("OpenAI")
+    provider: str = Form("OpenAI"),
 ):
     logger.info(f"Starting podcast creation. PDF file name: {pdf_content.filename}")
     if not pdf_content:
@@ -100,19 +142,20 @@ async def create_podcasts_endpoint(
         tasks[task_id] = {"status": "processing", "result": None}
 
         background_tasks.add_task(
-            process_podcast_creation, 
-            task_id, 
-            pdf_bytes, 
-            summarizer_model, 
-            scriptwriter_model, 
-            enhancer_model, 
-            provider
+            process_podcast_creation,
+            task_id,
+            pdf_bytes,
+            summarizer_model,
+            scriptwriter_model,
+            enhancer_model,
+            provider,
         )
 
         return {"task_id": task_id}
     except Exception as e:
         logger.error(f"Error in create_podcasts_endpoint: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
+
 
 @app.get("/podcast_status/{task_id}")
 async def get_podcast_status(task_id: str):
@@ -121,33 +164,41 @@ async def get_podcast_status(task_id: str):
         raise HTTPException(status_code=404, detail="Task not found")
     return task
 
+
 @app.get("/get_podcast_audio/{task_id}/{podcast_type}")
 async def get_podcast_audio(task_id: str, podcast_type: str):
     task = tasks.get(task_id)
     if not task or task["status"] != "completed":
-        raise HTTPException(status_code=404, detail="Audio not found or task not completed")
-    
+        raise HTTPException(
+            status_code=404, detail="Audio not found or task not completed"
+        )
+
     podcasts = task["result"]["podcasts"]
     podcast = next((p for p in podcasts if p["type"] == podcast_type), None)
-    
+
     if not podcast:
-        raise HTTPException(status_code=404, detail=f"Podcast of type {podcast_type} not found")
-    
+        raise HTTPException(
+            status_code=404, detail=f"Podcast of type {podcast_type} not found"
+        )
+
     audio_data = base64.b64decode(podcast["audio"])
-    
+
     return Response(content=audio_data, media_type="audio/mpeg")
 
+
 async def process_podcast_creation(
-    task_id: str, 
-    pdf_bytes: bytes, 
+    task_id: str,
+    pdf_bytes: bytes,
     summarizer_model: str,
     scriptwriter_model: str,
     enhancer_model: str,
-    provider: str
+    provider: str,
 ):
     try:
         logger.info(f"Processing podcast creation for task {task_id}")
-        logger.info(f"Using models - Summarizer: {summarizer_model}, Scriptwriter: {scriptwriter_model}, Enhancer: {enhancer_model}")
+        logger.info(
+            f"Using models - Summarizer: {summarizer_model}, Scriptwriter: {scriptwriter_model}, Enhancer: {enhancer_model}"
+        )
 
         all_timestamps = get_all_timestamps()
         logger.info(f"All timestamps: {all_timestamps}")
@@ -159,12 +210,17 @@ async def process_podcast_creation(
         async def create_podcast_subtask(timestamp, podcast_type):
             try:
                 logger.info(f"Creating podcast for timestamp {timestamp}")
-                podcast_audio, dialogue_text, new_timestamp = await create_podcast_audio(
-                    pdf_bytes, timestamp=timestamp,
+                (
+                    podcast_audio,
+                    dialogue_text,
+                    new_timestamp,
+                ) = await create_podcast_audio(
+                    pdf_bytes,
+                    timestamp=timestamp,
                     summarizer_model=summarizer_model,
                     scriptwriter_model=scriptwriter_model,
                     enhancer_model=enhancer_model,
-                    provider=provider
+                    provider=provider,
                 )
 
                 logger.info(f"Podcast created successfully for timestamp {timestamp}")
@@ -174,24 +230,34 @@ async def process_podcast_creation(
                     "timestamp": timestamp,
                     "new_timestamp": new_timestamp,
                     "type": podcast_type,
-                    "audio": base64.b64encode(podcast_audio).decode('utf-8') if podcast_audio else None,
-                    "dialogue": dialogue_text
+                    "audio": base64.b64encode(podcast_audio).decode("utf-8")
+                    if podcast_audio
+                    else None,
+                    "dialogue": dialogue_text,
                 }
             except Exception as e:
-                logger.error(f"Error in create_podcast_subtask for timestamp {timestamp}: {str(e)}", exc_info=True)
+                logger.error(
+                    f"Error in create_podcast_subtask for timestamp {timestamp}: {str(e)}",
+                    exc_info=True,
+                )
                 return {"error": str(e), "timestamp": timestamp, "type": podcast_type}
 
         logger.info("Creating both podcasts concurrently")
         podcasts = await asyncio.gather(
             create_podcast_subtask(random_timestamp, "random"),
-            create_podcast_subtask(last_timestamp, "last")
+            create_podcast_subtask(last_timestamp, "last"),
         )
 
         # Check for errors in podcast creation
         errors = [podcast for podcast in podcasts if "error" in podcast]
         if errors:
-            error_messages = "; ".join([f"{error['type']} podcast: {error['error']}" for error in errors])
-            tasks[task_id] = {"status": "failed", "error": f"Failed to create podcasts: {error_messages}"}
+            error_messages = "; ".join(
+                [f"{error['type']} podcast: {error['error']}" for error in errors]
+            )
+            tasks[task_id] = {
+                "status": "failed",
+                "error": f"Failed to create podcasts: {error_messages}",
+            }
         else:
             logger.info("Podcasts created successfully")
             tasks[task_id] = {"status": "completed", "result": {"podcasts": podcasts}}
@@ -199,6 +265,7 @@ async def process_podcast_creation(
     except Exception as e:
         logger.error(f"Error in process_podcast_creation: {str(e)}", exc_info=True)
         tasks[task_id] = {"status": "failed", "error": str(e)}
+
 
 @app.post("/process_feedback")
 async def process_feedback(request: FeedbackRequest):
@@ -214,14 +281,23 @@ async def process_feedback(request: FeedbackRequest):
         add_feedback_to_state(old_timestamp, feedback)
 
     try:
-        optimize_prompt("summarizer", old_timestamp, new_timestamp, "gpt-4o-mini", "gpt-4o-mini")
-        optimize_prompt("scriptwriter", old_timestamp, new_timestamp, "gpt-4o-mini", "gpt-4o-mini")
-        optimize_prompt("enhancer", old_timestamp, new_timestamp, "gpt-4o-mini", "gpt-4o-mini")
+        optimize_prompt(
+            "summarizer", old_timestamp, new_timestamp, "gpt-4o-mini", "gpt-4o-mini"
+        )
+        optimize_prompt(
+            "scriptwriter", old_timestamp, new_timestamp, "gpt-4o-mini", "gpt-4o-mini"
+        )
+        optimize_prompt(
+            "enhancer", old_timestamp, new_timestamp, "gpt-4o-mini", "gpt-4o-mini"
+        )
     except Exception as e:
         logger.error(f"Error optimizing prompts: {str(e)}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"Error optimizing prompts: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Error optimizing prompts: {str(e)}"
+        )
 
     return {"message": "Feedback processed and prompts optimized"}
+
 
 @app.post("/vote")
 async def vote(request: VoteRequest):
@@ -239,14 +315,18 @@ async def vote(request: VoteRequest):
 @app.post("/submit_experiment_idea")
 async def submit_experiment_idea(request: Request):
     idea = await request.body()
-    idea_text = idea.decode('utf-8')
-    
+    idea_text = idea.decode("utf-8")
+
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     with open(EXPERIMENT_IDEAS_FILE, "a") as f:
-        f.write(f"\n\n---\n\nNew Experiment Idea (submitted on {timestamp}):\n\n{idea_text}\n")
-    
+        f.write(
+            f"\n\n---\n\nNew Experiment Idea (submitted on {timestamp}):\n\n{idea_text}\n"
+        )
+
     return {"message": "Experiment idea submitted successfully"}
+
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)
