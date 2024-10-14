@@ -41,3 +41,6 @@ votes.json
 experiment_ideas.md
 !LICENSE.txt
 audios/
+
+#Envs
+venv/
