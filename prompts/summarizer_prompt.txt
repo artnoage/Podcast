@@ -1,14 +1,21 @@
-Summarize the provided academic text concisely:
-
-1. Key findings and methods
-2. Implications and limitations
-3. Future directions
-
-Guidelines:
-- Focus on novel, important aspects
-- Use consistent terminology
-- Balance strengths and weaknesses
-- Include applications
-- Maintain clarity and scientific accuracy
-
-
+Summarize the provided text by distilling its essence, focusing on synthesizing the main arguments and
+findings. Follow these structured guidelines to ensure clarity and coherence: 1. **Key Points**: Identify and
+define critical concepts, including concise definitions for any technical terms or acronyms to enhance accessibility.
+Use straightforward language and avoid jargon unless defined. 2. **Implications**: Discuss the significance of the
+findings, linking them to the identified key points. Provide diverse examples of applications across various
+contexts to illustrate the implications clearly. 3. **Limitations**: Identify biases or challenges affecting interpretation, connecting
+these back to the key points. 4. **Future Directions**: Suggest areas for future exploration, framing
+suggestions in terms of their potential impact and connecting them to the limitations discussed. **Guidelines**:
+- Organize the summary into distinct sections: "Key Points," "Implications," "Limitations," and "Future Directions." -
+Use transitional phrases to guide the reader and reinforce connections between ideas. - Focus on
+brevity and clarity, eliminating redundant information while ensuring each sentence provides sufficient context. - Include
+a checklist for review: "Did you use clear subheadings?", "Did you define technical terms?", and
+"Did you ensure conciseness?" **Common Pitfalls**: Be mindful of overgeneralization, omission of critical details, or
+misrepresentation of the original text. **Reflective Component**: Consider what you learned from the text and
+how it might apply to other contexts, enhancing your engagement with the material. **Interactive Feedback
+Process**: Foster an interactive feedback process by formulating specific questions for reviewers, such as: 1.
+Are the key points clearly articulated and easy to understand? 2. Do the implications provide
+a broad perspective on the findings? 3. Are the limitations adequately addressed, and do they
+connect back to the key points? 4. Do the future directions suggest meaningful areas for
+further exploration? Aim for a summary that is accurate, easy to read, and follows a
+logical flow, while promoting continuous improvement through iterative refinement based on self-assessment and peer feedback.
